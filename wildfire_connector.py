@@ -37,8 +37,6 @@ import re
 import magic
 import shutil
 
-requests.packages.urllib3.disable_warnings()
-
 
 class WildfireConnector(BaseConnector):
 
