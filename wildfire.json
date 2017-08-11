@@ -14,7 +14,7 @@
     "publisher": "Phantom",
     "consolidate_widgets": true,
     "logo": "pan.png",
-    "license": "Copyright (c) Phantom Cyber Corporation 2016",
+    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
     "configuration": {
       "base_url": {
         "data_type": "string",
