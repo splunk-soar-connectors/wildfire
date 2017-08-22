@@ -1004,7 +1004,7 @@
             "description": "Hash of file/sample to download",
             "data_type": "string",
             "order": 0,
-            "contains": ["md5", "sha256", "wildfire task id"],
+            "contains": [ "md5", "sha256", "wildfire task id" ],
             "required": true,
             "primary": true
           }
@@ -1147,6 +1147,81 @@
             "data_type": "string",
             "column_name": "File Type",
             "column_order": "2"
+          },
+          {
+            "data_path": "summary.total_objects",
+            "data_type": "numeric"
+          },
+          {
+            "data_path": "summary.total_objects_successful",
+            "data_type": "numeric"
+          }
+        ],
+        "versions":"EQ(*)"
+      },
+      {
+        "action": "save report",
+        "description": "Save a PDF of the detonation report to the Vault.",
+        "type": "investigate",
+        "identifier": "save_report",
+        "read_only": true,
+        "lock": {
+          "enabled": false
+        },
+        "parameters": {
+          "id": {
+            "description": "File MD5 or Sha256 to get the results of",
+            "data_type": "string",
+            "order": 0,
+            "contains": [ "md5", "sha256", "wildfire task id" ],
+            "required": true,
+            "primary": true
+          }
+        },
+        "render": {
+          "width": 12,
+          "title": "Save Report",
+          "type": "table",
+          "height": 5
+        },
+        "output": [
+          {
+            "data_path": "action_result.data.*.name",
+            "data_type": "string"
+          },
+          {
+            "data_path": "action_result.data.*.vault_id",
+            "data_type": "string",
+            "contains": [ "vault id" ]
+          },
+          {
+            "data_path": "action_result.status",
+            "data_type": "string"
+          },
+          {
+            "data_path": "action_result.message",
+            "data_type": "string"
+          },
+          {
+            "data_path": "action_result.summary.name",
+            "data_type": "string",
+            "column_name": "File Name",
+            "column_order": "0"
+          },
+          {
+            "data_path": "action_result.summary.vault_id",
+            "data_type": "string",
+            "column_name": "Vault ID",
+            "column_order": "1"
+          },
+          {
+            "data_path": "action_result.summary.file_type",
+            "data_type": "string"
+          },
+          {
+            "data_path": "action_result.parameter.id",
+            "data_type": "string",
+            "contains": [ "md5", "sha256", "wildfire task id" ]
           },
           {
             "data_path": "summary.total_objects",

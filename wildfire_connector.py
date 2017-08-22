@@ -46,6 +46,7 @@ class WildfireConnector(BaseConnector):
     ACTION_ID_GET_REPORT = "get_report"
     ACTION_ID_GET_SAMPLE = "get_sample"
     ACTION_ID_GET_PCAP = "get_pcap"
+    ACTION_ID_SAVE_REPORT = "save_report"
     ACTION_ID_TEST_ASSET_CONNECTIVITY = 'test_asset_connectivity'
 
     MAGIC_FORMATS = [
@@ -470,6 +471,26 @@ class WildfireConnector(BaseConnector):
 
         return self._save_file_to_vault(action_result, response, sample_hash)
 
+    def _save_report(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        sample_hash = param[WILDFIRE_JSON_TASK_ID]
+
+        self.save_progress('Getting report from WildFire')
+
+        data = {
+            'hash': sample_hash,
+            'format': 'pdf'
+        }
+
+        ret_val, response = self._make_rest_call('/get/report', action_result, self.GET_REPORT_ERROR_DESC, method='post', data=data, parse_response=False)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        return self._save_file_to_vault(action_result, response, sample_hash)
+
     def _get_platform_id(self, param):
 
         platform = param.get(WILDFIRE_JSON_PLATFORM)
@@ -666,6 +687,8 @@ class WildfireConnector(BaseConnector):
             ret_val = self._get_sample(param)
         elif (action_id == self.ACTION_ID_GET_PCAP):
             ret_val = self._get_pcap(param)
+        elif (action_id == self.ACTION_ID_SAVE_REPORT):
+            ret_val = self._save_report(param)
         elif (action_id == self.ACTION_ID_TEST_ASSET_CONNECTIVITY):
             ret_val = self._test_connectivity(param)
 
