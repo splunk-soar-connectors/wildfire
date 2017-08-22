@@ -12,10 +12,6 @@
 #
 # --
 
-# import json
-
-from wildfire_consts import *
-
 
 def json_dump_view(provides, all_app_runs, context):
 
