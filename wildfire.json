@@ -1,7 +1,7 @@
 {
     "appid"    : "c5aa8f59-6a3e-4031-b321-69068c725c68",
     "name"   : "WildFire",
-    "description": "This app supports executing investigative actions like 'detonate file' to analyze file on the WildFire sandbox.",
+    "description": "This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox",
     "type": "sandbox",
     "main_module": "wildfire_connector.pyc",
     "app_version": "1.0.25",
@@ -10,7 +10,7 @@
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.190",
+    "min_phantom_version": "3.0.247",
     "publisher": "Phantom",
     "consolidate_widgets": true,
     "logo": "pan.png",
@@ -31,7 +31,7 @@
         "default": true
       },
       "api_key": {
-        "data_type": "string",
+        "data_type": "password",
         "description": "API Key",
         "order": 2,
         "required": true
