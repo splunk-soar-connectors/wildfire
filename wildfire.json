@@ -4,8 +4,8 @@
     "description": "This app supports executing investigative actions like 'detonate file' to analyze file on the WildFire sandbox.",
     "type": "sandbox",
     "main_module": "wildfire_connector.pyc",
-    "app_version": "1.0.23",
-    "utctime_updated": "2017-08-10T00:13:33.000000Z",
+    "app_version": "1.0.25",
+    "utctime_updated": "2017-08-28T22:57:44.000000Z",
     "package_name": "phantom_wildfire",
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
@@ -14,7 +14,7 @@
     "publisher": "Phantom",
     "consolidate_widgets": true,
     "logo": "pan.png",
-    "license": "Copyright (c) Phantom Cyber Corporation 2016",
+    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
     "configuration": {
       "base_url": {
         "data_type": "string",

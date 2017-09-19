@@ -1,7 +1,7 @@
 # --
 # File: wildfire_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016
+# Copyright (c) Phantom Cyber Corporation, 2016-2017
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -693,6 +693,7 @@ class WildfireConnector(BaseConnector):
             ret_val = self._test_connectivity(param)
 
         return ret_val
+
 
 if __name__ == '__main__':
 
