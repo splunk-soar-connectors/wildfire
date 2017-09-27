@@ -1,7 +1,7 @@
 # --
 # File: wildfire_view.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016
+# Copyright (c) Phantom Cyber Corporation, 2016-2017
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -11,10 +11,6 @@
 # of Phantom Cyber.
 #
 # --
-
-# import json
-
-from wildfire_consts import *
 
 
 def json_dump_view(provides, all_app_runs, context):
