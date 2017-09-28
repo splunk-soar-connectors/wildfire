@@ -165,7 +165,7 @@ of Phantom Cyber.
 
 </ul>
 
-<div class="tab-content"> <!-- All Tabs content -->
+<div class="tab-content" style="z-index: 1;"> <!-- All Tabs content -->
   
   {% for report in result.reports %} <!-- Loop for each report -->
   <div id="report{{ forloop.counter0 }}" class="tab-pane fade {% if forloop.first %} active in {% endif %}" role="tabpanel">
@@ -327,7 +327,7 @@ of Phantom Cyber.
            </li>
         {% endfor %}
       </ul>
-      <div class="tab-content"> <!-- Process Details Tabs content -->
+      <div class="tab-content" style="z-index: 1;"> <!-- Process Details Tabs content -->
         {% for curr_proc in report.process_list.process %}
         <div id="process{{ forloop.counter0 }}" class="tab-pane fade {% if forloop.first %} active in {% endif %}" role="tabpanel">
           <h5 class="wf-h5-style">Process Info</h5>
