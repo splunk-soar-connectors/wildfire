@@ -1,6 +1,6 @@
 {
-    "appid"    : "c5aa8f59-6a3e-4031-b321-69068c725c68",
-    "name"   : "WildFire",
+    "appid": "c5aa8f59-6a3e-4031-b321-69068c725c68",
+    "name": "WildFire",
     "description": "This app supports executing investigative actions like 'detonate file' to analyze file on the WildFire sandbox.",
     "type": "sandbox",
     "main_module": "wildfire_connector.pyc",
@@ -13,1226 +13,1313 @@
     "min_phantom_version": "3.0.190",
     "publisher": "Phantom",
     "consolidate_widgets": true,
-    "logo": "pan.png",
+    "logo": "logo_paloaltonetworks.svg",
+    "logo_dark": "logo_paloaltonetworks_dark.svg",
     "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
     "configuration": {
-      "base_url": {
-        "data_type": "string",
-        "description": "Base URL to WildFire service",
-        "required": true,
-        "order": 0,
-        "default": "https://wildfire.paloaltonetworks.com"
-      },
-      "verify_server_cert": {
-        "data_type": "boolean",
-        "description": "Verify server certificate",
-        "required": true,
-        "order": 1,
-        "default": true
-      },
-      "api_key": {
-        "data_type": "string",
-        "description": "API Key",
-        "order": 2,
-        "required": true
-      },
-      "timeout": {
-        "data_type": "numeric",
-        "description": "Detonate timeout in mins",
-        "order": 3,
-        "required": true,
-        "default": 10
-      }
+        "base_url": {
+            "data_type": "string",
+            "description": "Base URL to WildFire service",
+            "required": true,
+            "order": 0,
+            "default": "https://wildfire.paloaltonetworks.com"
+        },
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "description": "Verify server certificate",
+            "required": true,
+            "order": 1,
+            "default": true
+        },
+        "api_key": {
+            "data_type": "string",
+            "description": "API Key",
+            "order": 2,
+            "required": true
+        },
+        "timeout": {
+            "data_type": "numeric",
+            "description": "Detonate timeout in mins",
+            "order": 3,
+            "required": true,
+            "default": 10
+        }
     },
     "actions": [
-      {
-        "action": "test connectivity",
-        "description": "Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials.",
-        "type": "test",
-        "identifier": "test_asset_connectivity",
-        "read_only": true,
-        "lock": {
-          "enabled": false
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials.",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
         },
-        "parameters": {
+        {
+            "action": "detonate file",
+            "description": "Run the file in the WildFire sandbox and retrieve the analysis results.",
+            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>",
+            "type": "investigate",
+            "identifier": "detonate_file",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "wildfire_view.display_report",
+                "title": "Detonation Report"
+            },
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "file_name": {
+                    "description": "Filename to use",
+                    "verbose": "This value will be passed to the sandbox as the name of the file that is pickup up from the vault",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "file name"
+                    ],
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.malware",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.file_info.md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.file_info.sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.file_info.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.malware",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.platform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.software",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.malware",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         },
-        "output": [],
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "detonate file",
-        "description": "Run the file in the WildFire sandbox and retrieve the analysis results.",
-        "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>",
-        "type": "investigate",
-        "identifier": "detonate_file",
-        "read_only": true,
-        "lock": {
-          "enabled": false
+        {
+            "action": "get report",
+            "description": "Query for results of an already completed detonation in WildFire.",
+            "verbose": "Each detonation report in WildFire is denoted by the sha256 and md5 of the file.",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "id": {
+                    "description": "File MD5 or Sha256 to get the results of",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "wildfire_view.display_report",
+                "title": "Detonation Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.malware",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.file_info.md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.file_info.sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.file_info.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.malware",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.platform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.software",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.malware",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         },
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "wildfire_view.display_report",
-          "title": "Detonation Report"
+        {
+            "action": "get file",
+            "description": "Download a sample from WildFire and add it to the vault.",
+            "verbose": "Do note that WildFire does not generally store samples that have been uploaded for detonation.",
+            "type": "investigate",
+            "identifier": "get_sample",
+            "read_only": true,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.hash"
+            },
+            "parameters": {
+                "hash": {
+                    "description": "Hash of file/sample to download",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get File",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": "1"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.file_type",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": "2"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": "0"
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": "1"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         },
-        "parameters": {
-          "vault_id": {
-            "description": "Vault ID of file to detonate",
-            "data_type": "string",
-            "order": 0,
-            "contains": ["pe file", "pdf", "flash", "apk", "jar", "doc", "xls", "ppt"],
-            "required": true,
-            "primary": true
-          },
-          "file_name": {
-            "description": "Filename to use",
-            "verbose": "This value will be passed to the sandbox as the name of the file that is pickup up from the vault",
-            "data_type": "string",
-            "order": 1,
-            "contains": ["file name"],
-            "required": false
-          }
+        {
+            "action": "get pcap",
+            "description": "Download the pcap file of a sample from WildFire and add it to the vault.",
+            "type": "investigate",
+            "identifier": "get_pcap",
+            "read_only": true,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.hash"
+            },
+            "parameters": {
+                "hash": {
+                    "description": "Hash of file/sample to download pcap of",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "platform": {
+                    "description": "Platform of file/sample to download pcap of",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "value_list": [
+                        "Default",
+                        "Win XP, Adobe 9.3.3, Office 2003",
+                        "Win XP, Adobe 9.4.0, Flash 10, Office 2007",
+                        "Win XP, Adobe 11, Flash 11, Office 2010",
+                        "Win 7 32-bit, Adobe 11, Flash11, Office 2010",
+                        "Win 7 64 bit, Adobe 11, Flash 11, Office 2010",
+                        "Android 2.3, API 10, avd2.3.1"
+                    ]
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Pcap",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.platform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.file_type",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": "2"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": "0"
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": "1"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         },
-        "output": [
-          {
-            "data_path": "action_result.parameter.file_name",
-            "data_type": "string",
-            "contains": ["file name"]
-          },
-          {
-            "data_path": "action_result.parameter.vault_id",
-            "data_type": "string",
-            "contains": ["pe file", "pdf", "flash", "apk", "jar", "doc", "xls", "ppt"]
-          },
-          {
-            "data_path": "action_result.data.*.version",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
+        {
+            "action": "save report",
+            "description": "Save a PDF of the detonation report to the Vault.",
+            "type": "investigate",
+            "identifier": "save_report",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "id": {
+                    "description": "File MD5 or Sha256 to get the results of",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Save Report",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.file_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": "0"
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": "1"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
             ],
-            "data_path": "action_result.data.*.file_info.md5",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.file_info.sha1",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.file_info.size",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.file_info.sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.file_info.malware",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.file_info.filetype",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.md5",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.malware",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.version",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.platform",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.software",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.size",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "ip"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha1",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "file path"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "process name"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "process name"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.status",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.message",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.summary.malware",
-            "data_type": "string"
-          },
-          {
-            "data_path": "summary.total_objects",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "summary.total_objects_successful",
-            "data_type": "numeric"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.task",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@reg_key",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
-            "data_type": "string"
-          }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "get report",
-        "description": "Query for results of an already completed detonation in WildFire.",
-        "verbose": "Each detonation report in WildFire is denoted by the sha256 and md5 of the file.",
-        "type": "investigate",
-        "identifier": "get_report",
-        "read_only": true,
-        "lock": {
-          "enabled": false
-        },
-        "parameters": {
-          "id": {
-            "description": "File MD5 or Sha256 to get the results of",
-            "data_type": "string",
-            "order": 0,
-            "contains": [ "md5", "sha256", "wildfire task id" ],
-            "required": true,
-            "primary": true
-          }
-        },
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "wildfire_view.display_report",
-          "title": "Detonation Report"
-        },
-        "output": [
-          {
-            "data_path": "action_result.parameter.id",
-            "data_type": "string",
-            "contains": ["md5", "sha256", "wildfire task id"]
-          },
-          {
-            "data_path": "action_result.data.*.version",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.file_info.md5",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.file_info.sha1",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.file_info.size",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.file_info.sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.file_info.malware",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.file_info.filetype",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.md5",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.malware",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.version",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.platform",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.software",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.size",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "ip"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha1",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "file path"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "process name"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "process name"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "md5",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha1",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "sha256",
-              "hash"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.status",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.message",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.summary.malware",
-            "data_type": "string"
-          },
-          {
-            "data_path": "summary.total_objects",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "summary.total_objects_successful",
-            "data_type": "numeric"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.task",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
-            "data_type": "string"
-          },
-          {
-            "contains": [
-              "pid"
-            ],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@pid",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@reg_key",
-            "data_type": "string"
-          },
-          {
-            "contains": ["process name"],
-            "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
-            "data_type": "string"
-          }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "get file",
-        "description": "Download a sample from WildFire and add it to the vault.",
-        "verbose": "Do note that WildFire does not generally store samples that have been uploaded for detonation.",
-        "type": "investigate",
-        "identifier": "get_sample",
-        "read_only": true,
-        "lock": {
-          "enabled": true,
-          "data_path": "parameters.hash"
-        },
-        "parameters": {
-          "hash": {
-            "description": "Hash of file/sample to download",
-            "data_type": "string",
-            "order": 0,
-            "contains": [ "md5", "sha256", "wildfire task id" ],
-            "required": true,
-            "primary": true
-          }
-        },
-        "render": {
-          "width": 12,
-          "title": "Get File",
-          "type": "table",
-          "height": 5
-        },
-        "output": [
-          {
-            "data_path": "action_result.data.*.name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.vault_id",
-            "data_type": "string",
-            "contains": [ "vault id" ]
-          },
-          {
-            "data_path": "action_result.status",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.message",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.summary.name",
-            "data_type": "string",
-            "column_name": "File Name",
-            "column_order": "0"
-          },
-          {
-            "data_path": "action_result.summary.vault_id",
-            "data_type": "string",
-            "column_name": "Vault ID",
-            "column_order": "1"
-          },
-          {
-            "data_path": "action_result.summary.file_type",
-            "data_type": "string",
-            "column_name": "File Type",
-            "column_order": "2"
-          },
-          {
-            "data_path": "action_result.parameter.hash",
-            "data_type": "string",
-            "contains": [ "md5", "sha256", "wildfire task id" ],
-            "column_name": "Hash",
-            "column_order": "1"
-          },
-          {
-            "data_path": "summary.total_objects",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "summary.total_objects_successful",
-            "data_type": "numeric"
-          }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "get pcap",
-        "description": "Download the pcap file of a sample from WildFire and add it to the vault.",
-        "type": "investigate",
-        "identifier": "get_pcap",
-        "read_only": true,
-        "lock": {
-          "enabled": true,
-          "data_path": "parameters.hash"
-        },
-        "parameters": {
-          "hash": {
-            "description": "Hash of file/sample to download pcap of",
-            "data_type": "string",
-            "order": 0,
-            "contains": ["md5", "sha256", "wildfire task id"],
-            "required": true,
-            "primary": true
-          },
-          "platform": {
-            "description": "Platform of file/sample to download pcap of",
-            "data_type": "string",
-            "order": 1,
-            "required": true,
-            "value_list": ["Default", "Win XP, Adobe 9.3.3, Office 2003", "Win XP, Adobe 9.4.0, Flash 10, Office 2007", "Win XP, Adobe 11, Flash 11, Office 2010", "Win 7 32-bit, Adobe 11, Flash11, Office 2010", "Win 7 64 bit, Adobe 11, Flash 11, Office 2010", "Android 2.3, API 10, avd2.3.1"]
-          }
-
-        },
-        "render": {
-          "width": 12,
-          "title": "Get Pcap",
-          "type": "table",
-          "height": 5
-        },
-        "output": [
-          {
-            "data_path": "action_result.parameter.platform",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.parameter.hash",
-            "data_type": "string",
-            "contains": ["md5", "sha256", "wildfire task id"]
-          },
-          {
-            "data_path": "action_result.data.*.name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.vault_id",
-            "data_type": "string",
-            "contains": [ "vault id" ]
-          },
-          {
-            "data_path": "action_result.status",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.message",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.summary.name",
-            "data_type": "string",
-            "column_name": "File Name",
-            "column_order": "0"
-          },
-          {
-            "data_path": "action_result.summary.vault_id",
-            "data_type": "string",
-            "column_name": "Vault ID",
-            "column_order": "1"
-          },
-          {
-            "data_path": "action_result.summary.file_type",
-            "data_type": "string",
-            "column_name": "File Type",
-            "column_order": "2"
-          },
-          {
-            "data_path": "summary.total_objects",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "summary.total_objects_successful",
-            "data_type": "numeric"
-          }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "save report",
-        "description": "Save a PDF of the detonation report to the Vault.",
-        "type": "investigate",
-        "identifier": "save_report",
-        "read_only": true,
-        "lock": {
-          "enabled": false
-        },
-        "parameters": {
-          "id": {
-            "description": "File MD5 or Sha256 to get the results of",
-            "data_type": "string",
-            "order": 0,
-            "contains": [ "md5", "sha256", "wildfire task id" ],
-            "required": true,
-            "primary": true
-          }
-        },
-        "render": {
-          "width": 12,
-          "title": "Save Report",
-          "type": "table",
-          "height": 5
-        },
-        "output": [
-          {
-            "data_path": "action_result.data.*.name",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.vault_id",
-            "data_type": "string",
-            "contains": [ "vault id" ]
-          },
-          {
-            "data_path": "action_result.status",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.message",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.summary.name",
-            "data_type": "string",
-            "column_name": "File Name",
-            "column_order": "0"
-          },
-          {
-            "data_path": "action_result.summary.vault_id",
-            "data_type": "string",
-            "column_name": "Vault ID",
-            "column_order": "1"
-          },
-          {
-            "data_path": "action_result.summary.file_type",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.parameter.id",
-            "data_type": "string",
-            "contains": [ "md5", "sha256", "wildfire task id" ]
-          },
-          {
-            "data_path": "summary.total_objects",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "summary.total_objects_successful",
-            "data_type": "numeric"
-          }
-        ],
-        "versions":"EQ(*)"
-      }
+            "versions": "EQ(*)"
+        }
     ]
 }
