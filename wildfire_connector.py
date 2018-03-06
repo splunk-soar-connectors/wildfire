@@ -539,24 +539,26 @@ class WildfireConnector(BaseConnector):
         # get verdict whether hash is in WildFire database
         verdict_code = int(response['get-verdict-info']['verdict'])
 
-        if verdict_code == 0:
-            verdict = {0: 'benign'}
-        elif verdict_code == 1:
-            verdict = {1: 'malware'}
-        elif verdict_code == 2:
-            verdict = {2: 'grayware'}
-        elif verdict_code == 4:
-            verdict = {4: 'phishing'}
-        elif verdict_code == -100:
-            verdict = {-100: 'pending, the sample exists, but there is currently no verdict'}
-        elif verdict_code == -101:
-            verdict = {-101: 'error'}
-        elif verdict_code == -102:
-            verdict = {-102: 'unknown, cannot find sample record in the WildFire database'}
-        elif verdict_code == -103:
-            verdict = {-103: 'invalid hash value'}
-
-        return verdict
+        try:
+            if verdict_code == 0:
+                verdict = {0: 'benign'}
+            elif verdict_code == 1:
+                verdict = {1: 'malware'}
+            elif verdict_code == 2:
+                verdict = {2: 'grayware'}
+            elif verdict_code == 4:
+                verdict = {4: 'phishing'}
+            elif verdict_code == -100:
+                verdict = {-100: 'pending, the sample exists, but there is currently no verdict'}
+            elif verdict_code == -101:
+                verdict = {-101: 'error'}
+            elif verdict_code == -102:
+                verdict = {-102: 'unknown, cannot find sample record in the WildFire database'}
+            elif verdict_code == -103:
+                verdict = {-103: 'invalid hash value'}
+            return verdict
+        except:
+            return "verdict unknown"
 
     def _detonate_url(self, param):
 
@@ -579,13 +581,17 @@ class WildfireConnector(BaseConnector):
             return action_result.get_status()
 
         # get sha256 and md5 hashes
-        task_id = response['submit-link-info']['sha256']
-
-        if not task_id:
-            task_id = response['submit-link-info']['md5']
+        try:
+            task_id = response['submit-link-info']['sha256']
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "task id not part of response, can't continue")
 
         verdict = self._get_verdict(task_id, action_result)
-        verdict_code, verdict_message = verdict.items()[0]
+
+        try:
+            verdict_code, verdict_message = verdict.items()[0]
+        except:
+            return action_result.set_status(phantom.APP_ERROR, verdict)
 
         if verdict_code >= 0:
             summary_available = True
