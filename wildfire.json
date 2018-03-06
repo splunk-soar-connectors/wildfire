@@ -578,7 +578,6 @@
                     "contains": [
                         "url"
                     ],
-                    "value_list": [],
                     "default": "",
                     "order": 0
                 }

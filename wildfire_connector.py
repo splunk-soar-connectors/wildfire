@@ -558,16 +558,13 @@ class WildfireConnector(BaseConnector):
 
         return verdict
 
-    def _validate_url(self, param):
+    def _validate_url(self, url):
 
-        url = param
+        if ('://' not in url):
+            url = "http://{0}".format(url)
 
-        if self.ACTION_ID_DETONATE_URL:
-            if ('://' not in url):
-                url = "http://{0}".format(url)
-
-            if (not ph_utils.is_url(url)):
-                return phantom.APP_ERROR
+        if (not ph_utils.is_url(url)):
+            return phantom.APP_ERROR
 
         return url
 
@@ -609,7 +606,6 @@ class WildfireConnector(BaseConnector):
 
         # Add the response into the data section
         action_result.add_data(response)
-        action_result.add_data({})
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
