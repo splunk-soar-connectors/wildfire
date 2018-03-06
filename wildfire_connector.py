@@ -558,16 +558,6 @@ class WildfireConnector(BaseConnector):
 
         return verdict
 
-    def _validate_url(self, url):
-
-        if ('://' not in url):
-            url = "http://{0}".format(url)
-
-        if (not ph_utils.is_url(url)):
-            return phantom.APP_ERROR
-
-        return url
-
     def _detonate_url(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -577,7 +567,10 @@ class WildfireConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # add an http to url if not present
-        url = self._validate_url(param['url'])
+        url = param['url']
+
+        if (not ph_utils.is_url(url)):
+            return action_result.get_status()
 
         # make rest call to get sha256 and md5
         ret_val, response = self._make_rest_call('/submit/link', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'link': ('', url)})

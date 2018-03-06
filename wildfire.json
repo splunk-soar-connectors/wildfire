@@ -571,7 +571,7 @@
             "read_only": true,
             "parameters": {
                 "url": {
-                    "description": "URL to query",
+                    "description": "URL to query. Starts with http:// or https://",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
