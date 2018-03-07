@@ -540,7 +540,7 @@ class WildfireConnector(BaseConnector):
         try:
             verdict_code = int(response['get-verdict-info']['verdict'])
         except:
-            return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved", None), None, None)
+            return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved"), None, None)
 
         if verdict_code == 0:
             verdict = 'benign'
