@@ -540,26 +540,26 @@ class WildfireConnector(BaseConnector):
         try:
             verdict_code = int(response['get-verdict-info']['verdict'])
         except:
-            return "verdict cannot be retrieved"
+            return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved", None), None, None)
 
         if verdict_code == 0:
-            verdict = {0: 'benign'}
+            verdict = 'benign'
         elif verdict_code == 1:
-            verdict = {1: 'malware'}
+            verdict = 'malware'
         elif verdict_code == 2:
-            verdict = {2: 'grayware'}
+            verdict = 'grayware'
         elif verdict_code == 4:
-            verdict = {4: 'phishing'}
+            verdict = 'phishing'
         elif verdict_code == -100:
-            verdict = {-100: 'pending, the sample exists, but there is currently no verdict'}
+            verdict = 'pending, the sample exists, but there is currently no verdict'
         elif verdict_code == -101:
-            verdict = {-101: 'error'}
+            verdict = 'error'
         elif verdict_code == -102:
-            verdict = {-102: 'unknown, cannot find sample record in the WildFire database'}
+            verdict = 'unknown, cannot find sample record in the WildFire database'
         elif verdict_code == -103:
-            verdict = {-103: 'invalid hash value'}
+            verdict = 'invalid hash value'
 
-        return verdict
+        return (phantom.APP_SUCCESS, verdict_code, verdict)
 
     def _detonate_url(self, param):
 
@@ -587,11 +587,10 @@ class WildfireConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, "task id not part of response, can't continue")
 
-        verdict = self._get_verdict(task_id, action_result)
-        try:
-            verdict_code, verdict_message = verdict.items()[0]
-        except:
-            return action_result.set_status(phantom.APP_ERROR, verdict)
+        ret_val, verdict_code, verdict_message = self._get_verdict(task_id, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
 
         if verdict_code >= 0:
             summary_available = True
