@@ -1,7 +1,7 @@
 # --
 # File: wildfire_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2017
+# Copyright (c) Phantom Cyber Corporation, 2016-2018
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -526,60 +526,93 @@ class WildfireConnector(BaseConnector):
 
         return self._save_file_to_vault(action_result, response, sample_hash)
 
-    def validate_parameters(self, param):
-        """Do our own validations instead of BaseConnector doing it for us"""
+    def _get_verdict(self, task_id, action_result):
 
-        action = self.get_action_identifier()
+        self.save_progress("Getting verdict for: {0}".format(task_id))
 
-        if (action == self.ACTION_ID_DETONATE_URL):
+        # make rest call to get verdict whether URL is in wildfire db
+        ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
 
-            # add an http if not present
-            url = param[WILDFIRE_JSON_URL]
-            if ('://' not in url):
-                url = "http://{0}".format(url)
+        if (phantom.is_fail(ret_val)):
+            return (action_result.get_status(), None, None)
 
-            if (not ph_utils.is_url(url)):
-                return phantom.APP_ERROR
+        # get verdict whether hash is in WildFire database
+        try:
+            verdict_code = int(response['get-verdict-info']['verdict'])
+        except:
+            return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved"), None, None)
 
-            param[WILDFIRE_JSON_URL] = url
+        if verdict_code == 0:
+            verdict = 'benign'
+        elif verdict_code == 1:
+            verdict = 'malware'
+        elif verdict_code == 2:
+            verdict = 'grayware'
+        elif verdict_code == 4:
+            verdict = 'phishing'
+        elif verdict_code == -100:
+            verdict = 'pending, the sample exists, but there is currently no verdict'
+        elif verdict_code == -101:
+            verdict = 'error'
+        elif verdict_code == -102:
+            verdict = 'unknown, cannot find sample record in the WildFire database'
+        elif verdict_code == -103:
+            verdict = 'invalid hash value'
 
-        return phantom.APP_SUCCESS
+        return (phantom.APP_SUCCESS, verdict_code, verdict)
 
     def _detonate_url(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # add an http if not present
-        url = param[WILDFIRE_JSON_URL]
+        # Access action parameters passed in the 'param' dictionary
+        # add an http to url if not present
+        url = param['url']
 
-        self.save_progress('Detonating URL')
+        if (not ph_utils.is_url(url)):
+            return action_result.get_status()
 
+        # make rest call to get sha256 and md5
         ret_val, response = self._make_rest_call('/submit/link', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'link': ('', url)})
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        data = action_result.add_data({})
+        # get sha256 and md5 hashes
+        try:
+            task_id = response['submit-link-info']['sha256']
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "task id not part of response, can't continue")
 
-        # The first part is the uploaded file info
-        data.update(response)
-
-        # get the sha256
-        task_id = response.get('submit-link-info', {}).get('sha256')
-
-        # Now poll for the result
-        ret_val, response = self._poll_task_status(task_id, action_result)
+        ret_val, verdict_code, verdict_message = self._get_verdict(task_id, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        # The next part is the report
-        data.update(response)
+        if verdict_code >= 0:
+            summary_available = True
+            # Now poll for the result
+            ret_val, response = self._poll_task_status(task_id, action_result)
 
-        malware = data.get('file_info', {}).get('malware', 'no')
+            if (phantom.is_fail(ret_val)):
+                return action_result.get_status()
+        else:
+            summary_available = False
 
-        action_result.update_summary({WILDFIRE_JSON_MALWARE: malware})
+        # Add the response into the data section
+        action_result.add_data(response)
 
+        # Add a dictionary that is made up of the most important values from data into the summary
+        summary = action_result.update_summary({})
+        summary['verdict_code'] = verdict_code
+        summary['verdict'] = verdict_message
+        summary['summary_available'] = summary_available
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_vault_file_sha256(self, vault_id, action_result):

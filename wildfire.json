@@ -10,11 +10,12 @@
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.247",
+    "min_phantom_version": "3.0.284",
     "publisher": "Phantom",
     "consolidate_widgets": true,
-    "logo": "pan.png",
-    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
+    "logo": "logo_paloaltonetworks.svg",
+    "logo_dark": "logo_paloaltonetworks_dark.svg",
+    "license": "Copyright (c) Phantom Cyber Corporation 2016-2018",
     "configuration": {
         "base_url": {
             "data_type": "string",
@@ -106,6 +107,10 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.file_name",
                     "data_type": "string",
                     "contains": [
@@ -127,7 +132,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.version",
+                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.malware",
                     "data_type": "string"
                 },
                 {
@@ -147,10 +156,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.file_info.size",
-                    "data_type": "string"
-                },
-                {
                     "contains": [
                         "sha256",
                         "hash"
@@ -159,11 +164,19 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.file_info.malware",
+                    "data_path": "action_result.data.*.file_info.size",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
                     "data_type": "string"
                 },
                 {
@@ -171,7 +184,15 @@
                         "md5",
                         "hash"
                     ],
-                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
                     "data_type": "string"
                 },
                 {
@@ -179,70 +200,11 @@
                         "sha256",
                         "hash"
                     ],
-                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.malware",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.platform",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.software",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "ip"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
                     "data_type": "string"
                 },
                 {
@@ -251,10 +213,6 @@
                         "hash"
                     ],
                     "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
                     "data_type": "string"
                 },
                 {
@@ -274,15 +232,121 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.malware",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.platform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
                     "data_type": "string"
                 },
                 {
@@ -316,14 +380,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
-                    "data_type": "string"
-                },
-                {
                     "contains": [
                         "sha256",
                         "hash"
@@ -332,30 +388,15 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
                     "data_type": "string"
                 },
                 {
@@ -367,10 +408,15 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
                     "data_type": "string"
                 },
                 {
@@ -381,127 +427,14 @@
                     "data_type": "string"
                 },
                 {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "md5",
-                        "hash"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "sha1",
-                        "hash"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "sha256",
-                        "hash"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.malware",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                },
-                {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.task",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
                     "data_type": "string"
                 },
                 {
@@ -512,10 +445,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
-                    "data_type": "string"
-                },
-                {
                     "contains": [
                         "process name"
                     ],
@@ -523,21 +452,7 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
                     "data_type": "string"
                 },
                 {
@@ -548,17 +463,758 @@
                     "data_type": "string"
                 },
                 {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
                     "data_type": "string"
                 },
                 {
                     "contains": [
                         "process name"
                     ],
-                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.software",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.malware",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "identifier": "detonate_url",
+            "description": "Submit a single website link for WildFire analysis",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to query. Starts with http:// or https://",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.paloaltonetworks.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_type": "string",
+                    "example_values": [
+                        "PE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.malware",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "04f4f1c83f1e69b1f055202964536f13"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "828f02e6ca4bcf6c30264137f758fbe20dd866db"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "ca007e3b395688f5f3062729978dcdbadc90d9c3501d9a89c139d11c58d2a15e"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "796268"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.submit-link-info.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad01ab9b2bcd7f5c859521dbcd680774"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.submit-link-info.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.submit-link-info.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.paloaltonetworks.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Documents and Settings\\<USER>\\Local Settings\\Temp\\is-DNEQE.tmp\\_isetup\\_shfoldr.dll"
+                    ],
+                    "contains": [
+                        "file path",
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "35"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "92dc6ef532fbb4a5c3201469a5b5eb63"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "3e89ff837147c16b4e41c30d6c796374e0b8e62c"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "9884e9d1b4f8a873ccbd81f8ad0ae257776d2348d027d811a56475e028360d87"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.mutex",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.process",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.registry",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.malware",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "04f4f1c83f1e69b1f055202964536f13"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+                    "data_type": "string",
+                    "example_values": [
+                        "dnsqa-m03.c644a3e76e438794c399ea1ccdb9206b.me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+                    "data_type": "string",
+                    "example_values": [
+                        "82.163.143.56"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+                    "data_type": "string",
+                    "example_values": [
+                        "A"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_type": "string",
+                    "example_values": [
+                        "GB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "82.163.143.56"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+                    "data_type": "string",
+                    "example_values": [
+                        "dnsqa-m03.c644a3e76e438794c399ea1ccdb9206b.me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+                    "data_type": "string",
+                    "example_values": [
+                        "POST"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/QualityCheck/ni5.php"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+                    "data_type": "string",
+                    "example_values": [
+                        "WinHttpClient"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "204"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp\" /SL5=\"$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe\""
+                    ],
+                    "contains": [
+                        "file path",
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp\" /SL5=\"$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe\""
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@pid",
+                    "data_type": "string",
+                    "example_values": [
+                        "140"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "92dc6ef532fbb4a5c3201469a5b5eb63"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Documents and Settings\\Administrator\\Local Settings\\Temp\\is-DNEQE.tmp\\_isetup\\_shfoldr.dll"
+                    ],
+                    "contains": [
+                        "file path",
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "3e89ff837147c16b4e41c30d6c796374e0b8e62c"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "9884e9d1b4f8a873ccbd81f8ad0ae257776d2348d027d811a56475e028360d87"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+                    "data_type": "string",
+                    "example_values": [
+                        "23312"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
+                    "data_type": "string",
+                    "example_values": [
+                        "dll"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.java_api",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local\\RstrMgr3887CAB8-533F-4C85-B0DC-3E5639F8D511"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_pid",
+                    "data_type": "string",
+                    "example_values": [
+                        "140"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_process_image",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp\" /SL5=\"$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@command",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp\" /SL5=\"$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key",
+                    "data_type": "string",
+                    "example_values": [
+                        "HKEY_LOCAL_MACHINE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey",
+                    "data_type": "string",
+                    "example_values": [
+                        "SOFTWARE\\5da059a482fd494db3f252126fbc3d5b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+                    "data_type": "string",
+                    "example_values": [
+                        "1?"
+                    ],
+                    "contains": [
+                        "file path",
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\REGISTRY\\MACHINE\\SOFTWARE\\5da059a482fd494db3f252126fbc3d5b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
+                    "data_type": "string",
+                    "example_values": [
+                        "FX"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_type": "string",
+                    "example_values": [
+                        "1880"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
+                    "data_type": "string",
+                    "example_values": [
+                        "c:\\documents and settings\\administrator\\sample.exe"
+                    ],
+                    "contains": [
+                        "file path",
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.child.process.@name",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp\" /SL5=\"$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.child.process.@pid",
+                    "data_type": "string",
+                    "example_values": [
+                        "140"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.child.process.@text",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp\" /SL5=\"$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "ca007e3b395688f5f3062729978dcdbadc90d9c3501d9a89c139d11c58d2a15e"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "796268"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.software",
+                    "data_type": "string",
+                    "example_values": [
+                        "PE Static Analyzer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
+                    "data_type": "string",
+                    "example_values": [
+                        "Contains overlay data with high entropy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+                    "data_type": "string",
+                    "example_values": [
+                        "Entropy is a measurement of the randomness in data. Overlays with high entropy indicate encoded or encrypted data."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3030"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created Process c:\\documents and settings\\administrator\\sample.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "3.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad01ab9b2bcd7f5c859521dbcd680774"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.summary_available",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.task_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "malware",
+                        "unknown, cannot find sample record in the WildFire database"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.verdict_code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        -102
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Task id: 14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f\nSummary available: True\nVerdict: malware\nVerdict code: 1\nSha256: 14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f\nMd5: ad01ab9b2bcd7f5c859521dbcd680774",
+                        "Verdict code: -102\nVerdict: unknown, cannot find sample record in the WildFire database\nSummary available: False"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "wildfire_view.display_report",
+                "title": "Detonation Report"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -594,6 +1250,10 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
@@ -603,7 +1263,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.version",
+                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_info.malware",
                     "data_type": "string"
                 },
                 {
@@ -623,10 +1287,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.file_info.size",
-                    "data_type": "string"
-                },
-                {
                     "contains": [
                         "sha256",
                         "hash"
@@ -635,11 +1295,19 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.file_info.malware",
+                    "data_path": "action_result.data.*.file_info.size",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.file_info.filetype",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
                     "data_type": "string"
                 },
                 {
@@ -647,7 +1315,15 @@
                         "md5",
                         "hash"
                     ],
-                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
                     "data_type": "string"
                 },
                 {
@@ -655,70 +1331,11 @@
                         "sha256",
                         "hash"
                     ],
-                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.malware",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.platform",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.software",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "ip"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
                     "data_type": "string"
                 },
                 {
@@ -727,10 +1344,6 @@
                         "hash"
                     ],
                     "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.#text",
                     "data_type": "string"
                 },
                 {
@@ -750,15 +1363,121 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.malware",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.platform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
                     "data_type": "string"
                 },
                 {
@@ -792,14 +1511,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
-                    "data_type": "string"
-                },
-                {
                     "contains": [
                         "sha256",
                         "hash"
@@ -808,30 +1519,15 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
                     "data_type": "string"
                 },
                 {
@@ -843,10 +1539,15 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
                     "data_type": "string"
                 },
                 {
@@ -857,127 +1558,14 @@
                     "data_type": "string"
                 },
                 {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "md5",
-                        "hash"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "sha1",
-                        "hash"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "sha256",
-                        "hash"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.malware",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                },
-                {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@pid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@process_image",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@pid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@process_image",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.task",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
                     "data_type": "string"
                 },
                 {
@@ -988,10 +1576,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
-                    "data_type": "string"
-                },
-                {
                     "contains": [
                         "process name"
                     ],
@@ -999,21 +1583,7 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "pid"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "process name"
-                    ],
-                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletekey.*.@reg_key",
                     "data_type": "string"
                 },
                 {
@@ -1024,15 +1594,101 @@
                     "data_type": "string"
                 },
                 {
+                    "contains": [
+                        "process name"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "pid"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@pid",
                     "data_type": "string"
                 },
                 {
                     "contains": [
                         "process name"
                     ],
-                    "data_path": "action_result.data.*.task_info.report.*.registry.deletevaluekey.*.@process_image",
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@process_image",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.registry.setvaluekey.*.@reg_key",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "data_path": "action_result.data.*.task_info.report.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.software",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.malware",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "versions": "EQ(*)"
@@ -1070,6 +1726,21 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": "1"
+                },
+                {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string"
                 },
@@ -1081,12 +1752,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.file_type",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": "2"
                 },
                 {
                     "data_path": "action_result.summary.name",
@@ -1101,21 +1770,8 @@
                     "column_order": "1"
                 },
                 {
-                    "data_path": "action_result.summary.file_type",
-                    "data_type": "string",
-                    "column_name": "File Type",
-                    "column_order": "2"
-                },
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "md5",
-                        "sha256",
-                        "wildfire task id"
-                    ],
-                    "column_name": "Hash",
-                    "column_order": "1"
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1175,7 +1831,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.platform",
+                    "data_path": "action_result.status",
                     "data_type": "string"
                 },
                 {
@@ -1186,6 +1842,10 @@
                         "sha256",
                         "wildfire task id"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.platform",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -1199,12 +1859,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.file_type",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": "2"
                 },
                 {
                     "data_path": "action_result.summary.name",
@@ -1219,10 +1877,8 @@
                     "column_order": "1"
                 },
                 {
-                    "data_path": "action_result.summary.file_type",
-                    "data_type": "string",
-                    "column_name": "File Type",
-                    "column_order": "2"
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1266,6 +1922,19 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "wildfire task id"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string"
                 },
@@ -1277,11 +1946,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.summary.file_type",
                     "data_type": "string"
                 },
                 {
@@ -1297,17 +1962,8 @@
                     "column_order": "1"
                 },
                 {
-                    "data_path": "action_result.summary.file_type",
+                    "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "contains": [
-                        "md5",
-                        "sha256",
-                        "wildfire task id"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
