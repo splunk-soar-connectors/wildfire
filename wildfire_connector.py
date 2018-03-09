@@ -534,7 +534,7 @@ class WildfireConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
 
         if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
+            return (action_result.get_status(), None, None)
 
         # get verdict whether hash is in WildFire database
         try:
