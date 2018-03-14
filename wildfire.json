@@ -566,7 +566,7 @@
             "action": "detonate url",
             "identifier": "detonate_url",
             "description": "Submit a single website link for WildFire analysis",
-            "verbose": "",
+            "verbose": "The URL submitted returns a hash, which is then queried in the WildFire database. If the hash is present in the WildFire database, then a report will be returned. If not, then a verdict cannot be concluded.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
