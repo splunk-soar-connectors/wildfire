@@ -328,7 +328,7 @@ class WildfireConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return (action_result.get_status(), None)
 
-        # parse if successfull
+        # parse if successful
         response = self._parse_report_status_msg(response, action_result)
 
         if (response):
@@ -695,7 +695,7 @@ class WildfireConnector(BaseConnector):
         # Add the report
         data.update(response)
 
-        malware = data.get('file_info', {}).get('malware', 'no')
+        malware = response.get('file_info', {}).get('malware', 'no')
 
         action_result.update_summary({WILDFIRE_JSON_MALWARE: malware})
 
