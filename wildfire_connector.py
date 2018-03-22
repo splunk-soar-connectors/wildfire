@@ -43,6 +43,7 @@ class WildfireConnector(BaseConnector):
     # The actions supported by this connector
     ACTION_ID_DETONATE_FILE = "detonate_file"
     ACTION_ID_DETONATE_URL = "detonate_url"
+    ACTION_GET_URL_REPUTATION = "get_url_reputation"
     ACTION_ID_GET_REPORT = "get_report"
     ACTION_ID_GET_SAMPLE = "get_sample"
     ACTION_ID_GET_PCAP = "get_pcap"
@@ -534,13 +535,15 @@ class WildfireConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
 
         if (phantom.is_fail(ret_val)):
-            return (action_result.get_status(), None, None)
+            return (action_result.get_status(), None)
 
         # get verdict whether hash is in WildFire database
         try:
             verdict_code = int(response['get-verdict-info']['verdict'])
+            verdict_sha256 = response['get-verdict-info']['sha256']
+            verdict_md5 = response['get-verdict-info']['md5']
         except:
-            return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved"), None, None)
+            return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved"), None)
 
         if verdict_code == 0:
             verdict = 'benign'
@@ -559,7 +562,14 @@ class WildfireConnector(BaseConnector):
         elif verdict_code == -103:
             verdict = 'invalid hash value'
 
-        return (phantom.APP_SUCCESS, verdict_code, verdict)
+        verdict_data = {
+            'verdict_code': verdict_code,
+            'verdict_message': verdict,
+            'verdict_sha256': verdict_sha256,
+            'verdict_md5': verdict_md5
+        }
+
+        return (phantom.APP_SUCCESS, verdict_data)
 
     def _detonate_url(self, param):
 
@@ -585,14 +595,14 @@ class WildfireConnector(BaseConnector):
         try:
             task_id = response['submit-link-info']['sha256']
         except:
-            return action_result.set_status(phantom.APP_ERROR, "task id not part of response, can't continue")
+            return action_result.set_status(phantom.APP_ERROR, "Task id not part of response, can't continue")
 
-        ret_val, verdict_code, verdict_message = self._get_verdict(task_id, action_result)
+        ret_val, verdict_data = self._get_verdict(task_id, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        if verdict_code >= 0:
+        if verdict_data['verdict_code'] >= 0:
             summary_available = True
             # Now poll for the result
             ret_val, response = self._poll_task_status(task_id, action_result)
@@ -607,9 +617,47 @@ class WildfireConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['verdict_code'] = verdict_code
-        summary['verdict'] = verdict_message
+        summary['verdict_code'] = verdict_data['verdict_code']
+        summary['verdict'] = verdict_data['verdict_message']
         summary['summary_available'] = summary_available
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _get_url_reputation(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Access action parameters passed in the 'param' dictionary
+        # add an http to url if not present
+        url = param['url']
+
+        # make rest call to get sha256 and md5
+        ret_val, response = self._make_rest_call('/submit/link', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'link': ('', url)})
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # get sha256 and md5 hashes
+        try:
+            task_id = response['submit-link-info']['sha256']
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Task id not part of response, can't continue")
+
+        ret_val, verdict_data = self._get_verdict(task_id, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # Add the response into the data section
+        action_result.add_data(verdict_data)
+
+        summary = action_result.update_summary({})
+        summary['success'] = True
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -714,6 +762,8 @@ class WildfireConnector(BaseConnector):
             ret_val = self._detonate_file(param)
         elif (action_id == self.ACTION_ID_DETONATE_URL):
             ret_val = self._detonate_url(param)
+        elif (action_id == self.ACTION_GET_URL_REPUTATION):
+            ret_val = self._get_url_reputation(param)
         elif (action_id == self.ACTION_ID_GET_REPORT):
             ret_val = self._get_report(param)
         elif (action_id == self.ACTION_ID_GET_SAMPLE):
