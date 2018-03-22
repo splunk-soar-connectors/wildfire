@@ -636,9 +636,6 @@ class WildfireConnector(BaseConnector):
         # add an http to url if not present
         url = param['url']
 
-        if (not ph_utils.is_url(url)):
-            return action_result.get_status()
-
         # make rest call to get sha256 and md5
         ret_val, response = self._make_rest_call('/submit/link', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'link': ('', url)})
 
