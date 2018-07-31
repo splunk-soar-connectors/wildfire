@@ -585,15 +585,26 @@ class WildfireConnector(BaseConnector):
         if (not ph_utils.is_url(url)):
             return action_result.get_status()
 
+        is_file = param['is_file']
+
+        if is_file:
+            endpoint = '/submit/url'
+            files = {'url': ('', url)}
+            r_path = 'upload-file-info'
+        else:
+            endpoint = '/submit/link'
+            files = {'link': ('', url)}
+            r_path = 'submit-link-info'
+
         # make rest call to get sha256 and md5
-        ret_val, response = self._make_rest_call('/submit/link', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'link': ('', url)})
+        ret_val, response = self._make_rest_call(endpoint, action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files=files)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         # get sha256 and md5 hashes
         try:
-            task_id = response['submit-link-info']['sha256']
+            task_id = response[r_path]['sha256']
         except:
             return action_result.set_status(phantom.APP_ERROR, "Task id not part of response, can't continue")
 

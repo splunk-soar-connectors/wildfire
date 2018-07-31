@@ -580,6 +580,14 @@
                     ],
                     "default": "",
                     "order": 0
+                },
+		"is_file": {
+                    "description": "True if the URL points to a file (WildFire treats these differently)",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 1
                 }
             },
             "output": [
