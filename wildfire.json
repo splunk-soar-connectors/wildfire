@@ -48,7 +48,7 @@
     "actions": [
         {
             "action": "test connectivity",
-            "description": "Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials.",
+            "description": "Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials",
             "type": "test",
             "identifier": "test_asset_connectivity",
             "read_only": true,
@@ -61,7 +61,7 @@
         },
         {
             "action": "detonate file",
-            "description": "Run the file in the WildFire sandbox and retrieve the analysis results.",
+            "description": "Run the file in the WildFire sandbox and retrieve the analysis results",
             "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>",
             "type": "investigate",
             "identifier": "detonate_file",
@@ -1327,7 +1327,7 @@
         },
         {
             "action": "get report",
-            "description": "Query for results of an already completed detonation in WildFire.",
+            "description": "Query for results of an already completed detonation in WildFire",
             "verbose": "Each detonation report in WildFire is denoted by the sha256 and md5 of the file.",
             "type": "investigate",
             "identifier": "get_report",
@@ -1803,7 +1803,7 @@
         },
         {
             "action": "get file",
-            "description": "Download a sample from WildFire and add it to the vault.",
+            "description": "Download a sample from WildFire and add it to the vault",
             "verbose": "Do note that WildFire does not generally store samples that have been uploaded for detonation.",
             "type": "investigate",
             "identifier": "get_sample",
@@ -1894,7 +1894,7 @@
         },
         {
             "action": "get pcap",
-            "description": "Download the pcap file of a sample from WildFire and add it to the vault.",
+            "description": "Download the pcap file of a sample from WildFire and add it to the vault",
             "type": "investigate",
             "identifier": "get_pcap",
             "read_only": true,
@@ -2001,7 +2001,7 @@
         },
         {
             "action": "save report",
-            "description": "Save a PDF of the detonation report to the Vault.",
+            "description": "Save a PDF of the detonation report to the vault",
             "type": "investigate",
             "identifier": "save_report",
             "read_only": true,
