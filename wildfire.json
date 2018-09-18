@@ -29,7 +29,7 @@
             "description": "Verify server certificate",
             "required": true,
             "order": 1,
-            "default": true
+            "default": false
         },
         "api_key": {
             "data_type": "password",
