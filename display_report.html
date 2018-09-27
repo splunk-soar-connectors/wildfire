@@ -9,17 +9,11 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- 
-File: ./wildfire/display_report.html
+<!--
+Copyright (c) 2016-2018 Splunk Inc.
 
-Copyright (c) Phantom Cyber Corporation, 2014-2018
-
-This unpublished material is proprietary to Phantom Cyber.
-All rights reserved. The methods and
-techniques described herein are considered trade secrets
-and/or confidential. Reproduction or distribution, in whole
-or in part, is forbidden except by express written permission
-of Phantom Cyber.
+SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
+without a valid written license from Splunk Inc. is PROHIBITED.
 -->
 
 <style>
@@ -28,7 +22,6 @@ of Phantom Cyber.
 .wildfire-display-report a:hover {
   text-decoration:underline;
 }
-
 
 .wildfire-display-report .wf-table-vertical {
   width: initial;
@@ -82,7 +75,7 @@ of Phantom Cyber.
 
 <!------------------- For each Result ---------------------->
 
-<h3 class="wf-h3-style">File Info</h3>
+<h3 class="wf-h3-style">Information</h3>
 <table class="wf-table-vertical">
 {% if result.file_info.sha256 %}
 <tr>
@@ -137,25 +130,24 @@ of Phantom Cyber.
 
 <br>
 {% if result.message %}
-<p>{% autoescape off %}{{ result.message }}{% endautoescape %}</p>
+<p>{{ result.message }}</p>
 {% endif %}
 
-<h3 class="wf-h3-style">Analysis</h3>
-
+<h3 class="wf-h3-style">WildFire Analysis Report</h3>
 <!-- Set the tabs and their headers -->
 <ul class="nav nav-tabs" role="tablist">
 
 <!-- The reports -->
 {% for report in result.reports %}
-   <li {% if forloop.first %} class="active" {% endif %}>
+  <li {% if forloop.first %} class="active" {% endif %}>
     <a data-toggle="tab" href="#report{{ forloop.counter0}}">{{ report.name }}</a>
-   </li>
+  </li>
 {% endfor %}
 
 </ul>
 
-<div class="tab-content"> <!-- All Tabs content -->
-  
+<div class="tab-content" style="z-index: 1;"> <!-- All Tabs content -->
+
   {% for report in result.reports %} <!-- Loop for each report -->
   <div id="report{{ forloop.counter0 }}" class="tab-pane fade {% if forloop.first %} active in {% endif %}" role="tabpanel">
 
@@ -311,12 +303,12 @@ of Phantom Cyber.
       <h4 class="wf-h4-style">Process Details</h4>
       <ul class="nav nav-tabs" role="tablist">
         {% for curr_proc in report.process_list.process %}
-           <li {% if forloop.first %} class="active" {% endif %}>
+          <li {% if forloop.first %} class="active" {% endif %}>
             <a data-toggle="tab" href="#process{{ forloop.counter0}}">{{ curr_proc|by_key:'@name' }} - {{ curr_proc|by_key:'@pid' }}</a>
-           </li>
+          </li>
         {% endfor %}
       </ul>
-      <div class="tab-content"> <!-- Process Details Tabs content -->
+      <div class="tab-content" style="z-index: 1;"> <!-- Process Details Tabs content -->
         {% for curr_proc in report.process_list.process %}
         <div id="process{{ forloop.counter0 }}" class="tab-pane fade {% if forloop.first %} active in {% endif %}" role="tabpanel">
           <h5 class="wf-h5-style">Process Info</h5>
@@ -680,4 +672,3 @@ of Phantom Cyber.
 </div> <!-- Main Div -->
 
 {% endblock %} <!-- Main Start Block -->
-
