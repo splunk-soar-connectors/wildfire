@@ -4,8 +4,8 @@
     "description": "This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox",
     "type": "sandbox",
     "main_module": "wildfire_connector.pyc",
-    "app_version": "1.0.33",
-    "utctime_updated": "2018-09-21T00:16:59.000000Z",
+    "app_version": "1.0.34",
+    "utctime_updated": "2018-10-05T22:11:35.000000Z",
     "package_name": "phantom_wildfire",
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
@@ -581,7 +581,7 @@
                     "default": "",
                     "order": 0
                 },
-		"is_file": {
+                "is_file": {
                     "description": "True if the URL points to a file (WildFire treats these differently)",
                     "data_type": "boolean",
                     "required": true,
