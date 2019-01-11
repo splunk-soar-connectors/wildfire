@@ -400,11 +400,11 @@ class WildfireConnector(BaseConnector):
 
     def _save_file_to_vault(self, action_result, response, sample_hash):
 
-        if hasattr(Vault, 'get_vault_tmp_dir'):
+        if hasattr(Vault, 'create_attachment'):
             try:
                 vault_ret_dict = Vault.create_attachment(response.content, self.get_container_id())
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not file to vault: {0}".format(e))
+                return action_result.set_status(phantom.APP_ERROR, "Could not add file to vault: {0}".format(e))
         else:
             # Create a tmp directory on the vault partition
             guid = uuid.uuid4()
