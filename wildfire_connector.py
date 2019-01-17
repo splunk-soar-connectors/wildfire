@@ -400,41 +400,41 @@ class WildfireConnector(BaseConnector):
 
     def _save_file_to_vault(self, action_result, response, sample_hash):
 
-        if hasattr(Vault, 'create_attachment'):
-            try:
-                vault_ret_dict = Vault.create_attachment(response.content, self.get_container_id())
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not add file to vault: {0}".format(e))
+        # Create a tmp directory on the vault partition
+        guid = uuid.uuid4()
+
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            temp_dir = Vault.get_vault_tmp_dir()
         else:
-            # Create a tmp directory on the vault partition
-            guid = uuid.uuid4()
-            local_dir = '/vault/tmp/{}'.format(guid)
-            self.save_progress("Using temp directory: {0}".format(guid))
+            temp_dir = '/vault/tmp'
 
-            try:
-                os.makedirs(local_dir)
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", e)
+        local_dir = '{0}/{1}'.format(temp_dir, guid)
+        self.save_progress("Using temp directory: {0}".format(guid))
 
-            file_path = "{0}/{1}".format(local_dir, sample_hash)
+        try:
+            os.makedirs(local_dir)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", e)
 
-            # open and download the file
-            with open(file_path, 'wb') as f:
-                f.write(response.content)
+        file_path = "{0}/{1}".format(local_dir, sample_hash)
 
-            contains = []
-            file_ext = ''
-            magic_str = magic.from_file(file_path)
-            for regex, cur_contains, extension in self.MAGIC_FORMATS:
-                if regex.match(magic_str):
-                    contains.extend(cur_contains)
-                    if (not file_ext):
-                        file_ext = extension
+        # open and download the file
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
 
-            file_name = '{}{}'.format(sample_hash, file_ext)
+        contains = []
+        file_ext = ''
+        magic_str = magic.from_file(file_path)
+        for regex, cur_contains, extension in self.MAGIC_FORMATS:
+            if regex.match(magic_str):
+                contains.extend(cur_contains)
+                if (not file_ext):
+                    file_ext = extension
 
-            # move the file to the vault
-            vault_ret_dict = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name, metadata={'contains': contains})
+        file_name = '{}{}'.format(sample_hash, file_ext)
+
+        # move the file to the vault
+        vault_ret_dict = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name, metadata={'contains': contains})
 
         curr_data = {}
 
