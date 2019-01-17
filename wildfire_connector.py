@@ -1,6 +1,7 @@
-# Copyright (c) 2016-2018 Splunk Inc.
+# File: wildfire_connector.py
+# Copyright (c) 2016-2019 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
 #
 
@@ -401,7 +402,13 @@ class WildfireConnector(BaseConnector):
 
         # Create a tmp directory on the vault partition
         guid = uuid.uuid4()
-        local_dir = '/vault/tmp/{}'.format(guid)
+
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            temp_dir = Vault.get_vault_tmp_dir()
+        else:
+            temp_dir = '/vault/tmp'
+
+        local_dir = '{0}/{1}'.format(temp_dir, guid)
         self.save_progress("Using temp directory: {0}".format(guid))
 
         try:
@@ -428,6 +435,7 @@ class WildfireConnector(BaseConnector):
 
         # move the file to the vault
         vault_ret_dict = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name, metadata={'contains': contains})
+
         curr_data = {}
 
         if (vault_ret_dict['succeeded']):
