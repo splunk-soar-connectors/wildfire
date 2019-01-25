@@ -4,18 +4,18 @@
     "description": "This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox",
     "type": "sandbox",
     "main_module": "wildfire_connector.pyc",
-    "app_version": "1.0.33",
-    "utctime_updated": "2018-09-21T00:16:59.000000Z",
+    "app_version": "1.0.37",
+    "utctime_updated": "2019-01-17T20:12:38.000000Z",
     "package_name": "phantom_wildfire",
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.5.210",
+    "min_phantom_version": "4.0.1068",
     "publisher": "Phantom",
     "consolidate_widgets": true,
     "logo": "logo_paloaltonetworks.svg",
     "logo_dark": "logo_paloaltonetworks_dark.svg",
-    "license": "Copyright (c) 2016-2018 Splunk Inc.",
+    "license": "Copyright (c) 2016-2019 Splunk Inc.",
     "configuration": {
         "base_url": {
             "data_type": "string",
@@ -27,7 +27,6 @@
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": true,
             "order": 1,
             "default": false
         },
@@ -580,6 +579,13 @@
                     ],
                     "default": "",
                     "order": 0
+                },
+                "is_file": {
+                    "description": "True if the URL points to a file (WildFire treats these differently)",
+                    "data_type": "boolean",
+                    "primary": false,
+                    "default": false,
+                    "order": 1
                 }
             },
             "output": [
@@ -589,6 +595,10 @@
                     "example_values": [
                         "success"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.is_file",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.parameter.url",
