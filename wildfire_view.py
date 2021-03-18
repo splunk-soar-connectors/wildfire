@@ -92,7 +92,7 @@ def get_ctx_result(result):
 
     if (message) and ('max polling attempts' in message):
         ctx_result['message'] = message
-        print message
+        print(message)
 
     reports = data.get('task_info', {}).get('report')
 

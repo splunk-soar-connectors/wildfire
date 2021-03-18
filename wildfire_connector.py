@@ -303,7 +303,7 @@ class WildfireConnector(BaseConnector):
         if (not input_dict):
             return {}
 
-        for key in input_dict.keys():
+        for key in list(input_dict.keys()):
             if (type(input_dict[key]) != list):
                 input_dict[key] = [input_dict[key]]
             input_dict[key.lower()] = input_dict.pop(key)
@@ -796,7 +796,7 @@ if __name__ == '__main__':
     pudb.set_trace()
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -807,6 +807,6 @@ if __name__ == '__main__':
         connector = WildfireConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
