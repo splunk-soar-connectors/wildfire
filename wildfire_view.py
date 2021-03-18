@@ -38,7 +38,7 @@ def parse_report(report):
     # the HTTP connections
     try:
         http_connections = report['network']['url']
-    except:
+    except Exception:
         http_connections = []
 
     for http_conn in http_connections:

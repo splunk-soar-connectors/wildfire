@@ -11,7 +11,7 @@ from phantom.app import BaseConnector
 from phantom.app import ActionResult
 try:
     from phantom.vault import Vault
-except:
+except Exception:
     import phantom.vault as Vault
 
 import phantom.utils as ph_utils
@@ -148,7 +148,7 @@ class WildfireConnector(BaseConnector):
 
             try:
                 processes = report['process_list']['process']
-            except:
+            except Exception:
                 processes = []
 
             for process in processes:
@@ -250,7 +250,7 @@ class WildfireConnector(BaseConnector):
                 payload = open(Vault.get_file_path(vault_id), 'rb')
             else:
                 payload = open(Vault.get_vault_file(vault_id), 'rb')  # pylint: disable=E1101
-        except:
+        except Exception:
             return (action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None)
 
         files = {'file': (filename, payload)}
@@ -267,7 +267,7 @@ class WildfireConnector(BaseConnector):
 
         try:
             payload = open(filepath, 'rb')
-        except:
+        except Exception:
            self.set_status(phantom.APP_ERROR, 'Test pdf file not found at "{}"'.format(filepath))
            self.append_to_message('Test Connectivity failed')
            return self.get_status()
@@ -542,7 +542,7 @@ class WildfireConnector(BaseConnector):
             verdict_code = int(response['get-verdict-info']['verdict'])
             verdict_sha256 = response['get-verdict-info']['sha256']
             verdict_md5 = response['get-verdict-info']['md5']
-        except:
+        except Exception:
             return (action_result.set_status(phantom.APP_ERROR, "Verdict could not be retrieved"), None)
 
         if verdict_code == 0:
@@ -605,7 +605,7 @@ class WildfireConnector(BaseConnector):
         # get sha256 and md5 hashes
         try:
             task_id = response[r_path]['sha256']
-        except:
+        except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Task id not part of response, can't continue")
 
         ret_val, verdict_data = self._get_verdict(task_id, action_result)
@@ -656,7 +656,7 @@ class WildfireConnector(BaseConnector):
         # get sha256 and md5 hashes
         try:
             task_id = response['submit-link-info']['sha256']
-        except:
+        except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Task id not part of response, can't continue")
 
         ret_val, verdict_data = self._get_verdict(task_id, action_result)
@@ -690,7 +690,7 @@ class WildfireConnector(BaseConnector):
         else:
             try:
                 metadata = Vault.get_meta_by_hash(self.get_container_id(), vault_id, calculate=True)[0]
-            except:
+            except Exception:
                 self.debug_print('Handled Exception:', e)
                 metadata = None
 
