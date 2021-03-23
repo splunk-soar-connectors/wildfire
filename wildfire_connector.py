@@ -250,6 +250,15 @@ class WildfireConnector(BaseConnector):
                 payload = open(Vault.get_file_path(vault_id), 'rb')
             else:
                 payload = open(Vault.get_vault_file(vault_id), 'rb')  # pylint: disable=E1101
+        except RuntimeError as e:
+            if str(e) == WILDFIRE_ERR_DEFUNCT_GET_FILE_PATH_API:  # since Phantom 4.10
+                import phantom.vault as vault
+                success, message, info = vault.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=False)
+                if success:
+                    payload = open(info[0]['path'], 'rb')
+                else:
+                    return (action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None)
+
         except Exception:
             return (action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None)
 
@@ -684,6 +693,12 @@ class WildfireConnector(BaseConnector):
         if hasattr(Vault, 'get_file_info'):
             try:
                 metadata = Vault.get_file_info(container_id=self.get_container_id(), vault_id=vault_id)[0]['metadata']
+            except RuntimeError as e:
+                if str(e) == WILDFIRE_ERR_DEFUNCT_GET_FILE_INFO_API:  # since Phantom 4.10
+                    import phantom.vault as vault
+                    success, message, info = vault.vault_info(container_id=self.get_container_id(), vault_id=vault_id, trace=False)
+                    if success:
+                        metadata = info[0]['metadata']
             except Exception as e:
                 self.debug_print('Handled Exception:', e)
                 metadata = None
@@ -788,6 +803,7 @@ class WildfireConnector(BaseConnector):
 
         return ret_val
 
+
 def main():
     import pudb
     import argparse
@@ -852,6 +868,7 @@ def main():
         print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
+
 
 if __name__ == '__main__':
     main()
