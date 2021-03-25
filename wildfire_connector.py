@@ -253,7 +253,7 @@ class WildfireConnector(BaseConnector):
             payload = open(vault_meta_info[0]['path'], 'rb')
 
         except Exception:
-            return (action_result.set_status(phantom.APP_ERROR, "Could not get file path for vault item"), None, None)
+            return (action_result.set_status(phantom.APP_ERROR, "Could not get file path for vault item"), None)
 
         if not payload:
             return (action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None)
@@ -697,7 +697,7 @@ class WildfireConnector(BaseConnector):
             metadata = vault_meta_info[0]['metadata']
 
         except Exception:
-            return (action_result.set_status(phantom.APP_ERROR, "Could not get file path for vault item"), None, None)
+            return (action_result.set_status(phantom.APP_ERROR, "Could not get file path for vault item"), None)
 
         if not metadata:
             return (action_result.set_status(phantom.APP_ERROR, "Unable to get meta info of vault file"), None)
