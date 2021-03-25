@@ -128,7 +128,7 @@ class WildfireConnector(BaseConnector):
         if not reports:
             return None
 
-        if type(reports) != list:
+        if not isinstance(reports, list):
             reports = [reports]
 
         response['task_info']['report'] = reports
@@ -158,7 +158,7 @@ class WildfireConnector(BaseConnector):
             sum_entries = report.get('summary', {}).get('entry')
             if sum_entries:
                 for i, entry in enumerate(sum_entries):
-                    if type(entry) != dict:
+                    if not isinstance(entry, dict):
                         sum_entries[i] = {'#text': entry, '@details': 'N/A', '@score': 'N/A', '@id': 'N/A'}
 
             report['registry'] = self._normalize_children_into_list(report.get('registry'))
@@ -297,7 +297,7 @@ class WildfireConnector(BaseConnector):
         if key not in input_dict:
             return None
 
-        if type(input_dict[key]) != list:
+        if not isinstance(input_dict[key], list):
             input_dict[key] = [input_dict[key]]
         input_dict[key.lower()] = input_dict.pop(key)
 
@@ -309,7 +309,7 @@ class WildfireConnector(BaseConnector):
             return {}
 
         for key in list(input_dict.keys()):
-            if type(input_dict[key]) != list:
+            if not isinstance(input_dict[key], list):
                 input_dict[key] = [input_dict[key]]
             input_dict[key.lower()] = input_dict.pop(key)
 
