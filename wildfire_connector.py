@@ -9,11 +9,8 @@
 import phantom.app as phantom
 from phantom.app import BaseConnector
 from phantom.app import ActionResult
-try:
-    from phantom.vault import Vault
-except Exception:
-    import phantom.vault as Vault
-
+from phantom.vault import Vault
+import phantom.rules as ph_rules
 import phantom.utils as ph_utils
 
 from wildfire_consts import *
@@ -246,20 +243,19 @@ class WildfireConnector(BaseConnector):
             filename = vault_id
 
         try:
-            if hasattr(Vault, 'get_file_path'):
-                payload = open(Vault.get_file_path(vault_id), 'rb')
-            else:
-                payload = open(Vault.get_vault_file(vault_id), 'rb')  # pylint: disable=E1101
-        except RuntimeError as e:
-            if str(e) == WILDFIRE_ERR_DEFUNCT_GET_FILE_PATH_API:  # since Phantom 4.10
-                import phantom.vault as vault
-                success, message, info = vault.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=False)
-                if success:
-                    payload = open(info[0]['path'], 'rb')
-                else:
-                    return (action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None)
+            success, message, vault_meta_info = ph_rules.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=False)
+            if not vault_meta_info:
+                self.debug_print("Error while fetching meta information for vault ID: {}, message: {}".format(vault_id, message))
+                return (action_result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_FILE_NOT_FOUND_IN_VAULT), None)
+
+            if not isinstance(vault_meta_info, list):
+                vault_meta_info = list(vault_meta_info)
+            payload = open(vault_meta_info[0]['path'], 'rb')
 
         except Exception:
+            return (action_result.set_status(phantom.APP_ERROR, "Could not get file path for vault item"), None, None)
+
+        if not payload:
             return (action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None)
 
         files = {'file': (filename, payload)}
@@ -690,24 +686,18 @@ class WildfireConnector(BaseConnector):
         sha256 = None
         metadata = None
 
-        if hasattr(Vault, 'get_file_info'):
-            try:
-                metadata = Vault.get_file_info(container_id=self.get_container_id(), vault_id=vault_id)[0]['metadata']
-            except RuntimeError as e:
-                if str(e) == WILDFIRE_ERR_DEFUNCT_GET_FILE_INFO_API:  # since Phantom 4.10
-                    import phantom.vault as vault
-                    success, message, info = vault.vault_info(container_id=self.get_container_id(), vault_id=vault_id, trace=False)
-                    if success:
-                        metadata = info[0]['metadata']
-            except Exception as e:
-                self.debug_print('Handled Exception:', e)
-                metadata = None
-        else:
-            try:
-                metadata = Vault.get_meta_by_hash(self.get_container_id(), vault_id, calculate=True)[0]
-            except Exception:
-                self.debug_print('Handled Exception:', e)
-                metadata = None
+        try:
+            success, message, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id, trace=False)
+            if not vault_meta_info:
+                self.debug_print("Error while fetching meta information for vault ID: {}, message: {}".format(vault_id, message))
+                return (action_result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_FILE_NOT_FOUND_IN_VAULT), None)
+
+            if not isinstance(vault_meta_info, list):
+                vault_meta_info = list(vault_meta_info)
+            metadata = vault_meta_info[0]['metadata']
+
+        except Exception:
+            return (action_result.set_status(phantom.APP_ERROR, "Could not get file path for vault item"), None, None)
 
         if not metadata:
             return (action_result.set_status(phantom.APP_ERROR, "Unable to get meta info of vault file"), None)
