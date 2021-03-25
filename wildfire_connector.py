@@ -308,7 +308,7 @@ class WildfireConnector(BaseConnector):
         if not input_dict:
             return {}
 
-        for key in list(input_dict.keys()):
+        for key in input_dict:
             if not isinstance(input_dict[key], list):
                 input_dict[key] = [input_dict[key]]
             input_dict[key.lower()] = input_dict.pop(key)
