@@ -1,5 +1,5 @@
 # File: wildfire_view.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -38,7 +38,7 @@ def parse_report(report):
     # the HTTP connections
     try:
         http_connections = report['network']['url']
-    except:
+    except Exception:
         http_connections = []
 
     for http_conn in http_connections:
@@ -92,7 +92,7 @@ def get_ctx_result(result):
 
     if (message) and ('max polling attempts' in message):
         ctx_result['message'] = message
-        print message
+        print(message)
 
     reports = data.get('task_info', {}).get('report')
 

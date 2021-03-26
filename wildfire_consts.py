@@ -1,5 +1,5 @@
 # File: wildfire_consts.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -20,6 +20,7 @@ WILDFIRE_ERR_REPLY_FORMAT_KEY_MISSING = "None '{key}' missing in reply from devi
 WILDFIRE_ERR_REPLY_NOT_SUCCESS = "REST call returned '{status}'"
 WILDFIRE_SUCC_REST_CALL_SUCCEEDED = "REST Api call succeeded"
 WILDFIRE_ERR_REST_API = "REST Api Call returned error, status_code: {status_code}, detail: {detail}"
+WILDFIRE_ERR_FILE_NOT_FOUND_IN_VAULT = "File not found in vault"
 
 WILDFIRE_TEST_PDF_FILE = "wildfire_test_connectivity.pdf"
 WILDFIRE_SLEEP_SECS = 10
