@@ -1,5 +1,5 @@
 # File: wildfire_consts.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -20,11 +20,17 @@ WILDFIRE_ERR_REPLY_FORMAT_KEY_MISSING = "None '{key}' missing in reply from devi
 WILDFIRE_ERR_REPLY_NOT_SUCCESS = "REST call returned '{status}'"
 WILDFIRE_SUCC_REST_CALL_SUCCEEDED = "REST Api call succeeded"
 WILDFIRE_ERR_REST_API = "REST Api Call returned error, status_code: {status_code}, detail: {detail}"
+WILDFIRE_ERR_FILE_NOT_FOUND_IN_VAULT = "File not found in vault"
+WILDFIRE_INVALID_INT = "Please provide a valid integer value in the {param}"
+WILDFIRE_ERR_INVALID_PARAM = "Please provide a non-zero positive integer in the {param}"
+WILDFIRE_ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
 
 WILDFIRE_TEST_PDF_FILE = "wildfire_test_connectivity.pdf"
 WILDFIRE_SLEEP_SECS = 10
 WILDFIRE_MSG_REPORT_PENDING = "Report Pending"
 WILDFIRE_MSG_MAX_POLLS_REACHED = "Reached max polling attempts. Please use the MD5 or Sha256 of the file as a parameter to <b>get report</b> to query the report status."
+
+WILDFIRE_TIMEOUT = "'timeout' action parameter"
 
 # in minutes
 WILDFIRE_MAX_TIMEOUT_DEF = 10
