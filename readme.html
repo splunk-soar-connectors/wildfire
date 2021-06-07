@@ -13,3 +13,24 @@ To enable the access for fetching files from the Wildfire instance, please enabl
     <li>Select Licensing API option in the left navigation panel and activate the licensing API key</li>
 </ol>
 </p>
+
+<p><b>Playbook Backward Compatibility</b>
+	<ul>
+		<li>The list of supported Platforms in <b>platform</b> parameter of <b>Get Pcap</b> action has been updated as mentioned below. Hence, it is requested to the end-user to please update their existing playbooks and provide updated values to this action parameter to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+      <ul>
+        <li>Below mentioned old values are updated to new values:</li>
+          <ul>
+              <li><b>Win XP, Adobe 9.3.3, Office 2003</b> -> <b>Windows XP, Adobe Reader 9.3.3, Office 2003</b></li>
+              <li><b>Win XP, Adobe 9.4.0, Flash 10, Office 2007</b> -> <b>Windows XP, Adobe Reader 9.4.0, Flash 10, Office 2007</b></li>
+              <li><b>Win XP, Adobe 11, Flash 11, Office 2010</b> -> <b>Windows XP, Adobe Reader 11, Flash 11, Office 2010</b></li>
+              <li><b>Win 7 32-bit, Adobe 11, Flash11, Office 2010</b> -> <b>Windows 7 32-bit, Adobe Reader 11, Flash11, Office 20103</b></li>
+              <li><b>Win 7 64 bit, Adobe 11, Flash 11, Office 201</b> -> <b>Windows 7 64-bit, Adobe Reader 11, Flash 11, Office 2010</b></li>
+          </ul>
+        <li><b>27</b> new values have been added.</li>
+      </ul>
+	</ul>
+</p>
+
+<p>
+  The <b>timeout</b> parameter is only useful for fetching the report in detonate actions and 'get report' action
+</p>
