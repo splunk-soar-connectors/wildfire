@@ -70,6 +70,7 @@ def get_ctx_result(result):
     ctx_result['task_id'] = param.get('id')
     ctx_result['vault_id'] = param.get('vault_id')
     ctx_result['vault_file_name'] = param.get('file_name')
+    ctx_result['param'] = param
 
     data = result.get_data()
 
@@ -95,6 +96,12 @@ def get_ctx_result(result):
         print(message)
 
     reports = data.get('task_info', {}).get('report')
+
+    if param.get('is_file', None) is False:
+        reports = data.get('result', {}).get('report')
+        reports = [reports]
+        ctx_result['url_type'] = data.get('result', {}).get('url_type', None)
+        ctx_result['analysis_time'] = data.get('result', {}).get('analysis_time', None)
 
     if (not reports):
         return ctx_result
