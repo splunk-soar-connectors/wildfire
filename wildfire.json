@@ -10,7 +10,7 @@
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "5.0.0",
     "latest_tested_versions": [
         "Cloud API, May 17, 2021"
     ],
@@ -10328,7 +10328,7 @@
                     "data_path": "action_result.summary.vault_id",
                     "data_type": "string",
                     "column_name": "Vault ID",
-                    "column_order": "1"
+                    "column_order": "3"
                 },
                 {
                     "data_path": "action_result.message",
