@@ -15,6 +15,7 @@
         "Cloud API, May 17, 2021"
     ],
     "python_version": "3",
+    "fips_compliant": true,
     "publisher": "Splunk",
     "consolidate_widgets": true,
     "logo": "logo_paloaltonetworks.svg",
@@ -65,7 +66,7 @@
         {
             "action": "detonate file",
             "description": "Run the file in the WildFire sandbox and retrieve the analysis results",
-            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>",
+            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>.",
             "type": "investigate",
             "identifier": "detonate_file",
             "read_only": true,
@@ -912,7 +913,7 @@
             "action": "detonate url",
             "identifier": "detonate_url",
             "description": "Submit a single website link for WildFire analysis",
-            "verbose": "The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>If the hash is present in the WildFire database, then a report will be returned as:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>",
+            "verbose": "The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>If the hash is present in the WildFire database, then a report will be returned as:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -9362,7 +9363,7 @@
             "action": "url reputation",
             "identifier": "get_url_reputation",
             "description": "Submit a single website link for WildFire verdict",
-            "verbose": "The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be quieried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>",
+            "verbose": "The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be quieried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
