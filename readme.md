@@ -46,5 +46,13 @@ API key.
 
     -   **27** new values have been added.
 
+**Detonate File: Filename Parameter**
+
+-   According to the Wildfire documentation: "When submitting supported script files, you must specify 
+    an accurate filename using the context parameter, otherwise WildFire is unable to parse the file 
+    and returns a 418 Unsupported File Type response." 
+-   Please see the following link for more information: [Wildfire API Documentation](https://docs.paloaltonetworks.com/wildfire/u-v/wildfire-api/submit-files-and-links-through-the-wildfire-api)
+
+
 The **timeout** parameter is only useful for fetching the report in detonate actions and 'get
 report' action

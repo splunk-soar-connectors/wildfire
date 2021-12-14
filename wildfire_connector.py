@@ -172,7 +172,6 @@ class WildfireConnector(BaseConnector):
         elif 'HTTPS_PROXY' in os.environ:
             self._proxy['https'] = os.environ.get('HTTPS_PROXY')
 
-
         self._req_sess = requests.Session()
 
         return phantom.APP_SUCCESS
