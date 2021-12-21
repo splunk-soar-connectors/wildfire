@@ -1,8 +1,16 @@
 <!-- File: readme.html
   Copyright (c) 2016-2021 Splunk Inc.
 
-  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-  without a valid written license from Splunk Inc. is PROHIBITED.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language governing permissions
+and limitations under the License.
 -->
 
 <p>
@@ -31,6 +39,12 @@ To enable the access for fetching files from the Wildfire instance, please enabl
 	</ul>
 </p>
 
+<p><b>Detonate File: Filename Parameter</b></p>
+  <ul>
+    <li>According to the Wildfire documentation: "When submitting supported script files, you must specify an accurate filename using the context parameter, otherwise WildFire is unable to parse the file and returns a 418 Unsupported File Type response."</li>
+    <li>Please see the following link for more information: <a href="https://docs.paloaltonetworks.com/wildfire/u-v/wildfire-api/submit-files-and-links-through-the-wildfire-api/submit-a-remote-file-to-wildfire-api.html" target="_blank">Wildfire API Documentation</a></li>
+  </ul>
+</p>
 <p>
   The <b>timeout</b> parameter is only useful for fetching the report in detonate actions and 'get report' action
 </p>
