@@ -9947,6 +9947,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.task_info.report.*.file_info.Min_SDK_Requirement",
+                    "data_type": "string",
+                    "example_values": [
+                        "11"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file_info.Repackaged",
+                    "data_type": "string",
+                    "example_values": [
+                        "False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file_info.Target_SDK",
+                    "data_type": "string",
+                    "example_values": [
+                        "11"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.task_info.report.*.malware",
                     "data_type": "string"
                 },
