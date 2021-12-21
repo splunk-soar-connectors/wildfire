@@ -2,7 +2,7 @@
 # WildFire
 
 Publisher: Splunk  
-Connector Version: 2\.1\.5  
+Connector Version: 2\.1\.7  
 Product Vendor: Palo Alto Networks  
 Product Name: WildFire  
 Product Version Supported (regex): "\.\*"  
@@ -1521,6 +1521,9 @@ action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.App\_Icon | string
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.App\_Name | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.File\_Type | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Max\_SDK\_Requirement | string | 
+action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Min\_SDK\_Requirement | string | 
+action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Repackaged | string | 
+action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Target\_SDK | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Min\_SDK\_Requirement | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Repackaged | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Target\_SDK | string | 
