@@ -147,7 +147,8 @@ class WildfireConnector(BaseConnector):
 
         config = self.get_config()
 
-        ret_val, self.timeout = self._validate_integer(self, config.get(WILDFIRE_JSON_POLL_TIMEOUT_MINS, WILDFIRE_MAX_TIMEOUT_DEF), WILDFIRE_TIMEOUT)
+        ret_val, self.timeout = self._validate_integer(self, config.get(
+            WILDFIRE_JSON_POLL_TIMEOUT_MINS, WILDFIRE_MAX_TIMEOUT_DEF), WILDFIRE_TIMEOUT)
         if phantom.is_fail(ret_val):
             return self.get_status()
 
@@ -317,7 +318,8 @@ class WildfireConnector(BaseConnector):
 
         return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_REST_API.format(status_code=status_code, detail=detail))
 
-    def _make_rest_call(self, endpoint, result, error_desc, method="get", params={}, data={}, files=None, parse_response=True, additional_succ_codes={}):
+    def _make_rest_call(self, endpoint, result, error_desc, method="get", params={}, data={},
+                        files=None, parse_response=True, additional_succ_codes={}):
 
         url = "{0}{1}".format(self._base_url, endpoint)
 
@@ -385,7 +387,8 @@ class WildfireConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid"), None
 
         if not vault_info:
-            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
+            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(
+                param.get('vault_id')))
 
         vault_path = vault_info.get('path', None)
         if vault_path is None:
@@ -607,7 +610,8 @@ class WildfireConnector(BaseConnector):
 
         # move the file to the vault
         try:
-            success, message, vault_id = ph_rules.vault_add(self.get_container_id(), file_path, file_name=file_name, metadata={'contains': contains})
+            success, message, vault_id = ph_rules.vault_add(self.get_container_id(), file_path,
+                                                            file_name=file_name, metadata={'contains': contains})
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
@@ -639,7 +643,8 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress('Getting file from WildFire')
 
-        ret_val, response = self._make_rest_call('/get/sample', action_result, self.GET_SAMPLE_ERROR_DESC, method='post', data={'hash': sample_hash}, parse_response=False)
+        ret_val, response = self._make_rest_call('/get/sample', action_result, self.GET_SAMPLE_ERROR_DESC,
+                                                 method='post', data={'hash': sample_hash}, parse_response=False)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -659,7 +664,8 @@ class WildfireConnector(BaseConnector):
             'format': 'pdf'
         }
 
-        ret_val, response = self._make_rest_call('/get/report', action_result, self.GET_REPORT_ERROR_DESC, method='post', data=data, parse_response=False)
+        ret_val, response = self._make_rest_call('/get/report', action_result, self.GET_REPORT_ERROR_DESC,
+                                                 method='post', data=data, parse_response=False)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -695,19 +701,22 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress('Getting pcap from WildFire')
 
-        ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
+        ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC,
+                                                 method='post', data=rest_data, parse_response=False)
 
         if phantom.is_fail(ret_val):
             if platform_id in [2, 5]:
                 platform_id = 60 if platform_id == 2 else 61
                 rest_data.update({'platform': platform_id})
-                ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
+                ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC,
+                                                         method='post', data=rest_data, parse_response=False)
 
                 if phantom.is_fail(ret_val):
                     if platform_id == 60:
                         platform_id = 20
                         rest_data.update({'platform': platform_id})
-                        ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
+                        ret_val, response = self._make_rest_call(
+                            '/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
 
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
@@ -731,9 +740,11 @@ class WildfireConnector(BaseConnector):
 
         # make rest call to get verdict whether URL is in wildfire db
         if not task_id:
-            ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'url': ('', url)})
+            ret_val, response = self._make_rest_call('/get/verdict', action_result,
+                                                     self.FILE_UPLOAD_ERROR_DESC, method='post', files={'url': ('', url)})
         else:
-            ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
+            ret_val, response = self._make_rest_call('/get/verdict', action_result,
+                                                     self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
