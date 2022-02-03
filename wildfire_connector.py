@@ -1,6 +1,6 @@
 # File: wildfire_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
 #
 #
 # Phantom imports
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
-from phantom.vault import Vault
-import phantom.rules as ph_rules
-import phantom.utils as ph_utils
-
-from wildfire_consts import *
-
-# Other imports used by this connector
-import os
-import time
 import inspect
 import json
+# Other imports used by this connector
+import os
+import re
+import shutil
+import time
+import uuid
+
+import magic
+import phantom.app as phantom
+import phantom.rules as ph_rules
+import phantom.utils as ph_utils
 import requests
 import xmltodict
-import uuid
-import re
-import magic
-import shutil
 from bs4 import BeautifulSoup
+from phantom.app import ActionResult, BaseConnector
+from phantom.vault import Vault
+
+from wildfire_consts import *
 
 
 class WildfireConnector(BaseConnector):
@@ -1028,8 +1027,9 @@ class WildfireConnector(BaseConnector):
 
 
 def main():
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
