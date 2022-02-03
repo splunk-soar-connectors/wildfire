@@ -1033,7 +1033,6 @@ class WildfireConnector(BaseConnector):
 
 def main():
     import argparse
-
     import sys
 
     import pudb

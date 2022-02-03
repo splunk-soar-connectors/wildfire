@@ -69,6 +69,13 @@ API key.
 The **timeout** parameter is only useful for fetching the report in detonate actions and 'get
 report' action
 
+### Port Information
+The app uses HTTP/ HTTPS protocol for communicating with the Wildfire server. Below are the default ports used by Splunk SOAR.
+
+SERVICE NAME | TRANSPORT PROTOCOL | PORT
+------------ | ------------------ | ----
+**http** | tcp | 80
+**https** | tcp | 443
 
 ### Configuration Variables
 The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a WildFire asset in SOAR.
