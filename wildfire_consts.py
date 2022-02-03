@@ -14,7 +14,7 @@
 # and limitations under the License.
 WILDFIRE_JSON_BASE_URL = "base_url"
 WILDFIRE_JSON_TASK_ID = "task_id"
-WILDFIRE_JSON_API_KEY = "api_key" # pragma: allowlist secret
+WILDFIRE_JSON_API_KEY = "api_key"  # pragma: allowlist secret
 WILDFIRE_JSON_MALWARE = "malware"
 WILDFIRE_JSON_TASK_ID = "id"
 WILDFIRE_JSON_URL = "url"
