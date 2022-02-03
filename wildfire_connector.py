@@ -317,9 +317,15 @@ class WildfireConnector(BaseConnector):
 
         return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_REST_API.format(status_code=status_code, detail=detail))
 
-    def _make_rest_call(self, endpoint, result, error_desc, method="get", params={}, data={}, files=None, parse_response=True, additional_succ_codes={}):
+    def _make_rest_call(
+        self, endpoint, result, error_desc, method="get", params={}, data=None,
+        files=None, parse_response=True, additional_succ_codes={}
+    ):
 
         url = "{0}{1}".format(self._base_url, endpoint)
+
+        if not data:
+            data = {}
 
         config = self.get_config()
 
@@ -1027,6 +1033,7 @@ class WildfireConnector(BaseConnector):
 
 def main():
     import argparse
+
     import sys
 
     import pudb
