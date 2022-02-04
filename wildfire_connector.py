@@ -455,12 +455,15 @@ class WildfireConnector(BaseConnector):
         if not input_dict:
             return {}
 
-        for key in list(input_dict):
+        output_dict = {}
+        for key in input_dict:
             if not isinstance(input_dict[key], list):
-                input_dict[key] = [input_dict[key]]
-            input_dict[key.lower()] = input_dict.pop(key)
+                output_dict[key] = [input_dict[key]]
+            else:
+                output_dict[key] = input_dict[key]
+            output_dict[key.lower()] = output_dict.pop(key)
 
-        return input_dict
+        return output_dict
 
     def _check_detonated_report(self, task_id, action_result):
         """This function is different than other functions that get the report
