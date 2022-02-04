@@ -1,6 +1,6 @@
 # File: wildfire_consts.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # and limitations under the License.
 WILDFIRE_JSON_BASE_URL = "base_url"
 WILDFIRE_JSON_TASK_ID = "task_id"
-WILDFIRE_JSON_API_KEY = "api_key"
+WILDFIRE_JSON_API_KEY = "api_key"  # pragma: allowlist secret
 WILDFIRE_JSON_MALWARE = "malware"
 WILDFIRE_JSON_TASK_ID = "id"
 WILDFIRE_JSON_URL = "url"
@@ -35,7 +35,8 @@ WILDFIRE_ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer v
 WILDFIRE_TEST_PDF_FILE = "wildfire_test_connectivity.pdf"
 WILDFIRE_SLEEP_SECS = 10
 WILDFIRE_MSG_REPORT_PENDING = "Report Pending"
-WILDFIRE_MSG_MAX_POLLS_REACHED = "Reached max polling attempts. Please use the MD5 or Sha256 of the file as a parameter to <b>get report</b> to query the report status."
+WILDFIRE_MSG_MAX_POLLS_REACHED = ("Reached max polling attempts. "
+"Please use the MD5 or Sha256 of the file as a parameter to <b>get report</b> to query the report status.")
 
 WILDFIRE_TIMEOUT = "'timeout' action parameter"
 
