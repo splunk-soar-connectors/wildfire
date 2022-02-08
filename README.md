@@ -2,7 +2,7 @@
 # WildFire
 
 Publisher: Splunk  
-Connector Version: 2\.2\.2  
+Connector Version: 2\.2\.3  
 Product Vendor: Palo Alto Networks  
 Product Name: WildFire  
 Product Version Supported (regex): "\.\*"  
