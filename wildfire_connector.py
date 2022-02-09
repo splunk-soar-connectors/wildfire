@@ -1,6 +1,6 @@
 # File: wildfire_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
 #
 #
 # Phantom imports
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
-from phantom.vault import Vault
-import phantom.rules as ph_rules
-import phantom.utils as ph_utils
-
-from wildfire_consts import *
-
-# Other imports used by this connector
-import os
-import time
 import inspect
 import json
+# Other imports used by this connector
+import os
+import re
+import shutil
+import time
+import uuid
+
+import magic
+import phantom.app as phantom
+import phantom.rules as ph_rules
+import phantom.utils as ph_utils
 import requests
 import xmltodict
-import uuid
-import re
-import magic
-import shutil
 from bs4 import BeautifulSoup
+from phantom.app import ActionResult, BaseConnector
+from phantom.vault import Vault
+
+from wildfire_consts import *
 
 
 class WildfireConnector(BaseConnector):
@@ -147,7 +146,8 @@ class WildfireConnector(BaseConnector):
 
         config = self.get_config()
 
-        ret_val, self.timeout = self._validate_integer(self, config.get(WILDFIRE_JSON_POLL_TIMEOUT_MINS, WILDFIRE_MAX_TIMEOUT_DEF), WILDFIRE_TIMEOUT)
+        ret_val, self.timeout = self._validate_integer(self, config.get(
+            WILDFIRE_JSON_POLL_TIMEOUT_MINS, WILDFIRE_MAX_TIMEOUT_DEF), WILDFIRE_TIMEOUT)
         if phantom.is_fail(ret_val):
             return self.get_status()
 
@@ -317,9 +317,15 @@ class WildfireConnector(BaseConnector):
 
         return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_REST_API.format(status_code=status_code, detail=detail))
 
-    def _make_rest_call(self, endpoint, result, error_desc, method="get", params={}, data={}, files=None, parse_response=True, additional_succ_codes={}):
+    def _make_rest_call(
+        self, endpoint, result, error_desc, method="get", params={}, data=None,
+        files=None, parse_response=True, additional_succ_codes={}
+    ):
 
         url = "{0}{1}".format(self._base_url, endpoint)
+
+        if not data:
+            data = {}
 
         config = self.get_config()
 
@@ -385,7 +391,8 @@ class WildfireConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid"), None
 
         if not vault_info:
-            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
+            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(
+                param.get('vault_id')))
 
         vault_path = vault_info.get('path', None)
         if vault_path is None:
@@ -448,12 +455,15 @@ class WildfireConnector(BaseConnector):
         if not input_dict:
             return {}
 
+        output_dict = {}
         for key in input_dict:
             if not isinstance(input_dict[key], list):
-                input_dict[key] = [input_dict[key]]
-            input_dict[key.lower()] = input_dict.pop(key)
+                output_dict[key] = [input_dict[key]]
+            else:
+                output_dict[key] = input_dict[key]
+            output_dict[key.lower()] = output_dict.pop(key)
 
-        return input_dict
+        return output_dict
 
     def _check_detonated_report(self, task_id, action_result):
         """This function is different than other functions that get the report
@@ -607,7 +617,8 @@ class WildfireConnector(BaseConnector):
 
         # move the file to the vault
         try:
-            success, message, vault_id = ph_rules.vault_add(self.get_container_id(), file_path, file_name=file_name, metadata={'contains': contains})
+            success, message, vault_id = ph_rules.vault_add(self.get_container_id(), file_path,
+                                                            file_name=file_name, metadata={'contains': contains})
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
@@ -639,7 +650,8 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress('Getting file from WildFire')
 
-        ret_val, response = self._make_rest_call('/get/sample', action_result, self.GET_SAMPLE_ERROR_DESC, method='post', data={'hash': sample_hash}, parse_response=False)
+        ret_val, response = self._make_rest_call('/get/sample', action_result, self.GET_SAMPLE_ERROR_DESC,
+                                                 method='post', data={'hash': sample_hash}, parse_response=False)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -659,7 +671,8 @@ class WildfireConnector(BaseConnector):
             'format': 'pdf'
         }
 
-        ret_val, response = self._make_rest_call('/get/report', action_result, self.GET_REPORT_ERROR_DESC, method='post', data=data, parse_response=False)
+        ret_val, response = self._make_rest_call('/get/report', action_result, self.GET_REPORT_ERROR_DESC,
+                                                 method='post', data=data, parse_response=False)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -695,19 +708,22 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress('Getting pcap from WildFire')
 
-        ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
+        ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC,
+                                                 method='post', data=rest_data, parse_response=False)
 
         if phantom.is_fail(ret_val):
             if platform_id in [2, 5]:
                 platform_id = 60 if platform_id == 2 else 61
                 rest_data.update({'platform': platform_id})
-                ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
+                ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC,
+                                                         method='post', data=rest_data, parse_response=False)
 
                 if phantom.is_fail(ret_val):
                     if platform_id == 60:
                         platform_id = 20
                         rest_data.update({'platform': platform_id})
-                        ret_val, response = self._make_rest_call('/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
+                        ret_val, response = self._make_rest_call(
+                            '/get/pcap', action_result, self.GET_PCAP_ERROR_DESC, method='post', data=rest_data, parse_response=False)
 
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
@@ -731,9 +747,11 @@ class WildfireConnector(BaseConnector):
 
         # make rest call to get verdict whether URL is in wildfire db
         if not task_id:
-            ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'url': ('', url)})
+            ret_val, response = self._make_rest_call('/get/verdict', action_result,
+                                                     self.FILE_UPLOAD_ERROR_DESC, method='post', files={'url': ('', url)})
         else:
-            ret_val, response = self._make_rest_call('/get/verdict', action_result, self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
+            ret_val, response = self._make_rest_call('/get/verdict', action_result,
+                                                     self.FILE_UPLOAD_ERROR_DESC, method='post', files={'hash': ('', task_id)})
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
@@ -1017,8 +1035,10 @@ class WildfireConnector(BaseConnector):
 
 
 def main():
-    import pudb
     import argparse
+    import sys
+
+    import pudb
 
     pudb.set_trace()
 
@@ -1027,12 +1047,14 @@ def main():
     argparser.add_argument('input_test_json', help='Input Test JSON file')
     argparser.add_argument('-u', '--username', help='username', required=False)
     argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
 
     username = args.username
     password = args.password
+    verify = args.verify
 
     if username is not None and password is None:
 
@@ -1045,7 +1067,7 @@ def main():
             login_url = WildfireConnector._get_phantom_base_url() + '/login'
 
             print("Accessing the Login page")
-            r = requests.get(login_url, verify=False)
+            r = requests.get(login_url, verify=verify)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1058,11 +1080,13 @@ def main():
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                login_url, verify=verify, data=data, headers=headers
+            )
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
-            exit(1)
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -1079,7 +1103,7 @@ def main():
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)
 
 
 if __name__ == '__main__':

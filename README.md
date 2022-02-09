@@ -2,16 +2,16 @@
 # WildFire
 
 Publisher: Splunk  
-Connector Version: 2\.1\.7  
+Connector Version: 2\.2\.2  
 Product Vendor: Palo Alto Networks  
 Product Name: WildFire  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.1\.0  
 
 This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox
 
-[comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2016-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # "  Copyright (c) 2016-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -68,6 +68,16 @@ API key.
 
 The **timeout** parameter is only useful for fetching the report in detonate actions and 'get
 report' action
+
+## Port Information
+
+The app uses HTTP/ HTTPS protocol for communicating with the Wildfire server. Below are the default
+ports used by Splunk SOAR.
+
+|         Service Name | Transport Protocol | Port |
+|----------------------|--------------------|------|
+|         http         | tcp                | 80   |
+|         https        | tcp                | 443  |
 
 
 ### Configuration Variables
