@@ -1,12 +1,12 @@
 [comment]: # "Auto-generated SOAR connector documentation"
 # WildFire
 
-Publisher: Splunk  
-Connector Version: 2\.2\.2  
+Publisher: Splunk Community  
+Connector Version: 3\.0\.0  
 Product Vendor: Palo Alto Networks  
 Product Name: WildFire  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Minimum Product Version: 5\.2\.0  
 
 This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox
 
@@ -1532,10 +1532,10 @@ action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.App\_Name | string
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.File\_Type | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Max\_SDK\_Requirement | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Min\_SDK\_Requirement | string | 
-action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Repackaged | string | 
-action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Target\_SDK | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Min\_SDK\_Requirement | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Repackaged | string | 
+action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Repackaged | string | 
+action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Target\_SDK | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.file\_info\.Target\_SDK | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.malware | string | 
 action\_result\.data\.\*\.task\_info\.report\.\*\.md5 | string |  `md5`  `hash` 
