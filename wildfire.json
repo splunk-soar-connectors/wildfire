@@ -11,9 +11,6 @@
     "product_name": "WildFire",
     "product_version_regex": ".*",
     "min_phantom_version": "5.2.0",
-    "latest_tested_versions": [
-        "Cloud API, May 17, 2021"
-    ],
     "python_version": "3",
     "fips_compliant": true,
     "publisher": "Splunk Community",
@@ -100,6 +97,7 @@
                 },
                 "file_name": {
                     "description": "Filename to use",
+                    "verbose": "This value will be passed to the sandbox as the name of the file that is pickup up from the vault. If a script is provided, this parameter is required.",
                     "data_type": "string",
                     "order": 1,
                     "contains": [
