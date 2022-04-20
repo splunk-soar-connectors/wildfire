@@ -4,19 +4,16 @@
     "description": "This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox",
     "type": "sandbox",
     "main_module": "wildfire_connector.py",
-    "app_version": "2.2.2",
+    "app_version": "3.0.0",
     "utctime_updated": "2022-02-04T17:52:04.000000Z",
     "package_name": "phantom_wildfire",
     "product_vendor": "Palo Alto Networks",
     "product_name": "WildFire",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.1.0",
-    "latest_tested_versions": [
-        "Cloud API, May 17, 2021"
-    ],
+    "min_phantom_version": "5.2.0",
     "python_version": "3",
     "fips_compliant": true,
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "consolidate_widgets": true,
     "logo": "logo_paloaltonetworks.svg",
     "logo_dark": "logo_paloaltonetworks_dark.svg",
@@ -105,7 +102,8 @@
                     "order": 1,
                     "contains": [
                         "file name"
-                    ]
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -9933,20 +9931,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.task_info.report.*.file_info.Repackaged",
-                    "data_type": "string",
-                    "example_values": [
-                        "False"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.task_info.report.*.file_info.Target_SDK",
-                    "data_type": "string",
-                    "example_values": [
-                        "11"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.task_info.report.*.file_info.Min_SDK_Requirement",
                     "data_type": "string",
                     "example_values": [
@@ -9958,6 +9942,20 @@
                     "data_type": "string",
                     "example_values": [
                         "False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file_info.Repackaged",
+                    "data_type": "string",
+                    "example_values": [
+                        "False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_info.report.*.file_info.Target_SDK",
+                    "data_type": "string",
+                    "example_values": [
+                        "11"
                     ]
                 },
                 {
