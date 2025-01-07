@@ -204,26 +204,26 @@ class WildfireConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        error_message = "Unknown error occurred. Please check the asset configuration and|or action parameters."
         error_code = "Error code unavailable"
         try:
             if e.args:
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
                 elif len(e.args) == 1:
                     error_code = "Error code unavailable"
-                    error_msg = e.args[0]
+                    error_message = e.args[0]
             else:
                 error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                error_message = "Unknown error occurred. Please check the asset configuration and|or action parameters."
         except:
             error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_message = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
 
-    def _parse_report_status_msg(self, response, action_result):
+    def _parse_report_status_message(self, response, action_result):
 
         task_info = response.get("task_info", None)
 
@@ -344,8 +344,8 @@ class WildfireConnector(BaseConnector):
         try:
             r = request_func(url, params=params, data=data, files=files, verify=config[phantom.APP_JSON_VERIFY], proxies=self._proxy)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return result.set_status(phantom.APP_ERROR, "REST Api to server failed", error_msg), None
+            error_message = self._get_error_message_from_exception(e)
+            return result.set_status(phantom.APP_ERROR, "REST Api to server failed", error_message), None
 
         # It's ok if r.text is None, dump that
         if hasattr(result, "add_debug_data"):
@@ -368,9 +368,9 @@ class WildfireConnector(BaseConnector):
         try:
             response_dict = xmltodict.parse(xml)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_message = self._get_error_message_from_exception(e)
             self.save_progress(WILDFIRE_ERR_UNABLE_TO_PARSE_REPLY)
-            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_UNABLE_TO_PARSE_REPLY, error_msg), None
+            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_UNABLE_TO_PARSE_REPLY, error_message), None
 
         if "wildfire" not in response_dict:
             return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_REPLY_FORMAT_KEY_MISSING.format(key="wildfire"))
@@ -406,8 +406,8 @@ class WildfireConnector(BaseConnector):
         try:
             payload = open(vault_path, "rb")
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_message))
 
         files = {"file": (filename, payload)}
 
@@ -424,8 +424,8 @@ class WildfireConnector(BaseConnector):
         try:
             payload = open(filepath, "rb")
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            self.set_status(phantom.APP_ERROR, 'Test pdf file not found at "{}"'.format(filepath), error_msg)
+            error_message = self._get_error_message_from_exception(e)
+            self.set_status(phantom.APP_ERROR, 'Test pdf file not found at "{}"'.format(filepath), error_message)
             self.append_to_message("Test Connectivity failed")
             return self.get_status()
 
@@ -484,7 +484,7 @@ class WildfireConnector(BaseConnector):
             return action_result.get_status(), None
 
         # parse if successful
-        response = self._parse_report_status_msg(response, action_result)
+        response = self._parse_report_status_message(response, action_result)
 
         if response:
             return phantom.APP_SUCCESS, response
@@ -517,14 +517,14 @@ class WildfireConnector(BaseConnector):
                 self.GET_REPORT_ERROR_DESC,
                 method="post",
                 data=data,
-                additional_succ_codes={404: WILDFIRE_MSG_REPORT_PENDING},
+                additional_succ_codes={404: WILDFIRE_MESSAGE_REPORT_PENDING},
                 parse_response=False if url else True,
             )
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
 
-            if WILDFIRE_MSG_REPORT_PENDING in response:
+            if WILDFIRE_MESSAGE_REPORT_PENDING in response:
                 time.sleep(WILDFIRE_SLEEP_SECS)
                 continue
 
@@ -534,8 +534,8 @@ class WildfireConnector(BaseConnector):
                     try:
                         response = response.json()
                     except Exception as e:
-                        error_msg = self._get_error_message_from_exception(e)
-                        return action_result.set_status(phantom.APP_ERROR, "Unable to parse response as JSON", error_msg), None
+                        error_message = self._get_error_message_from_exception(e)
+                        return action_result.set_status(phantom.APP_ERROR, "Unable to parse response as JSON", error_message), None
 
                     result = response.get("result", None)
                     if result:
@@ -544,7 +544,7 @@ class WildfireConnector(BaseConnector):
                         response["result"].update({"report": report})
                 else:
                     # parse if successfull and url is none
-                    response = self._parse_report_status_msg(response, action_result)
+                    response = self._parse_report_status_message(response, action_result)
 
                 if response:
                     return phantom.APP_SUCCESS, response
@@ -553,7 +553,7 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress("Reached max polling attempts.")
 
-        return action_result.set_status(phantom.APP_ERROR, WILDFIRE_MSG_MAX_POLLS_REACHED), None
+        return action_result.set_status(phantom.APP_ERROR, WILDFIRE_MESSAGE_MAX_POLLS_REACHED), None
 
     def _get_report(self, param):
 
@@ -604,8 +604,8 @@ class WildfireConnector(BaseConnector):
         try:
             os.makedirs(local_dir)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", error_msg)
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", error_message)
 
         file_path = "{0}/{1}".format(local_dir, sample_hash)
 
@@ -614,8 +614,8 @@ class WildfireConnector(BaseConnector):
             with open(file_path, "wb") as f:
                 f.write(response.content)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to open file: {}".format(error_msg))
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to open file: {}".format(error_message))
 
         contains = []
         file_ext = ""
@@ -634,8 +634,8 @@ class WildfireConnector(BaseConnector):
                 self.get_container_id(), file_path, file_name=file_name, metadata={"contains": contains}
             )
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, error_msg)
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
         curr_data = {}
         if success:
             curr_data[phantom.APP_JSON_VAULT_ID] = vault_id
@@ -944,8 +944,8 @@ class WildfireConnector(BaseConnector):
         try:
             sha256 = metadata["sha256"]
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to get meta info of vault file", error_msg), None
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to get meta info of vault file", error_message), None
 
         return phantom.APP_SUCCESS, sha256
 
