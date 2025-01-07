@@ -6,7 +6,7 @@ Connector Version: 3.0.0
 Product Vendor: Palo Alto Networks  
 Product Name: WildFire  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.0  
+Minimum Product Version: 6.3.0  
 
 This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox
 
