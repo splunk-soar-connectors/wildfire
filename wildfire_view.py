@@ -15,55 +15,55 @@
 def json_dump_view(provides, all_app_runs, context):
 
     # context['jsons'] = [json.dumps(item, separators=(',', ':'), sort_keys=True, indent=4) for item in j]
-    context['jsons'] = jsons = []
+    context["jsons"] = jsons = []
     for summary, action_results in all_app_runs:
         jsons.extend([x.id for x in action_results])
-    return 'json_dump.html'
+    return "json_dump.html"
 
 
 def all_results(provides, all_app_runs, context):
 
-    context['menu'] = menu = {}
+    context["menu"] = menu = {}
 
     # Loop through all the app runs
     for summary, action_results in all_app_runs:
         for result in action_results:
             param = result.get_param()
-            target = param.get('hash')
-            if (not target):
-                target = param.get('vault_id')
-            if (not target):
-                target = param.get('id')
+            target = param.get("hash")
+            if not target:
+                target = param.get("vault_id")
+            if not target:
+                target = param.get("id")
             menu[target] = {}
 
-    return '/widgets/uber_widget.html'
+    return "/widgets/uber_widget.html"
 
 
 def parse_report(report):
 
     # the HTTP connections
     try:
-        http_connections = report['network']['url']
+        http_connections = report["network"]["url"]
     except Exception:
         http_connections = []
 
     for http_conn in http_connections:
 
-        host = http_conn.get('@host', '')
-        if (host):
-            if (not host.endswith('/')):
-                host += '/'
-            if ('://' not in host):
-                host = 'http://{0}'.format(host)
+        host = http_conn.get("@host", "")
+        if host:
+            if not host.endswith("/"):
+                host += "/"
+            if "://" not in host:
+                host = "http://{0}".format(host)
 
-        uri = http_conn.get('@uri', '')
-        if (uri):
-            if (not uri.startswith('/')):
-                uri = '/{}'.format(uri)
+        uri = http_conn.get("@uri", "")
+        if uri:
+            if not uri.startswith("/"):
+                uri = "/{}".format(uri)
 
         url = "{0}/{1}".format(host, uri)
-        url = url.replace('///', '/')
-        http_conn['url'] = url
+        url = url.replace("///", "/")
+        http_conn["url"] = url
 
     return report
 
@@ -73,61 +73,61 @@ def get_ctx_result(result):
     ctx_result = {}
     param = result.get_param()
 
-    ctx_result['task_id'] = param.get('id')
-    ctx_result['vault_id'] = param.get('vault_id')
-    ctx_result['vault_file_name'] = param.get('file_name')
-    ctx_result['param'] = param
+    ctx_result["task_id"] = param.get("id")
+    ctx_result["vault_id"] = param.get("vault_id")
+    ctx_result["vault_file_name"] = param.get("file_name")
+    ctx_result["param"] = param
 
     data = result.get_data()
 
-    if (not data):
+    if not data:
         return ctx_result
 
     data = data[0]
 
-    if (not data):
+    if not data:
         return ctx_result
 
-    if ('file_info' in data):
-        ctx_result['file_info'] = data['file_info']
-    elif('upload-file-info' in data):
-        ctx_result['file_info'] = data['upload-file-info']
+    if "file_info" in data:
+        ctx_result["file_info"] = data["file_info"]
+    elif "upload-file-info" in data:
+        ctx_result["file_info"] = data["upload-file-info"]
 
-    ctx_result['reports'] = []
+    ctx_result["reports"] = []
 
     message = result.get_message()
 
-    if (message) and ('max polling attempts' in message):
-        ctx_result['message'] = message
+    if (message) and ("max polling attempts" in message):
+        ctx_result["message"] = message
         print(message)
 
-    reports = data.get('task_info', {}).get('report')
+    reports = data.get("task_info", {}).get("report")
 
-    if param.get('is_file', None) is False:
-        reports = data.get('result', {}).get('report')
+    if param.get("is_file", None) is False:
+        reports = data.get("result", {}).get("report")
         reports = [reports]
-        ctx_result['url_type'] = data.get('result', {}).get('url_type', None)
-        ctx_result['analysis_time'] = data.get('result', {}).get('analysis_time', None)
+        ctx_result["url_type"] = data.get("result", {}).get("url_type", None)
+        ctx_result["analysis_time"] = data.get("result", {}).get("analysis_time", None)
 
-    if (not reports):
+    if not reports:
         return ctx_result
 
-    ctx_result['reports'] = reports
+    ctx_result["reports"] = reports
     static_analysis = 1
     dynamic_analysis = 1
     for report in reports:
-        software = report.get('software')
-        if (not software):
+        software = report.get("software")
+        if not software:
             software = "Not specified, probably running Win XP SP2"
-            report['software'] = software
+            report["software"] = software
 
-        if ("Static Analyzer" in software):
-            report['type'] = 'static'
-            report['name'] = 'Static Analysis {}'.format(static_analysis)
+        if "Static Analyzer" in software:
+            report["type"] = "static"
+            report["name"] = "Static Analysis {}".format(static_analysis)
             static_analysis += 1
         else:
-            report['type'] = 'dynamic'
-            report['name'] = 'Dynamic Analysis {}'.format(dynamic_analysis)
+            report["type"] = "dynamic"
+            report["name"] = "Dynamic Analysis {}".format(dynamic_analysis)
             dynamic_analysis += 1
 
         parse_report(report)
@@ -137,13 +137,13 @@ def get_ctx_result(result):
 
 def display_report(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
 
             ctx_result = get_ctx_result(result)
-            if (not ctx_result):
+            if not ctx_result:
                 continue
             results.append(ctx_result)
     # print context
-    return 'display_report.html'
+    return "display_report.html"
