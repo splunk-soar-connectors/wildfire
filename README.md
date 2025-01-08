@@ -4,7 +4,7 @@
 Publisher: Splunk  
 Connector Version: 3.0.0  
 Product Vendor: Palo Alto Networks  
-Product Name: Wildfire  
+Product Name: WildFire  
 Product Version Supported (regex): ".\*"  
 Minimum Product Version: 6.3.0  
 
@@ -81,7 +81,7 @@ ports used by Splunk SOAR.
 
 
 ### Configuration variables
-This table lists the configuration variables required to operate WildFire. These variables are specified when configuring a Wildfire asset in Splunk SOAR.
+This table lists the configuration variables required to operate WildFire. These variables are specified when configuring a WildFire asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
