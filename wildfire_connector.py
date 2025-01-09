@@ -656,6 +656,43 @@ class WildfireConnector(BaseConnector):
 
         return action_result.get_status()
 
+    def _handle_file(self, action_result, file_name):
+
+        container_id = self.get_container_id()
+        local_file_path = file_name
+
+        vault_attach_dict = {}
+
+        self.debug_print("Vault file name: {0}".format(file_name))
+
+        vault_attach_dict[phantom.APP_JSON_ACTION_NAME] = self.get_action_name()
+        vault_attach_dict[phantom.APP_JSON_APP_RUN_ID] = self.get_app_run_id()
+
+        try:
+            success, message, vault_id = ph_rules.vault_add(
+                file_location=local_file_path, container=container_id, file_name=file_name, metadata=vault_attach_dict
+            )
+        except Exception as e:
+            self.debug_print(phantom.APP_ERR_FILE_ADD_TO_VAULT.format(self._get_error_message_from_exception(e)))
+            return phantom.APP_ERROR, phantom.APP_ERROR
+
+        if not success:
+            self.debug_print("Failed to add file to Vault: {0}".format(message))
+            return phantom.APP_ERROR, phantom.APP_ERROR
+
+        # add the vault id artifact to the container
+        cef_artifact = {}
+        if file_name:
+            cef_artifact.update({"fileName": file_name})
+        if vault_id:
+            cef_artifact.update({"vaultId": vault_id})
+
+        if not cef_artifact:
+            return phantom.APP_SUCCESS, phantom.APP_ERROR
+
+        self.save_progress("Added file to Vault: {0}".format(message))
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _get_sample(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -664,14 +701,24 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress("Getting file from WildFire")
 
-        ret_val, response = self._make_rest_call(
-            "/get/sample", action_result, self.GET_SAMPLE_ERROR_DESC, method="post", data={"hash": sample_hash}, parse_response=False
-        )
+        config = self.get_config()
+        url = "{0}{1}".format(self._base_url, "/get/sample")
+        key = config[WILDFIRE_JSON_API_KEY]
+        response = requests.post(url, data={"apikey": key, "hash": sample_hash})
 
-        if phantom.is_fail(ret_val):
+        if response.status_code != 200 and response.status_code != 403: # getting file returns 403 for empty file
             return action_result.get_status()
 
-        return self._save_file_to_vault(action_result, response, sample_hash)
+        content_disposition = response.headers.get("Content-Disposition")
+        if content_disposition and "filename=" in content_disposition:
+            file_name = content_disposition.split("filename=")[1].strip('"')
+        else:
+            file_name = "sample"
+
+        with open(file_name, 'wb') as file:
+            file.write(response.content)
+
+            return self._handle_file(action_result, file_name=file_name)
 
     def _save_report(self, param):
 
