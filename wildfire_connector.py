@@ -612,7 +612,7 @@ class WildfireConnector(BaseConnector):
         # open and download the file
         try:
             with open(file_path, "wb") as f:
-                if not isinstance(response, str): # handle empty files
+                if not isinstance(response, str):  # handle empty files
                     f.write(response.content)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
@@ -657,18 +657,24 @@ class WildfireConnector(BaseConnector):
 
         return action_result.get_status()
 
-
     def _get_sample(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         sample_hash = param[WILDFIRE_JSON_HASH]
 
-        self.save_progress('Getting file from WildFire')
+        self.save_progress("Getting file from WildFire")
 
         # wildfire API returns 403 for empty file
-        ret_val, response = self._make_rest_call('/get/sample', action_result, self.GET_SAMPLE_ERROR_DESC,
-                                                 method='post', data={'hash': sample_hash}, parse_response=False, additional_succ_codes={403:None})
+        ret_val, response = self._make_rest_call(
+            "/get/sample",
+            action_result,
+            self.GET_SAMPLE_ERROR_DESC,
+            method="post",
+            data={"hash": sample_hash},
+            parse_response=False,
+            additional_succ_codes={403: None},
+        )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -723,10 +729,15 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress("Getting pcap from WildFire")
 
-
         # wildfire API returns 403 for empty file
         ret_val, response = self._make_rest_call(
-            "/get/pcap", action_result, self.GET_PCAP_ERROR_DESC, method="post", data=rest_data, parse_response=False, additional_succ_codes={403:None}
+            "/get/pcap",
+            action_result,
+            self.GET_PCAP_ERROR_DESC,
+            method="post",
+            data=rest_data,
+            parse_response=False,
+            additional_succ_codes={403: None},
         )
 
         if phantom.is_fail(ret_val):
