@@ -10596,12 +10596,8 @@
     "pip_dependencies": {
         "wheel": [
             {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
                 "module": "python_magic",
-                "input_file": "wheels/shared/python_magic-0.4.18-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/python_magic-0.4.27-py2.py3-none-any.whl"
             }
         ]
     }
