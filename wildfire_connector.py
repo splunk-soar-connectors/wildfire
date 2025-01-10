@@ -612,8 +612,7 @@ class WildfireConnector(BaseConnector):
         # open and download the file
         try:
             with open(file_path, "wb") as f:
-                if not isinstance(response, str):  # handle empty files
-                    f.write(response.content)
+                f.write(response.content)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Unable to open file: {}".format(error_message))
@@ -665,7 +664,6 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress("Getting file from WildFire")
 
-        # wildfire API returns 403 for empty file
         ret_val, response = self._make_rest_call(
             "/get/sample",
             action_result,
@@ -673,7 +671,6 @@ class WildfireConnector(BaseConnector):
             method="post",
             data={"hash": sample_hash},
             parse_response=False,
-            additional_succ_codes={403: None},
         )
 
         if phantom.is_fail(ret_val):
@@ -729,7 +726,6 @@ class WildfireConnector(BaseConnector):
 
         self.save_progress("Getting pcap from WildFire")
 
-        # wildfire API returns 403 for empty file
         ret_val, response = self._make_rest_call(
             "/get/pcap",
             action_result,
@@ -737,7 +733,6 @@ class WildfireConnector(BaseConnector):
             method="post",
             data=rest_data,
             parse_response=False,
-            additional_succ_codes={403: None},
         )
 
         if phantom.is_fail(ret_val):
