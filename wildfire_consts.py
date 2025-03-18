@@ -36,7 +36,7 @@ WILDFIRE_TEST_PDF_FILE = "wildfire_test_connectivity.pdf"
 WILDFIRE_SLEEP_SECS = 10
 WILDFIRE_MESSAGE_REPORT_PENDING = "Report Pending"
 WILDFIRE_MESSAGE_MAX_POLLS_REACHED = (
-    "Reached max polling attempts. " "Please use the MD5 or Sha256 of the file as a parameter to <b>get report</b> to query the report status."
+    "Reached max polling attempts. Please use the MD5 or Sha256 of the file as a parameter to <b>get report</b> to query the report status."
 )
 
 WILDFIRE_TIMEOUT = "'timeout' action parameter"

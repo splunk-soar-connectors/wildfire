@@ -13,7 +13,6 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 def json_dump_view(provides, all_app_runs, context):
-
     # context['jsons'] = [json.dumps(item, separators=(',', ':'), sort_keys=True, indent=4) for item in j]
     context["jsons"] = jsons = []
     for summary, action_results in all_app_runs:
@@ -22,7 +21,6 @@ def json_dump_view(provides, all_app_runs, context):
 
 
 def all_results(provides, all_app_runs, context):
-
     context["menu"] = menu = {}
 
     # Loop through all the app runs
@@ -40,7 +38,6 @@ def all_results(provides, all_app_runs, context):
 
 
 def parse_report(report):
-
     # the HTTP connections
     try:
         http_connections = report["network"]["url"]
@@ -48,20 +45,19 @@ def parse_report(report):
         http_connections = []
 
     for http_conn in http_connections:
-
         host = http_conn.get("@host", "")
         if host:
             if not host.endswith("/"):
                 host += "/"
             if "://" not in host:
-                host = "http://{0}".format(host)
+                host = f"http://{host}"
 
         uri = http_conn.get("@uri", "")
         if uri:
             if not uri.startswith("/"):
-                uri = "/{}".format(uri)
+                uri = f"/{uri}"
 
-        url = "{0}/{1}".format(host, uri)
+        url = f"{host}/{uri}"
         url = url.replace("///", "/")
         http_conn["url"] = url
 
@@ -69,7 +65,6 @@ def parse_report(report):
 
 
 def get_ctx_result(result):
-
     ctx_result = {}
     param = result.get_param()
 
@@ -123,11 +118,11 @@ def get_ctx_result(result):
 
         if "Static Analyzer" in software:
             report["type"] = "static"
-            report["name"] = "Static Analysis {}".format(static_analysis)
+            report["name"] = f"Static Analysis {static_analysis}"
             static_analysis += 1
         else:
             report["type"] = "dynamic"
-            report["name"] = "Dynamic Analysis {}".format(dynamic_analysis)
+            report["name"] = f"Dynamic Analysis {dynamic_analysis}"
             dynamic_analysis += 1
 
         parse_report(report)
@@ -136,11 +131,9 @@ def get_ctx_result(result):
 
 
 def display_report(provides, all_app_runs, context):
-
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result(result)
             if not ctx_result:
                 continue
