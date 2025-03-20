@@ -39,7 +39,6 @@ from wildfire_consts import *
 
 
 class WildfireConnector(BaseConnector):
-
     # The actions supported by this connector
     ACTION_ID_DETONATE_FILE = "detonate_file"
     ACTION_ID_DETONATE_URL = "detonate_url"
@@ -140,15 +139,13 @@ class WildfireConnector(BaseConnector):
     }
 
     def __init__(self):
-
         # Call the BaseConnectors init first
-        super(WildfireConnector, self).__init__()
+        super().__init__()
 
         self._api_token = None
         self._proxy = None
 
     def initialize(self):
-
         config = self.get_config()
 
         ret_val, self.timeout = self._validate_integer(
@@ -221,10 +218,9 @@ class WildfireConnector(BaseConnector):
             error_code = "Error code unavailable"
             error_message = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
+        return f"Error Code: {error_code}. Error Message: {error_message}"
 
     def _parse_report_status_message(self, response, action_result):
-
         task_info = response.get("task_info", None)
 
         if not task_info:
@@ -241,7 +237,6 @@ class WildfireConnector(BaseConnector):
         response["task_info"]["report"] = reports
 
         for report in reports:
-
             report["network"] = self._normalize_children_into_list(report.get("network", {}))
             report["timeline"] = self._normalize_children_into_list(report.get("timeline", {}))
             report["process"] = self._normalize_children_into_list(report.get("process_created", {}))
@@ -279,7 +274,6 @@ class WildfireConnector(BaseConnector):
         return response
 
     def _parse_error(self, response, result, error_desc):
-
         status_code = response.status_code
         detail = response.text
 
@@ -326,8 +320,7 @@ class WildfireConnector(BaseConnector):
     def _make_rest_call(
         self, endpoint, result, error_desc, method="get", params={}, data=None, files=None, parse_response=True, additional_succ_codes={}
     ):
-
-        url = "{0}{1}".format(self._base_url, endpoint)
+        url = f"{self._base_url}{endpoint}"
 
         if not data:
             data = {}
@@ -337,7 +330,7 @@ class WildfireConnector(BaseConnector):
         request_func = getattr(self._req_sess, method)
 
         if not request_func:
-            return result.set_status(phantom.APP_ERROR, "Invalid method call: {0} for requests module".format(method)), None
+            return result.set_status(phantom.APP_ERROR, f"Invalid method call: {method} for requests module"), None
 
         data.update({"apikey": config[WILDFIRE_JSON_API_KEY]})
 
@@ -380,7 +373,6 @@ class WildfireConnector(BaseConnector):
         return phantom.APP_SUCCESS, response_dict["wildfire"]
 
     def _get_file_dict(self, param, action_result):
-
         vault_id = param["vault_id"]
 
         filename = param.get("file_name")
@@ -389,7 +381,7 @@ class WildfireConnector(BaseConnector):
 
         try:
             success, message, vault_info = ph_rules.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=False)
-            vault_info = list(vault_info)[0]
+            vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None
         except Exception:
@@ -407,25 +399,24 @@ class WildfireConnector(BaseConnector):
             payload = open(vault_path, "rb")
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, f"Unable to open vault file: {error_message}")
 
         files = {"file": (filename, payload)}
 
         return phantom.APP_SUCCESS, files
 
     def _test_connectivity(self, param):
-
         # get the file from the app directory
         dirpath = os.path.dirname(inspect.getfile(self.__class__))
         filename = WILDFIRE_TEST_PDF_FILE
 
-        filepath = "{}/{}".format(dirpath, filename)
+        filepath = f"{dirpath}/{filename}"
 
         try:
             payload = open(filepath, "rb")
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            self.set_status(phantom.APP_ERROR, 'Test pdf file not found at "{}"'.format(filepath), error_message)
+            self.set_status(phantom.APP_ERROR, f'Test pdf file not found at "{filepath}"', error_message)
             self.append_to_message("Test Connectivity failed")
             return self.get_status()
 
@@ -443,7 +434,6 @@ class WildfireConnector(BaseConnector):
         return self.set_status(phantom.APP_SUCCESS)
 
     def _normalize_into_list(self, input_dict, key):
-
         if not input_dict:
             return None
 
@@ -457,7 +447,6 @@ class WildfireConnector(BaseConnector):
         return input_dict
 
     def _normalize_children_into_list(self, input_dict):
-
         if not input_dict:
             return {}
 
@@ -492,7 +481,6 @@ class WildfireConnector(BaseConnector):
         return phantom.APP_ERROR, None
 
     def _poll_task_status(self, action_result, task_id=None, url=None):
-
         if not (task_id or url):
             return action_result.set_status(phantom.APP_ERROR, "Please provide 'task_id' or 'url'"), None
 
@@ -506,10 +494,9 @@ class WildfireConnector(BaseConnector):
             data = {"url": url}
 
         while polling_attempt < max_polling_attempts:
-
             polling_attempt += 1
 
-            self.save_progress("Polling attempt {0} of {1}".format(polling_attempt, max_polling_attempts))
+            self.save_progress(f"Polling attempt {polling_attempt} of {max_polling_attempts}")
 
             ret_val, response = self._make_rest_call(
                 "/get/report",
@@ -529,7 +516,6 @@ class WildfireConnector(BaseConnector):
                 continue
 
             if phantom.is_success(ret_val):
-
                 if url:
                     try:
                         response = response.json()
@@ -556,7 +542,6 @@ class WildfireConnector(BaseConnector):
         return action_result.set_status(phantom.APP_ERROR, WILDFIRE_MESSAGE_MAX_POLLS_REACHED), None
 
     def _get_report(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         task_id = param[WILDFIRE_JSON_TASK_ID]
@@ -589,7 +574,6 @@ class WildfireConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _save_file_to_vault(self, action_result, response, sample_hash):
-
         # Create a tmp directory on the vault partition
         guid = uuid.uuid4()
 
@@ -598,8 +582,8 @@ class WildfireConnector(BaseConnector):
         else:
             temp_dir = "/vault/tmp"
 
-        local_dir = "{0}/{1}".format(temp_dir, guid)
-        self.save_progress("Using temp directory: {0}".format(guid))
+        local_dir = f"{temp_dir}/{guid}"
+        self.save_progress(f"Using temp directory: {guid}")
 
         try:
             os.makedirs(local_dir)
@@ -607,7 +591,7 @@ class WildfireConnector(BaseConnector):
             error_message = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", error_message)
 
-        file_path = "{0}/{1}".format(local_dir, sample_hash)
+        file_path = f"{local_dir}/{sample_hash}"
 
         # open and download the file
         try:
@@ -615,7 +599,7 @@ class WildfireConnector(BaseConnector):
                 f.write(response.content)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to open file: {}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, f"Unable to open file: {error_message}")
 
         contains = []
         file_ext = ""
@@ -626,7 +610,7 @@ class WildfireConnector(BaseConnector):
                 if not file_ext:
                     file_ext = extension
 
-        file_name = "{}{}".format(sample_hash, file_ext)
+        file_name = f"{sample_hash}{file_ext}"
 
         # move the file to the vault
         try:
@@ -657,7 +641,6 @@ class WildfireConnector(BaseConnector):
         return action_result.get_status()
 
     def _get_sample(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         sample_hash = param[WILDFIRE_JSON_HASH]
@@ -679,7 +662,6 @@ class WildfireConnector(BaseConnector):
         return self._save_file_to_vault(action_result, response, sample_hash)
 
     def _save_report(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         sample_hash = param[WILDFIRE_JSON_TASK_ID]
@@ -698,7 +680,6 @@ class WildfireConnector(BaseConnector):
         return self._save_file_to_vault(action_result, response, sample_hash)
 
     def _get_platform_id(self, param):
-
         platform = param.get(WILDFIRE_JSON_PLATFORM)
 
         if not platform:
@@ -710,7 +691,6 @@ class WildfireConnector(BaseConnector):
         return phantom.APP_SUCCESS, self.PLATFORM_ID_MAPPING[platform]
 
     def _get_pcap(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         sample_hash = param[WILDFIRE_JSON_HASH]
@@ -765,11 +745,10 @@ class WildfireConnector(BaseConnector):
         return self._save_file_to_vault(action_result, response, sample_hash)
 
     def _get_verdict(self, action_result, task_id=None, url=None):
-
         if not (task_id or url):
             return action_result.set_status(phantom.APP_ERROR, "Please provide 'task_id' or 'url'"), None
 
-        self.save_progress("Getting verdict for: {0}".format(task_id if task_id else url))
+        self.save_progress(f"Getting verdict for: {task_id if task_id else url}")
 
         # make rest call to get verdict whether URL is in wildfire db
         if not task_id:
@@ -834,8 +813,7 @@ class WildfireConnector(BaseConnector):
         return phantom.APP_SUCCESS, verdict_data
 
     def _detonate_url(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -903,8 +881,7 @@ class WildfireConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_url_reputation(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -929,7 +906,6 @@ class WildfireConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_vault_file_sha256(self, vault_id, action_result):
-
         self.save_progress("Getting the sha256 of the file")
 
         sha256 = None
@@ -938,7 +914,7 @@ class WildfireConnector(BaseConnector):
         try:
             success, message, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id, trace=False)
             if not vault_meta_info:
-                self.debug_print("Error while fetching meta information for vault ID: {}, message: {}".format(vault_id, message))
+                self.debug_print(f"Error while fetching meta information for vault ID: {vault_id}, message: {message}")
                 return action_result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_FILE_NOT_FOUND_IN_VAULT), None
 
             if not isinstance(vault_meta_info, list):
@@ -960,7 +936,6 @@ class WildfireConnector(BaseConnector):
         return phantom.APP_SUCCESS, sha256
 
     def _detonate_file(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, files = self._get_file_dict(param, action_result)
@@ -981,7 +956,6 @@ class WildfireConnector(BaseConnector):
         ret_val, response = self._check_detonated_report(sha256, action_result)
 
         if phantom.is_fail(ret_val):
-
             # Was not detonated before
             self.save_progress("Uploading the file")
 
@@ -1030,7 +1004,6 @@ class WildfireConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
-
         ret_val = phantom.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this connector run
@@ -1081,7 +1054,6 @@ def main():
     verify = args.verify
 
     if username is not None and password is None:
-
         # User specified a username but not a password, so ask
         import getpass
 
