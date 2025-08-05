@@ -1,9 +1,9 @@
 # WildFire
 
-Publisher: Splunk \
-Connector Version: 3.0.4 \
-Product Vendor: Palo Alto Networks \
-Product Name: WildFire \
+Publisher: Splunk <br>
+Connector Version: 3.0.4 <br>
+Product Vendor: Palo Alto Networks <br>
+Product Name: WildFire <br>
 Minimum Product Version: 6.3.0
 
 This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox
@@ -72,20 +72,20 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials \
-[detonate file](#action-detonate-file) - Run the file in the WildFire sandbox and retrieve the analysis results \
-[detonate url](#action-detonate-url) - Submit a single website link for WildFire analysis \
-[url reputation](#action-url-reputation) - Submit a single website link for WildFire verdict \
-[get report](#action-get-report) - Query for results of an already completed detonation in WildFire \
-[get file](#action-get-file) - Download a sample from WildFire and add it to the vault \
-[get pcap](#action-get-pcap) - Download the pcap file of a sample from WildFire and add it to the vault \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials <br>
+[detonate file](#action-detonate-file) - Run the file in the WildFire sandbox and retrieve the analysis results <br>
+[detonate url](#action-detonate-url) - Submit a single website link for WildFire analysis <br>
+[url reputation](#action-url-reputation) - Submit a single website link for WildFire verdict <br>
+[get report](#action-get-report) - Query for results of an already completed detonation in WildFire <br>
+[get file](#action-get-file) - Download a sample from WildFire and add it to the vault <br>
+[get pcap](#action-get-pcap) - Download the pcap file of a sample from WildFire and add it to the vault <br>
 [save report](#action-save-report) - Save a PDF of the detonation report to the vault
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -100,7 +100,7 @@ No Output
 
 Run the file in the WildFire sandbox and retrieve the analysis results
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>When submitting supported script files, you must specify an accurate filename.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>.
@@ -260,7 +260,7 @@ summary.total_objects_successful | numeric | | |
 
 Submit a single website link for WildFire analysis
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>If the hash is present in the WildFire database, then a report will be returned as:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.
@@ -1412,7 +1412,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Submit a single website link for WildFire verdict
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be quieried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.
@@ -1445,7 +1445,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Query for results of an already completed detonation in WildFire
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Each detonation report in WildFire is denoted by the sha256 and md5 of the file.
@@ -1598,7 +1598,7 @@ summary.total_objects_successful | numeric | | |
 
 Download a sample from WildFire and add it to the vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Do note that WildFire does not generally store samples that have been uploaded for detonation.
@@ -1628,7 +1628,7 @@ summary.total_objects_successful | numeric | | |
 
 Download the pcap file of a sample from WildFire and add it to the vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1658,7 +1658,7 @@ summary.total_objects_successful | numeric | | |
 
 Save a PDF of the detonation report to the vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
