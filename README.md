@@ -1,7 +1,7 @@
 # WildFire
 
 Publisher: Splunk <br>
-Connector Version: 3.0.5 <br>
+Connector Version: 3.0.6 <br>
 Product Vendor: Palo Alto Networks <br>
 Product Name: WildFire <br>
 Minimum Product Version: 6.3.0
