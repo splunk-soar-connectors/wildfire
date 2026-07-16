@@ -1,3 +1,32 @@
+## Authentication
+
+This app supports two authentication methods, selected via the **Authentication method** asset
+configuration parameter:
+
+- **API Key (legacy):** The classic static WildFire API key, passed on every request. Palo Alto
+  Networks is deprecating this model — the WildFire Portal is deprecated on **Aug 31, 2026**, and
+  static API keys will **no longer be accepted after Jan 15, 2027**. Provide the **API Key**
+  parameter when using this method.
+- **OAuth2 (Strata Cloud Manager):** The new token-based model. The app obtains a short-lived
+  (15-minute) access token using the `client_credentials` grant and passes it as an
+  `Authorization: Bearer <token>` header on all WildFire API calls. Tokens are cached and
+  refreshed automatically. Provide **Client ID**, **Client Secret**, and **TSG ID** when using
+  this method.
+
+### Migrating to OAuth2 (Strata Cloud Manager)
+
+1. In Strata Cloud Manager (SCM), create a service account and note its `client_id`,
+   `client_secret`, and `tsg_id` (Tenant Service Group ID).
+1. In the SOAR asset, set **Authentication method** to **OAuth2 (Strata Cloud Manager)** and
+   populate **Client ID**, **Client Secret**, and **TSG ID**.
+1. Leave **OAuth2 token URL** at its default
+   (`https://auth.apps.paloaltonetworks.com/am/oauth2/access_token`) unless your environment
+   requires a different token host.
+1. Ensure outbound access to the OAuth2 token host is permitted through any proxy/firewall.
+1. Run **Test Connectivity** to validate the configuration.
+
+### Licensing API (API Key method)
+
 To enable the access for fetching files from the Wildfire instance, please enable the Licensing API
 key by [clicking here](https://support.paloaltonetworks.com/License/LicensingApi/34470) . If the
 redirect link is not working, please follow the below mentioned steps for activating the licensing

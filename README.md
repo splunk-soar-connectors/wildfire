@@ -1,12 +1,41 @@
 # WildFire
 
 Publisher: Splunk <br>
-Connector Version: 3.0.6 <br>
+Connector Version: 3.1.0 <br>
 Product Vendor: Palo Alto Networks <br>
 Product Name: WildFire <br>
 Minimum Product Version: 6.3.0
 
 This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox
+
+## Authentication
+
+This app supports two authentication methods, selected via the **Authentication method** asset
+configuration parameter:
+
+- **API Key (legacy):** The classic static WildFire API key, passed on every request. Palo Alto
+  Networks is deprecating this model — the WildFire Portal is deprecated on **Aug 31, 2026**, and
+  static API keys will **no longer be accepted after Jan 15, 2027**. Provide the **API Key**
+  parameter when using this method.
+- **OAuth2 (Strata Cloud Manager):** The new token-based model. The app obtains a short-lived
+  (15-minute) access token using the `client_credentials` grant and passes it as an
+  `Authorization: Bearer <token>` header on all WildFire API calls. Tokens are cached and
+  refreshed automatically. Provide **Client ID**, **Client Secret**, and **TSG ID** when using
+  this method.
+
+### Migrating to OAuth2 (Strata Cloud Manager)
+
+1. In Strata Cloud Manager (SCM), create a service account and note its `client_id`,
+   `client_secret`, and `tsg_id` (Tenant Service Group ID).
+1. In the SOAR asset, set **Authentication method** to **OAuth2 (Strata Cloud Manager)** and
+   populate **Client ID**, **Client Secret**, and **TSG ID**.
+1. Leave **OAuth2 token URL** at its default
+   (`https://auth.apps.paloaltonetworks.com/am/oauth2/access_token`) unless your environment
+   requires a different token host.
+1. Ensure outbound access to the OAuth2 token host is permitted through any proxy/firewall.
+1. Run **Test Connectivity** to validate the configuration.
+
+### Licensing API (API Key method)
 
 To enable the access for fetching files from the Wildfire instance, please enable the Licensing API
 key by [clicking here](https://support.paloaltonetworks.com/License/LicensingApi/34470) . If the
@@ -67,7 +96,12 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **base_url** | required | string | Base URL to WildFire service |
 **verify_server_cert** | optional | boolean | Verify server certificate |
-**api_key** | required | password | API Key |
+**auth_method** | required | string | Authentication method |
+**api_key** | optional | password | API Key (required for 'API Key (legacy)' authentication) |
+**client_id** | optional | string | Client ID (required for 'OAuth2 (Strata Cloud Manager)' authentication) |
+**client_secret** | optional | password | Client Secret (required for 'OAuth2 (Strata Cloud Manager)' authentication) |
+**tsg_id** | optional | string | TSG ID (Tenant Service Group ID, required for 'OAuth2 (Strata Cloud Manager)' authentication) |
+**auth_url** | optional | string | OAuth2 token URL (used for 'OAuth2 (Strata Cloud Manager)' authentication) |
 **timeout** | required | numeric | Detonate timeout in mins |
 
 ### Supported Actions
