@@ -1,6 +1,6 @@
 # File: wildfire_connector.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,11 +170,7 @@ class WildfireConnector(BaseConnector):
         self._auth_method = config.get(WILDFIRE_JSON_AUTH_METHOD, WILDFIRE_AUTH_API_KEY)
 
         if self._auth_method == WILDFIRE_AUTH_OAUTH:
-            if not (
-                config.get(WILDFIRE_JSON_CLIENT_ID)
-                and config.get(WILDFIRE_JSON_CLIENT_SECRET)
-                and config.get(WILDFIRE_JSON_TSG_ID)
-            ):
+            if not (config.get(WILDFIRE_JSON_CLIENT_ID) and config.get(WILDFIRE_JSON_CLIENT_SECRET) and config.get(WILDFIRE_JSON_TSG_ID)):
                 return self.set_status(phantom.APP_ERROR, WILDFIRE_ERR_MISSING_OAUTH_CREDS)
         else:
             if not config.get(WILDFIRE_JSON_API_KEY):
@@ -371,9 +367,7 @@ class WildfireConnector(BaseConnector):
             return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_FETCH, error_message), None
 
         if r.status_code != requests.codes.ok:  # pylint: disable=E1101
-            return result.set_status(
-                phantom.APP_ERROR, f"{WILDFIRE_ERR_TOKEN_FETCH}. Status code: {r.status_code}. Detail: {r.text}"
-            ), None
+            return result.set_status(phantom.APP_ERROR, f"{WILDFIRE_ERR_TOKEN_FETCH}. Status code: {r.status_code}. Detail: {r.text}"), None
 
         try:
             token_data = r.json()
