@@ -490,7 +490,7 @@ class WildfireConnector(BaseConnector):
             filename = vault_id
 
         try:
-            success, message, vault_info = ph_rules.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=False)
+            _success, _message, vault_info = ph_rules.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=False)
             vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None
@@ -534,7 +534,7 @@ class WildfireConnector(BaseConnector):
 
         files = {"file": (filename, payload)}
 
-        ret_val, response = self._make_rest_call("/submit/file", self, self.FILE_UPLOAD_ERROR_DESC, method="post", files=files)
+        ret_val, _response = self._make_rest_call("/submit/file", self, self.FILE_UPLOAD_ERROR_DESC, method="post", files=files)
 
         if phantom.is_fail(ret_val):
             self.append_to_message("Test Connectivity Failed")
@@ -701,7 +701,7 @@ class WildfireConnector(BaseConnector):
             error_message = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", error_message)
 
-        file_path = f"{local_dir}/{sample_hash}"
+        file_path = os.path.join(local_dir, uuid.uuid4().hex)
 
         # open and download the file
         try:
@@ -1022,7 +1022,7 @@ class WildfireConnector(BaseConnector):
         metadata = None
 
         try:
-            success, message, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id, trace=False)
+            _success, message, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id, trace=False)
             if not vault_meta_info:
                 self.debug_print(f"Error while fetching meta information for vault ID: {vault_id}, message: {message}")
                 return action_result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_FILE_NOT_FOUND_IN_VAULT), None

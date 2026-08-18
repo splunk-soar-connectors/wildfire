@@ -96,7 +96,7 @@ and limitations under the License.
             </td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ result.file_info.sha256 }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ result.file_info.sha256|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.file_info.sha256 }}
                 &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
               </a>
@@ -110,7 +110,7 @@ and limitations under the License.
             </td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ result.file_info.md5 }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ result.file_info.md5|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.file_info.md5 }}
                 &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
               </a>
@@ -155,7 +155,7 @@ and limitations under the License.
                 </td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ report.sha256 }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ report.sha256|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ report.sha256 }}
                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
@@ -251,7 +251,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url.url }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url.url|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_url.url }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -276,7 +276,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_tcp|by_key:'@ip' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_tcp|by_key:'@ip'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_tcp|by_key:"@ip" }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -302,7 +302,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_udp|by_key:'@ip' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_udp|by_key:'@ip'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_udp|by_key:"@ip" }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -328,7 +328,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_dns|by_key:'@query' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_dns|by_key:'@query'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_dns|by_key:"@query" }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -336,7 +336,7 @@ and limitations under the License.
                       <td>
                         {% if curr_dns|by_key:'@response' %}
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_dns|by_key:'@response' }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_dns|by_key:'@response'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ curr_dns|by_key:"@response" }}
                             &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                           </a>
@@ -382,14 +382,14 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@name' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@name'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@name' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -421,7 +421,7 @@ and limitations under the License.
                           </td>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['process command'], 'value': '{{ curr_proc|by_key:'@command' }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['process command'], 'value': '{{ curr_proc|by_key:'@command'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ curr_proc|by_key:'@command' }}
                               &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>
@@ -491,7 +491,7 @@ and limitations under the License.
                             <tr>
                               <td>
                                 <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@name' }}' }], 0, {{ container.id }}, null, false);">
+                                   onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@name'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                   {{ curr_file|by_key:'@name' }}
                                   &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                 </a>
@@ -501,7 +501,7 @@ and limitations under the License.
                               <td>
                                 {% if curr_file|by_key:'@sha256' %}
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ curr_file|by_key:'@sha256' }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ curr_file|by_key:'@sha256'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ curr_file|by_key:'@sha256' }}
                                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                   </a>
@@ -510,7 +510,7 @@ and limitations under the License.
                               <td>
                                 {% if curr_file|by_key:'@md5' %}
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_file|by_key:'@md5' }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_file|by_key:'@md5'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ curr_file|by_key:'@md5' }}
                                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                   </a>
@@ -519,7 +519,7 @@ and limitations under the License.
                               <td>
                                 {% if curr_file|by_key:'@sha1' %}
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['sha1', 'hash'], 'value': '{{ curr_file|by_key:'@sha1' }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['sha1', 'hash'], 'value': '{{ curr_file|by_key:'@sha1'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ curr_file|by_key:'@sha1' }}
                                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                   </a>
@@ -545,7 +545,7 @@ and limitations under the License.
                             <tr>
                               <td>
                                 <a href="javascript:;"
-                                   onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@name' }}' }], 0, {{ container.id }}, null, false);">
+                                   onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@name'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                   {{ curr_file|by_key:'@name' }}
                                   &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                 </a>
@@ -555,7 +555,7 @@ and limitations under the License.
                               <td>
                                 {% if curr_file|by_key:'@sha256' %}
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ curr_file|by_key:'@sha256' }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ curr_file|by_key:'@sha256'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ curr_file|by_key:'@sha256' }}
                                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                   </a>
@@ -564,7 +564,7 @@ and limitations under the License.
                               <td>
                                 {% if curr_file|by_key:'@md5' %}
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_file|by_key:'@md5' }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_file|by_key:'@md5'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ curr_file|by_key:'@md5' }}
                                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                   </a>
@@ -573,7 +573,7 @@ and limitations under the License.
                               <td>
                                 {% if curr_file|by_key:'@sha1' %}
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['sha1', 'hash'], 'value': '{{ curr_file|by_key:'@sha1' }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['sha1', 'hash'], 'value': '{{ curr_file|by_key:'@sha1'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ curr_file|by_key:'@sha1' }}
                                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                   </a>
@@ -605,28 +605,28 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@child_process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@child_process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@child_process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@child_pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@child_pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@child_pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@parent_process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@parent_process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@parent_process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@parent_pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@parent_pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@parent_pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -649,28 +649,28 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@child_process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@child_process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@child_process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@child_pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@child_pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@child_pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@parent_process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_proc|by_key:'@parent_process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@parent_process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@parent_pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_proc|by_key:'@parent_pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_proc|by_key:'@parent_pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -694,14 +694,14 @@ and limitations under the License.
                       <td>{{ curr_reg|by_key:"@reg_key" }}</td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_reg|by_key:'@process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_reg|by_key:'@process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_reg|by_key:'@process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_reg|by_key:'@pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_reg|by_key:'@pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_reg|by_key:'@pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -724,14 +724,14 @@ and limitations under the License.
                       <td>{{ curr_reg|by_key:"@reg_key" }}</td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_reg|by_key:'@process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_reg|by_key:'@process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_reg|by_key:'@process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_reg|by_key:'@pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_reg|by_key:'@pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_reg|by_key:'@pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -754,14 +754,14 @@ and limitations under the License.
                       <td>{{ curr_reg|by_key:"@reg_key" }}</td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_reg|by_key:'@process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_reg|by_key:'@process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_reg|by_key:'@process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_reg|by_key:'@pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_reg|by_key:'@pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_reg|by_key:'@pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -783,21 +783,21 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@deleted_file' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@deleted_file'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_file|by_key:'@deleted_file' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_file|by_key:'@process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_file|by_key:'@process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_file|by_key:'@process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_file|by_key:'@pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_file|by_key:'@pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_file|by_key:'@pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
@@ -819,21 +819,21 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@written_file' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ curr_file|by_key:'@written_file'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_file|by_key:'@written_file' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_file|by_key:'@process_image' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['process name'], 'value': '{{ curr_file|by_key:'@process_image'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_file|by_key:'@process_image' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                       </td>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_file|by_key:'@pid' }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['pid'], 'value': '{{ curr_file|by_key:'@pid'|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ curr_file|by_key:'@pid' }}
                           &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
