@@ -10,30 +10,27 @@ This app supports file detonation for forensic file analysis on the Palo Alto Ne
 
 ## Authentication
 
-This app supports two authentication methods, selected via the **Authentication method** asset
-configuration parameter:
+Select the method with the **Authentication method** asset parameter:
 
-- **API Key (legacy):** The classic static WildFire API key, passed on every request. Palo Alto
-  Networks is deprecating this model — the WildFire Portal is deprecated on **Aug 31, 2026**, and
-  static API keys will **no longer be accepted after Jan 15, 2027**. Provide the **API Key**
-  parameter when using this method.
-- **OAuth2 (Strata Cloud Manager):** The new token-based model. The app obtains a short-lived
-  (15-minute) access token using the `client_credentials` grant and passes it as an
-  `Authorization: Bearer <token>` header on all WildFire API calls. Tokens are cached and
-  refreshed automatically. Provide **Client ID**, **Client Secret**, and **TSG ID** when using
-  this method.
+- **API Key (legacy):** the static WildFire API key. Palo Alto is retiring this — static keys stop
+  working after **Jan 15, 2027**. Provide the **API Key** parameter.
+- **OAuth2 (Strata Cloud Manager):** token-based. Provide **Client ID**, **Client Secret**, and
+  **TSG ID**; the app fetches and refreshes a short-lived Bearer token automatically. Leave
+  **OAuth2 token URL** at its default unless directed otherwise.
 
 ### Migrating to OAuth2 (Strata Cloud Manager)
 
-1. In Strata Cloud Manager (SCM), create a service account and note its `client_id`,
-   `client_secret`, and `tsg_id` (Tenant Service Group ID).
-1. In the SOAR asset, set **Authentication method** to **OAuth2 (Strata Cloud Manager)** and
-   populate **Client ID**, **Client Secret**, and **TSG ID**.
-1. Leave **OAuth2 token URL** at its default
-   (`https://auth.apps.paloaltonetworks.com/am/oauth2/access_token`) unless your environment
-   requires a different token host.
-1. Ensure outbound access to the OAuth2 token host is permitted through any proxy/firewall.
-1. Run **Test Connectivity** to validate the configuration.
+1. **Identity & Access → Roles:** create a custom role with the `iam.service_account` and
+   `iam.custom_role` permissions.
+1. **Identity & Access → Access Management:** add a service account with the **All Apps & Services**
+   scope and the role above. Save the **Client ID** and **Client Secret** (the secret is shown
+   once). The **TSG ID** is the number in the account name
+   (`name@<tsg_id>.iam.panserviceaccount.com`).
+1. **Configuration → WildFire Settings:** create a WildFire API key and bind it to that service
+   account, then wait for its status to reach **Valid**. This requires an Advanced WildFire or
+   Prisma Access licence on the tenant — a token whose service account has no bound key is rejected.
+1. Enter **Client ID**, **Client Secret**, and **TSG ID** in the asset and run **Test
+   Connectivity**.
 
 ### Licensing API (API Key method)
 
