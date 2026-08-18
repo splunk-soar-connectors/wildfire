@@ -361,7 +361,11 @@ class WildfireConnector(BaseConnector):
                 auth=(client_id, client_secret),
                 verify=config[phantom.APP_JSON_VERIFY],
                 proxies=self._proxy,
+                timeout=WILDFIRE_DEFAULT_TIMEOUT_SECS,
             )
+        except requests.exceptions.Timeout as e:
+            error_message = self._get_error_message_from_exception(e)
+            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_TIMEOUT, error_message), None
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_FETCH, error_message), None
@@ -385,23 +389,31 @@ class WildfireConnector(BaseConnector):
             expires_in = WILDFIRE_OAUTH_DEFAULT_TTL_SECS
 
         self._access_token = access_token
-        self._token_expiry = now + max(WILDFIRE_OAUTH_MIN_TTL_SECS, expires_in - WILDFIRE_OAUTH_REFRESH_SKEW_SECS)
+        # Refresh a little before expiry, keep a small floor so a tiny TTL doesn't force a fetch per
+        # request, but never cache longer than the server-reported lifetime.
+        cache_ttl = min(expires_in, max(WILDFIRE_OAUTH_MIN_TTL_SECS, expires_in - WILDFIRE_OAUTH_REFRESH_SKEW_SECS))
+        self._token_expiry = now + cache_ttl
 
         return phantom.APP_SUCCESS, access_token
 
-    def _has_file_stream(self, files):
-        """Return True if `files` carries an actual file-like stream (a real upload).
+    def _rewind_files(self, files):
+        """Rewind any file-like streams in `files` so the request can be safely replayed.
 
         The connector also uses `files` to pass plain string form-fields (e.g., the verdict
-        url/hash as `("", value)`); those are safe to resend, whereas a consumed stream is not.
+        url/hash as `("", value)`); those carry no stream and are always safe to resend.
+        Returns True if there are no streams or every stream was rewound to the start, and
+        False if any stream is non-seekable and therefore cannot be replayed.
         """
         if not files:
-            return False
+            return True
         for value in files.values():
             payload = value[1] if isinstance(value, (list, tuple)) and len(value) > 1 else value
             if hasattr(payload, "read"):
-                return True
-        return False
+                if hasattr(payload, "seekable") and payload.seekable():
+                    payload.seek(0)
+                else:
+                    return False
+        return True
 
     def _make_rest_call(
         self, endpoint, result, error_desc, method="get", params={}, data=None, files=None, parse_response=True, additional_succ_codes={}
@@ -429,22 +441,39 @@ class WildfireConnector(BaseConnector):
 
         try:
             r = request_func(
-                url, headers=headers, params=params, data=data, files=files, verify=config[phantom.APP_JSON_VERIFY], proxies=self._proxy
+                url,
+                headers=headers,
+                params=params,
+                data=data,
+                files=files,
+                verify=config[phantom.APP_JSON_VERIFY],
+                proxies=self._proxy,
+                timeout=WILDFIRE_DEFAULT_TIMEOUT_SECS,
             )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return result.set_status(phantom.APP_ERROR, "REST Api to server failed", error_message), None
 
         # In OAuth mode a 401 may mean the cached token was invalidated server-side; refresh once and retry.
-        # Skip the retry only for real file uploads, whose stream would already be consumed by the first attempt.
-        if self._auth_method == WILDFIRE_AUTH_OAUTH and r.status_code == 401 and not self._has_file_stream(files):
+        if self._auth_method == WILDFIRE_AUTH_OAUTH and r.status_code == 401:
+            # Rewind any upload streams so the request can be replayed. If a stream is non-seekable
+            # it was already consumed by the first attempt and cannot be safely resent.
+            if not self._rewind_files(files):
+                return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_NONREPLAYABLE_UPLOAD), None
             ret_val, token = self._get_oauth_token(result, force_refresh=True)
             if phantom.is_fail(ret_val):
                 return result.get_status(), None
             headers["Authorization"] = f"Bearer {token}"
             try:
                 r = request_func(
-                    url, headers=headers, params=params, data=data, files=files, verify=config[phantom.APP_JSON_VERIFY], proxies=self._proxy
+                    url,
+                    headers=headers,
+                    params=params,
+                    data=data,
+                    files=files,
+                    verify=config[phantom.APP_JSON_VERIFY],
+                    proxies=self._proxy,
+                    timeout=WILDFIRE_DEFAULT_TIMEOUT_SECS,
                 )
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)

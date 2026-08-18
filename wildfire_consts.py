@@ -42,6 +42,8 @@ WILDFIRE_OAUTH_DEFAULT_TTL_SECS = 15 * 60
 WILDFIRE_OAUTH_REFRESH_SKEW_SECS = 120
 # Floor on the cached lifetime so a short/misconfigured TTL doesn't force a token fetch per request.
 WILDFIRE_OAUTH_MIN_TTL_SECS = 30
+# Bounded (connect, read) timeout for every outbound request so an unresponsive host cannot hang an action.
+WILDFIRE_DEFAULT_TIMEOUT_SECS = (10, 30)
 
 WILDFIRE_ERR_UNABLE_TO_PARSE_REPLY = "Unable to parse reply from device"
 WILDFIRE_ERR_REPLY_FORMAT_KEY_MISSING = "None '{key}' missing in reply from device"
@@ -61,6 +63,11 @@ WILDFIRE_ERR_MISSING_OAUTH_CREDS = (
 )
 WILDFIRE_ERR_TOKEN_FETCH = "Failed to obtain OAuth2 access token from Strata Cloud Manager"
 WILDFIRE_ERR_TOKEN_MISSING = "OAuth2 token response did not contain an 'access_token'"
+WILDFIRE_ERR_TOKEN_TIMEOUT = "Timed out connecting to the OAuth2 token endpoint at Strata Cloud Manager"
+WILDFIRE_ERR_NONREPLAYABLE_UPLOAD = (
+    "Authentication expired (401) during a file upload and the file stream is not seekable, so the "
+    "request cannot be safely resent. Please re-run the action."
+)
 
 WILDFIRE_TEST_PDF_FILE = "wildfire_test_connectivity.pdf"
 WILDFIRE_SLEEP_SECS = 10
