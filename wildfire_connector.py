@@ -339,6 +339,7 @@ class WildfireConnector(BaseConnector):
         """
         now = time.time()
         if not force_refresh and self._access_token and now < self._token_expiry:
+            self.debug_print("OAuth: reusing cached access token", {"expires_in_secs": int(self._token_expiry - now)})
             return phantom.APP_SUCCESS, self._access_token
 
         config = self.get_config()
@@ -353,6 +354,7 @@ class WildfireConnector(BaseConnector):
         }
 
         self.save_progress("Requesting OAuth2 access token from Strata Cloud Manager")
+        self.debug_print("OAuth: requesting access token", {"token_url": token_url, "force_refresh": force_refresh})
 
         try:
             r = self._req_sess.post(
@@ -369,6 +371,8 @@ class WildfireConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_FETCH, error_message), None
+
+        self.debug_print("OAuth: token endpoint responded", {"status_code": r.status_code})
 
         if r.status_code != requests.codes.ok:  # pylint: disable=E1101
             return result.set_status(phantom.APP_ERROR, f"{WILDFIRE_ERR_TOKEN_FETCH}. Status code: {r.status_code}. Detail: {r.text}"), None
@@ -393,6 +397,7 @@ class WildfireConnector(BaseConnector):
         # request, but never cache longer than the server-reported lifetime.
         cache_ttl = min(expires_in, max(WILDFIRE_OAUTH_MIN_TTL_SECS, expires_in - WILDFIRE_OAUTH_REFRESH_SKEW_SECS))
         self._token_expiry = now + cache_ttl
+        self.debug_print("OAuth: access token acquired", {"expires_in": expires_in, "cache_ttl_secs": cache_ttl})
 
         return phantom.APP_SUCCESS, access_token
 
@@ -430,6 +435,8 @@ class WildfireConnector(BaseConnector):
         if not request_func:
             return result.set_status(phantom.APP_ERROR, f"Invalid method call: {method} for requests module"), None
 
+        self.debug_print("REST call", {"endpoint": endpoint, "method": method, "auth_method": self._auth_method})
+
         headers = {}
         if self._auth_method == WILDFIRE_AUTH_OAUTH:
             ret_val, token = self._get_oauth_token(result)
@@ -456,9 +463,11 @@ class WildfireConnector(BaseConnector):
 
         # In OAuth mode a 401 may mean the cached token was invalidated server-side; refresh once and retry.
         if self._auth_method == WILDFIRE_AUTH_OAUTH and r.status_code == 401:
+            self.debug_print("OAuth: received 401, attempting token refresh and one retry")
             # Rewind any upload streams so the request can be replayed. If a stream is non-seekable
             # it was already consumed by the first attempt and cannot be safely resent.
             if not self._rewind_files(files):
+                self.debug_print("OAuth: 401 on a non-seekable upload stream; cannot safely retry")
                 return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_NONREPLAYABLE_UPLOAD), None
             ret_val, token = self._get_oauth_token(result, force_refresh=True)
             if phantom.is_fail(ret_val):
