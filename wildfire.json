@@ -32,16 +32,52 @@
             "order": 1,
             "default": true
         },
+        "auth_method": {
+            "data_type": "string",
+            "description": "Authentication method",
+            "order": 2,
+            "required": true,
+            "value_list": [
+                "API Key (legacy)",
+                "OAuth2 (Strata Cloud Manager)"
+            ],
+            "default": "API Key (legacy)"
+        },
         "api_key": {
             "data_type": "password",
-            "description": "API Key",
-            "order": 2,
-            "required": true
+            "description": "API Key (required for 'API Key (legacy)' authentication)",
+            "order": 3,
+            "required": false
+        },
+        "client_id": {
+            "data_type": "string",
+            "description": "Client ID (required for 'OAuth2 (Strata Cloud Manager)' authentication)",
+            "order": 4,
+            "required": false
+        },
+        "client_secret": {
+            "data_type": "password",
+            "description": "Client Secret (required for 'OAuth2 (Strata Cloud Manager)' authentication)",
+            "order": 5,
+            "required": false
+        },
+        "tsg_id": {
+            "data_type": "string",
+            "description": "TSG ID (Tenant Service Group ID, required for 'OAuth2 (Strata Cloud Manager)' authentication)",
+            "order": 6,
+            "required": false
+        },
+        "auth_url": {
+            "data_type": "string",
+            "description": "OAuth2 token URL (used for 'OAuth2 (Strata Cloud Manager)' authentication)",
+            "order": 7,
+            "required": false,
+            "default": "https://auth.apps.paloaltonetworks.com/am/oauth2/access_token"
         },
         "timeout": {
             "data_type": "numeric",
             "description": "Detonate timeout in mins",
-            "order": 3,
+            "order": 8,
             "required": true,
             "default": 10
         }

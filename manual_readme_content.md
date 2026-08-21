@@ -1,3 +1,35 @@
+## Authentication
+
+Select the method with the **Authentication method** asset parameter:
+
+- **API Key (legacy):** the static WildFire API key. Palo Alto is retiring this — static keys stop
+  working after **Jan 15, 2027**. Provide the **API Key** parameter.
+- **OAuth2 (Strata Cloud Manager):** token-based. Provide **Client ID**, **Client Secret**, and
+  **TSG ID**; the app fetches and refreshes a short-lived Bearer token automatically. Leave
+  **OAuth2 token URL** at its default unless directed otherwise.
+
+### OAuth2 setup (Strata Cloud Manager)
+
+Perform steps 1-4 in Strata Cloud Manager (SCM), then configure the asset in step 5.
+
+1. **Create a custom role.** In **Identity & Access → Roles → Custom Roles**, add a role with the
+   `iam.service_account` and `iam.custom_role` permissions.
+1. **Create a service account.** In **Identity & Access → Access Management**, select
+   **Add Identity → Service Account**. Give it the **All Apps & Services** scope and the custom role
+   from step 1.
+1. **Save the credentials.** On the credentials screen, copy the **Client ID** and **Client
+   Secret** — the secret is shown only once. Your **TSG ID** is the number in the account name
+   (`name@<tsg_id>.iam.panserviceaccount.com`).
+1. **Create and bind the API key.** In **Configuration → WildFire Settings**, select
+   **Create New Key**, choose the service account from step 2, and wait until the key status is
+   **Valid**. This requires an Advanced WildFire or Prisma Access license on the tenant — a token
+   whose service account has no bound key is rejected.
+1. **Configure the asset.** Set **Authentication method** to **OAuth2 (Strata Cloud Manager)**,
+   enter the **Client ID**, **Client Secret**, and **TSG ID**, leave **OAuth2 token URL** at its
+   default, and run **Test Connectivity**.
+
+### Licensing API (API Key method)
+
 To enable the access for fetching files from the Wildfire instance, please enable the Licensing API
 key by [clicking here](https://support.paloaltonetworks.com/License/LicensingApi/34470) . If the
 redirect link is not working, please follow the below mentioned steps for activating the licensing

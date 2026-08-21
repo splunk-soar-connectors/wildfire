@@ -144,6 +144,9 @@ class WildfireConnector(BaseConnector):
 
         self._api_token = None
         self._proxy = None
+        self._auth_method = None
+        self._access_token = None
+        self._token_expiry = 0
 
     def initialize(self):
         config = self.get_config()
@@ -162,6 +165,16 @@ class WildfireConnector(BaseConnector):
         self._host = self._base_url[self._base_url.find("//") + 2 :]
 
         self._base_url += "/publicapi"
+
+        # Determine and validate the authentication method
+        self._auth_method = config.get(WILDFIRE_JSON_AUTH_METHOD, WILDFIRE_AUTH_API_KEY)
+
+        if self._auth_method == WILDFIRE_AUTH_OAUTH:
+            if not (config.get(WILDFIRE_JSON_CLIENT_ID) and config.get(WILDFIRE_JSON_CLIENT_SECRET) and config.get(WILDFIRE_JSON_TSG_ID)):
+                return self.set_status(phantom.APP_ERROR, WILDFIRE_ERR_MISSING_OAUTH_CREDS)
+        else:
+            if not config.get(WILDFIRE_JSON_API_KEY):
+                return self.set_status(phantom.APP_ERROR, WILDFIRE_ERR_MISSING_API_KEY)
 
         self._proxy = {}
         env_vars = config.get("_reserved_environment_variables", {})
@@ -317,6 +330,96 @@ class WildfireConnector(BaseConnector):
 
         return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_REST_API.format(status_code=status_code, detail=detail))
 
+    def _get_oauth_token(self, result, force_refresh=False):
+        """Fetch (or reuse a cached) OAuth2 access token from Strata Cloud Manager.
+
+        Uses the client_credentials grant with HTTP Basic client authentication. The token
+        is cached and reused until shortly before its TTL expires.
+        :return: (status, access_token)
+        """
+        now = time.time()
+        if not force_refresh and self._access_token and now < self._token_expiry:
+            self.debug_print("OAuth: reusing cached access token", {"expires_in_secs": int(self._token_expiry - now)})
+            return phantom.APP_SUCCESS, self._access_token
+
+        config = self.get_config()
+        token_url = config.get(WILDFIRE_JSON_AUTH_URL) or WILDFIRE_DEFAULT_OAUTH_TOKEN_URL
+        client_id = config[WILDFIRE_JSON_CLIENT_ID]
+        client_secret = config[WILDFIRE_JSON_CLIENT_SECRET]
+        tsg_id = config[WILDFIRE_JSON_TSG_ID]
+
+        body = {
+            "grant_type": WILDFIRE_OAUTH_GRANT_TYPE,
+            "scope": WILDFIRE_OAUTH_SCOPE_FORMAT.format(tsg_id=tsg_id),
+        }
+
+        self.save_progress("Requesting OAuth2 access token from Strata Cloud Manager")
+        self.debug_print("OAuth: requesting access token", {"token_url": token_url, "force_refresh": force_refresh})
+
+        try:
+            r = self._req_sess.post(
+                token_url,
+                data=body,
+                auth=(client_id, client_secret),
+                verify=config[phantom.APP_JSON_VERIFY],
+                proxies=self._proxy,
+                timeout=WILDFIRE_DEFAULT_TIMEOUT_SECS,
+            )
+        except requests.exceptions.Timeout as e:
+            error_message = self._get_error_message_from_exception(e)
+            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_TIMEOUT, error_message), None
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_FETCH, error_message), None
+
+        self.debug_print("OAuth: token endpoint responded", {"status_code": r.status_code})
+
+        if r.status_code != requests.codes.ok:  # pylint: disable=E1101
+            return result.set_status(phantom.APP_ERROR, f"{WILDFIRE_ERR_TOKEN_FETCH}. Status code: {r.status_code}. Detail: {r.text}"), None
+
+        try:
+            token_data = r.json()
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_FETCH, error_message), None
+
+        access_token = token_data.get("access_token")
+        if not access_token:
+            return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_TOKEN_MISSING), None
+
+        try:
+            expires_in = int(token_data.get("expires_in", WILDFIRE_OAUTH_DEFAULT_TTL_SECS))
+        except (TypeError, ValueError):
+            expires_in = WILDFIRE_OAUTH_DEFAULT_TTL_SECS
+
+        self._access_token = access_token
+        # Refresh a little before expiry, keep a small floor so a tiny TTL doesn't force a fetch per
+        # request, but never cache longer than the server-reported lifetime.
+        cache_ttl = min(expires_in, max(WILDFIRE_OAUTH_MIN_TTL_SECS, expires_in - WILDFIRE_OAUTH_REFRESH_SKEW_SECS))
+        self._token_expiry = now + cache_ttl
+        self.debug_print("OAuth: access token acquired", {"expires_in": expires_in, "cache_ttl_secs": cache_ttl})
+
+        return phantom.APP_SUCCESS, access_token
+
+    def _rewind_files(self, files):
+        """Rewind any file-like streams in `files` so the request can be safely replayed.
+
+        The connector also uses `files` to pass plain string form-fields (e.g., the verdict
+        url/hash as `("", value)`); those carry no stream and are always safe to resend.
+        Returns True if there are no streams or every stream was rewound to the start, and
+        False if any stream is non-seekable and therefore cannot be replayed.
+        """
+        if not files:
+            return True
+        for value in files.values():
+            payload = value[1] if isinstance(value, (list, tuple)) and len(value) > 1 else value
+            if hasattr(payload, "read"):
+                if hasattr(payload, "seekable") and payload.seekable():
+                    payload.seek(0)
+                else:
+                    return False
+        return True
+
     def _make_rest_call(
         self, endpoint, result, error_desc, method="get", params={}, data=None, files=None, parse_response=True, additional_succ_codes={}
     ):
@@ -332,13 +435,58 @@ class WildfireConnector(BaseConnector):
         if not request_func:
             return result.set_status(phantom.APP_ERROR, f"Invalid method call: {method} for requests module"), None
 
-        data.update({"apikey": config[WILDFIRE_JSON_API_KEY]})
+        self.debug_print("REST call", {"endpoint": endpoint, "method": method, "auth_method": self._auth_method})
+
+        headers = {}
+        if self._auth_method == WILDFIRE_AUTH_OAUTH:
+            ret_val, token = self._get_oauth_token(result)
+            if phantom.is_fail(ret_val):
+                return result.get_status(), None
+            headers["Authorization"] = f"Bearer {token}"
+        else:
+            data.update({"apikey": config[WILDFIRE_JSON_API_KEY]})
 
         try:
-            r = request_func(url, params=params, data=data, files=files, verify=config[phantom.APP_JSON_VERIFY], proxies=self._proxy)
+            r = request_func(
+                url,
+                headers=headers,
+                params=params,
+                data=data,
+                files=files,
+                verify=config[phantom.APP_JSON_VERIFY],
+                proxies=self._proxy,
+                timeout=WILDFIRE_DEFAULT_TIMEOUT_SECS,
+            )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return result.set_status(phantom.APP_ERROR, "REST Api to server failed", error_message), None
+
+        # In OAuth mode a 401 may mean the cached token was invalidated server-side; refresh once and retry.
+        if self._auth_method == WILDFIRE_AUTH_OAUTH and r.status_code == 401:
+            self.debug_print("OAuth: received 401, attempting token refresh and one retry")
+            # Rewind any upload streams so the request can be replayed. If a stream is non-seekable
+            # it was already consumed by the first attempt and cannot be safely resent.
+            if not self._rewind_files(files):
+                self.debug_print("OAuth: 401 on a non-seekable upload stream; cannot safely retry")
+                return result.set_status(phantom.APP_ERROR, WILDFIRE_ERR_NONREPLAYABLE_UPLOAD), None
+            ret_val, token = self._get_oauth_token(result, force_refresh=True)
+            if phantom.is_fail(ret_val):
+                return result.get_status(), None
+            headers["Authorization"] = f"Bearer {token}"
+            try:
+                r = request_func(
+                    url,
+                    headers=headers,
+                    params=params,
+                    data=data,
+                    files=files,
+                    verify=config[phantom.APP_JSON_VERIFY],
+                    proxies=self._proxy,
+                    timeout=WILDFIRE_DEFAULT_TIMEOUT_SECS,
+                )
+            except Exception as e:
+                error_message = self._get_error_message_from_exception(e)
+                return result.set_status(phantom.APP_ERROR, "REST Api to server failed", error_message), None
 
         # It's ok if r.text is None, dump that
         if hasattr(result, "add_debug_data"):
