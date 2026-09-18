@@ -16,6 +16,7 @@ from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ._download import download_to_vault
 
 
 class GetFileParams(Params):
@@ -32,4 +33,13 @@ class GetFileOutput(ActionOutput):
 
 
 def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFileOutput:
-    raise NotImplementedError()
+    name = f"{params.hash}.bin"
+    vault_id = download_to_vault(
+        soar=soar,
+        asset=asset,
+        endpoint="get/sample",
+        data={"hash": params.hash},
+        file_name=name,
+        contains="file",
+    )
+    return GetFileOutput(name=name, vault_id=vault_id)
