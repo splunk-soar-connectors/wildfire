@@ -16,6 +16,7 @@ from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ._download import download_to_vault
 
 
 class SaveReportParams(Params):
@@ -34,4 +35,13 @@ class SaveReportOutput(ActionOutput):
 def save_report(
     params: SaveReportParams, soar: SOARClient, asset: Asset
 ) -> SaveReportOutput:
-    raise NotImplementedError()
+    name = f"{params.id}.pdf"
+    vault_id = download_to_vault(
+        soar=soar,
+        asset=asset,
+        endpoint="get/report",
+        data={"hash": params.id, "format": "pdf"},
+        file_name=name,
+        contains="pdf",
+    )
+    return SaveReportOutput(name=name, vault_id=vault_id)
