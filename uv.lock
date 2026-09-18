@@ -1173,7 +1173,7 @@ wheels = [
 ]
 
 [[package]]
-name = "wildfire-sdkfied"
+name = "wildfire"
 version = "4.0.0"
 source = { virtual = "." }
 dependencies = [

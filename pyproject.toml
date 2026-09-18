@@ -1,5 +1,5 @@
 [project]
-name = "wildfire-sdkfied"
+name = "wildfire"
 version = "4.0.0"
 description = "This app supports file detonation for forensic file analysis on the Palo Alto Networks WildFire sandbox"
 license = "Copyright (c) 2016-2026 Splunk Inc."
