@@ -24,7 +24,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [test connectivity](#action-test-connectivity) - Upload the bundled test PDF to verify WildFire connectivity. <br>
 [detonate file](#action-detonate-file) - Run the file in the WildFire sandbox and retrieve the analysis results <br>
 [detonate url](#action-detonate-url) - Submit a single website link for WildFire analysis <br>
-[get url reputation](#action-get-url-reputation) - Submit a single website link for WildFire verdict <br>
+[url reputation](#action-url-reputation) - Submit a single website link for WildFire verdict <br>
 [get report](#action-get-report) - Query for results of an already completed detonation in WildFire <br>
 [get sample](#action-get-sample) - Download a sample from WildFire and add it to the vault <br>
 [get pcap](#action-get-pcap) - Download the pcap file of a sample from WildFire and add it to the vault <br>
@@ -307,12 +307,12 @@ action_result.data.\*.version | string | | 2.0 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'get url reputation'
+## action: 'url reputation'
 
 Submit a single website link for WildFire verdict
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be quieried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.
 
@@ -336,6 +336,7 @@ action_result.data.\*.verdict_message | string | | unknown, cannot find sample r
 action_result.data.\*.verdict_sha256 | string | `sha256` | 14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f |
 action_result.data.\*.verdict_url | string | | https://www.google.com |
 action_result.data.\*.verdict_valid | string | | Yes |
+action_result.summary.success | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

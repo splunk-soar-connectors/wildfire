@@ -16,7 +16,7 @@ from soar_sdk.app import App
 from .test_connectivity import test_connectivity
 from .detonate_file import detonate_file
 from .detonate_url import detonate_url
-from .get_url_reputation import get_url_reputation
+from .get_url_reputation import UrlReputationSummary, get_url_reputation
 from .get_report import get_report
 from .get_sample import get_sample
 from .get_pcap import get_pcap
@@ -40,9 +40,13 @@ def register_actions(app: App) -> App:
     )
     app.register_action(
         action=get_url_reputation,
+        name="url reputation",
         description="Submit a single website link for WildFire verdict",
         action_type="investigate",
         verbose="The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be quieried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.",
+        read_only=True,
+        render_as="table",
+        summary_type=UrlReputationSummary,
     )
     app.register_action(
         action=get_report,
