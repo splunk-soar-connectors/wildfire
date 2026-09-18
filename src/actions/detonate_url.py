@@ -11,11 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
+import math
+import time
+
+import httpx
+import xmltodict
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.exceptions import ActionFailure
+from soar_sdk.logging import getLogger
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+
+logger = getLogger()
+VERDICT_MESSAGES = {
+    0: "benign",
+    1: "malware",
+    2: "grayware",
+    4: "phishing",
+    -100: "pending, the sample exists, but there is currently no verdict",
+    -101: "error",
+    -102: "unknown, cannot find sample record in the WildFire database",
+    -103: "invalid hash value",
+}
+POLL_INTERVAL_SECONDS = 5
 
 
 class DetonateUrlParams(Params):
@@ -1328,7 +1349,130 @@ class DetonateUrlOutput(ActionOutput):
     version: str = OutputField(example_values=["2.0"])
 
 
+def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
+    try:
+        parsed = xmltodict.parse(response.text)
+    except Exception as exc:
+        raise ActionFailure(f"Unable to parse reply from device: {exc}") from exc
+
+    wildfire = parsed.get("wildfire")
+    if not isinstance(wildfire, dict):
+        raise ActionFailure("None 'wildfire' missing in reply from device")
+    return wildfire
+
+
+def _raise_for_error(response: httpx.Response) -> None:
+    if response.status_code == httpx.codes.OK:
+        return
+    raise ActionFailure(
+        "REST Api Call returned error, "
+        f"status_code: {response.status_code}, "
+        f"detail: {response.text.strip() or 'N/A'}"
+    )
+
+
+def _get_verdict(
+    client: httpx.Client, asset: Asset, *, task_id: str | None, url: str | None
+) -> tuple[int, str]:
+    field, value = ("hash", task_id) if task_id else ("url", url)
+    response = client.post(
+        "get/verdict",
+        data={"apikey": asset.api_key},
+        files={field: ("", value)},
+    )
+    _raise_for_error(response)
+    verdict_info = _parse_wildfire_xml(response).get("get-verdict-info")
+    if not isinstance(verdict_info, dict):
+        raise ActionFailure("Verdict could not be retrieved")
+    try:
+        verdict_code = int(verdict_info["verdict"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ActionFailure("Verdict could not be retrieved") from exc
+    return verdict_code, VERDICT_MESSAGES.get(verdict_code, "unknown verdict code")
+
+
+def _poll_report(
+    client: httpx.Client, asset: Asset, *, task_id: str | None, url: str | None
+) -> dict[str, object]:
+    max_attempts = math.ceil(asset.timeout * 60 / POLL_INTERVAL_SECONDS)
+    report_data = (
+        {"apikey": asset.api_key, "format": "xml", "hash": task_id}
+        if task_id
+        else {"apikey": asset.api_key, "url": url}
+    )
+    for attempt in range(1, max_attempts + 1):
+        logger.progress("Polling attempt %s of %s", attempt, max_attempts)
+        response = client.post("get/report", data=report_data)
+        if response.status_code == httpx.codes.NOT_FOUND:
+            time.sleep(POLL_INTERVAL_SECONDS)
+            continue
+        _raise_for_error(response)
+        if task_id:
+            return _parse_wildfire_xml(response)
+        try:
+            report = response.json()
+            report_body = report.get("result", {}).get("report")
+            if isinstance(report_body, str):
+                report["result"]["report"] = json.loads(report_body)
+            return report
+        except (json.JSONDecodeError, TypeError, AttributeError) as exc:
+            raise ActionFailure(f"Unable to parse response as JSON: {exc}") from exc
+
+    raise ActionFailure("Reached max polling attempts.")
+
+
 def detonate_url(
     params: DetonateUrlParams, soar: SOARClient, asset: Asset
 ) -> DetonateUrlOutput:
-    raise NotImplementedError()
+    del soar
+    if not params.url.startswith(("http://", "https://")):
+        raise ActionFailure("Please provide a valid URL")
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
+    timeout = httpx.Timeout(None)
+    try:
+        with httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client:
+            task_id = None
+            if params.is_file:
+                response = client.post(
+                    "submit/url",
+                    data={"apikey": asset.api_key},
+                    files={"url": ("", params.url)},
+                )
+                _raise_for_error(response)
+                upload_info = _parse_wildfire_xml(response).get("upload-file-info")
+                if not isinstance(upload_info, dict):
+                    raise ActionFailure("Task id not part of response, can't continue")
+                task_id = upload_info.get("sha256") or upload_info.get("md5")
+                if not isinstance(task_id, str):
+                    raise ActionFailure("Task id not part of response, can't continue")
+                time.sleep(1)
+
+            verdict_code, verdict = _get_verdict(
+                client,
+                asset,
+                task_id=task_id,
+                url=None if task_id else params.url,
+            )
+            result = ActionResult(True, "Success", params.model_dump())
+            result.set_summary(
+                {
+                    "verdict_code": verdict_code,
+                    "verdict": verdict,
+                    "summary_available": verdict_code >= 0,
+                }
+            )
+            if verdict_code >= 0:
+                result.add_data(
+                    _poll_report(
+                        client,
+                        asset,
+                        task_id=task_id,
+                        url=None if task_id else params.url,
+                    )
+                )
+            else:
+                result.add_data({})
+            return result  # type: ignore[return-value]
+    except httpx.HTTPError as exc:
+        raise ActionFailure(f"REST Api to server failed: {exc}") from exc
