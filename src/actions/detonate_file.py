@@ -11,11 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import math
+import time
+
+import httpx
+import xmltodict
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.exceptions import ActionFailure
+from soar_sdk.logging import getLogger
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+
+logger = getLogger()
+POLL_INTERVAL_SECONDS = 5
 
 
 class DetonateFileParams(Params):
@@ -367,7 +377,105 @@ class DetonateFileOutput(ActionOutput):
     version: str
 
 
+def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
+    try:
+        parsed = xmltodict.parse(response.text)
+    except Exception as exc:
+        raise ActionFailure(f"Unable to parse reply from device: {exc}") from exc
+
+    wildfire = parsed.get("wildfire")
+    if not isinstance(wildfire, dict):
+        raise ActionFailure("None 'wildfire' missing in reply from device")
+    return wildfire
+
+
+def _raise_for_error(response: httpx.Response) -> None:
+    if response.status_code == httpx.codes.OK:
+        return
+    raise ActionFailure(
+        "REST Api Call returned error, "
+        f"status_code: {response.status_code}, "
+        f"detail: {response.text.strip() or 'N/A'}"
+    )
+
+
+def _poll_report(client: httpx.Client, asset: Asset, task_id: str) -> dict[str, object]:
+    max_attempts = math.ceil(asset.timeout * 60 / POLL_INTERVAL_SECONDS)
+    for attempt in range(1, max_attempts + 1):
+        logger.progress("Polling attempt %s of %s", attempt, max_attempts)
+        response = client.post(
+            "get/report",
+            data={
+                "apikey": asset.api_key,
+                "format": "xml",
+                "hash": task_id,
+            },
+        )
+        if response.status_code == httpx.codes.NOT_FOUND:
+            time.sleep(POLL_INTERVAL_SECONDS)
+            continue
+        _raise_for_error(response)
+        return _parse_wildfire_xml(response)
+    raise ActionFailure("Reached max polling attempts.")
+
+
 def detonate_file(
     params: DetonateFileParams, soar: SOARClient, asset: Asset
 ) -> DetonateFileOutput:
-    raise NotImplementedError()
+    attachments = soar.vault.get_attachment(
+        vault_id=params.vault_id, container_id=soar.get_executing_container_id()
+    )
+    if not attachments:
+        raise ActionFailure("Vault file could not be found with supplied Vault ID")
+    attachment = attachments[0]
+    file_name = params.file_name or attachment.name
+    sha256 = attachment.metadata.get("sha256") or attachment.hash
+    if not sha256:
+        raise ActionFailure("Unable to get meta info of vault file")
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
+    timeout = httpx.Timeout(None)
+    try:
+        with httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client:
+            logger.progress("Checking for prior detonations")
+            report_response = client.post(
+                "get/report",
+                data={
+                    "apikey": asset.api_key,
+                    "format": "xml",
+                    "hash": sha256,
+                },
+            )
+            upload_data: dict[str, object] = {}
+            if report_response.status_code == httpx.codes.OK:
+                report_data = _parse_wildfire_xml(report_response)
+            elif report_response.status_code == httpx.codes.NOT_FOUND:
+                logger.progress("Uploading the file")
+                with attachment.open("rb") as payload:
+                    upload_response = client.post(
+                        "submit/file",
+                        data={"apikey": asset.api_key},
+                        files={"file": (file_name, payload)},
+                    )
+                _raise_for_error(upload_response)
+                upload_data = _parse_wildfire_xml(upload_response)
+                upload_info = upload_data.get("upload-file-info")
+                if not isinstance(upload_info, dict):
+                    raise ActionFailure("Task id not part of response, can't continue")
+                task_id = upload_info.get("sha256") or upload_info.get("md5")
+                if not isinstance(task_id, str):
+                    raise ActionFailure("Task id not part of response, can't continue")
+                report_data = _poll_report(client, asset, task_id)
+            else:
+                _raise_for_error(report_response)
+                raise ActionFailure("Unable to retrieve prior detonation report")
+    except (OSError, httpx.HTTPError) as exc:
+        raise ActionFailure(f"REST Api to server failed: {exc}") from exc
+
+    data = {**upload_data, **report_data}
+    result = ActionResult(True, "Success", params.model_dump())
+    result.add_data(data)
+    file_info = report_data.get("file_info")
+    malware = file_info.get("malware", "no") if isinstance(file_info, dict) else "no"
+    result.set_summary({"malware": malware})
+    return result  # type: ignore[return-value]
