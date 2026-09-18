@@ -11,12 +11,73 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pathlib import Path
+
+import httpx
 from soar_sdk.abstract import SOARClient
+from soar_sdk.exceptions import ActionFailure
+from soar_sdk.logging import getLogger
 
 from ..asset import Asset
 
 __test__ = False
 
+logger = getLogger()
+TEST_PDF_NAME = "wildfire_test_connectivity.pdf"
+FILE_UPLOAD_ERRORS = {
+    401: "API key invalid",
+    405: "HTTP method Not Allowed",
+    413: "Sample file size over max limit",
+    418: "Sample file type is not supported",
+    419: "Max number of uploads per day exceeded",
+    422: "URL download error",
+    500: "Internal error",
+    513: "File upload failed",
+}
+
+
+def _error_detail(response: httpx.Response) -> str:
+    detail = response.text.strip()
+    if detail:
+        return detail
+    return FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
+
 
 def test_connectivity(soar: SOARClient, asset: Asset) -> None:
-    raise NotImplementedError()
+    """Upload the bundled test PDF to verify WildFire connectivity."""
+    del soar
+
+    test_pdf = Path(__file__).parents[2] / TEST_PDF_NAME
+    if not test_pdf.is_file():
+        raise ActionFailure(f'Test pdf file not found at "{test_pdf}"')
+
+    logger.progress("Detonating test pdf file for checking connectivity")
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
+    timeout = httpx.Timeout(None)
+
+    try:
+        with (
+            test_pdf.open("rb") as payload,
+            httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client,
+        ):
+            response = client.post(
+                "submit/file",
+                data={"apikey": asset.api_key},
+                files={"file": (TEST_PDF_NAME, payload)},
+            )
+    except httpx.HTTPError as exc:
+        raise ActionFailure(f"REST Api to server failed: {exc}") from exc
+    except OSError as exc:
+        raise ActionFailure(
+            f'Unable to open test pdf file at "{test_pdf}": {exc}'
+        ) from exc
+
+    if response.status_code != httpx.codes.OK:
+        detail = _error_detail(response)
+        raise ActionFailure(
+            "REST Api Call returned error, "
+            f"status_code: {response.status_code}, detail: {detail}"
+        )
+
+    logger.progress("Test Connectivity Passed")

@@ -21,7 +21,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - test connectivity <br>
+[test connectivity](#action-test-connectivity) - Upload the bundled test PDF to verify WildFire connectivity. <br>
 [detonate file](#action-detonate-file) - Run the file in the WildFire sandbox and retrieve the analysis results <br>
 [detonate url](#action-detonate-url) - Submit a single website link for WildFire analysis <br>
 [get url reputation](#action-get-url-reputation) - Submit a single website link for WildFire verdict <br>
@@ -32,7 +32,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ## action: 'test connectivity'
 
-test connectivity
+Upload the bundled test PDF to verify WildFire connectivity.
 
 Type: **test** <br>
 Read only: **True**
