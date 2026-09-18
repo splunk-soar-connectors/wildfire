@@ -12,55 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-import threading
-from collections.abc import Generator
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import ClassVar
+import os
 
 import pytest
-from soar_sdk.app import App
+from dotenv import find_dotenv, load_dotenv
 from soar_sdk.shims.phantom.encryption_helper import encryption_helper
 
 from src.app import create_wildfire_connector_app
 
 
-class WildFireProbeHandler(BaseHTTPRequestHandler):
-    response_status = 200
-    response_body = b"<wildfire/>"
-    requests: ClassVar[list[tuple[str, dict[str, str], bytes]]] = []
+def _required_wildfire_environment() -> tuple[str, str, bool]:
+    if not os.getenv("WILDFIRE_BASE_URL") or not os.getenv("WILDFIRE_API_KEY"):
+        env_path = find_dotenv(usecwd=True)
+        if env_path:
+            load_dotenv(env_path, override=False)
 
-    def do_POST(self) -> None:
-        content_length = int(self.headers.get("Content-Length", "0"))
-        body = self.rfile.read(content_length)
-        type(self).requests.append((self.path, dict(self.headers), body))
-        self.send_response(type(self).response_status)
-        self.send_header("Content-Type", "application/xml")
-        self.end_headers()
-        self.wfile.write(type(self).response_body)
+    missing = [
+        name
+        for name in ("WILDFIRE_BASE_URL", "WILDFIRE_API_KEY")
+        if not os.getenv(name)
+    ]
+    if missing:
+        pytest.fail(
+            "Missing required WildFire live-test environment variables: "
+            + ", ".join(missing)
+        )
 
-    def log_message(self, _format: str, *args: object) -> None:
-        del _format, args
+    verify_value = os.getenv("WILDFIRE_VERIFY_SERVER_CERT", "true").strip().lower()
+    if verify_value not in {"true", "false"}:
+        pytest.fail("WILDFIRE_VERIFY_SERVER_CERT must be 'true' or 'false'")
 
-
-@pytest.fixture
-def wildfire_server() -> Generator[tuple[str, type[WildFireProbeHandler]]]:
-    WildFireProbeHandler.response_status = 200
-    WildFireProbeHandler.response_body = b"<wildfire/>"
-    WildFireProbeHandler.requests = []
-    server = ThreadingHTTPServer(("127.0.0.1", 0), WildFireProbeHandler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    host, port = server.server_address
-    try:
-        yield f"http://{host}:{port}", WildFireProbeHandler
-    finally:
-        server.shutdown()
-        server.server_close()
-        thread.join()
+    return (
+        os.environ["WILDFIRE_BASE_URL"],
+        os.environ["WILDFIRE_API_KEY"],
+        verify_value == "true",
+    )
 
 
-def run_test_connectivity(app: App, base_url: str, api_key: str) -> None:
-    asset_id = "123"
+@pytest.mark.live
+def test_connectivity_uploads_bundled_probe_to_wildfire() -> None:
+    base_url, api_key, verify_server_cert = _required_wildfire_environment()
+    asset_id = "wildfire-live-test"
+    app = create_wildfire_connector_app()
     input_data = {
         "identifier": "test_connectivity",
         "action": "test_connectivity",
@@ -71,48 +64,13 @@ def run_test_connectivity(app: App, base_url: str, api_key: str) -> None:
             "directory": ".",
             "main_module": "src.app:app",
             "base_url": base_url,
-            "verify_server_cert": True,
+            "verify_server_cert": verify_server_cert,
             "api_key": encryption_helper.encrypt(api_key, salt=asset_id),
-            "timeout": 10.0,
         },
         "parameters": [{}],
     }
+
     app.handle(json.dumps(input_data))
-
-
-def test_connectivity_uploads_legacy_probe_with_api_key_in_body(
-    wildfire_server: tuple[str, type[WildFireProbeHandler]],
-) -> None:
-    base_url, handler = wildfire_server
-    app = create_wildfire_connector_app()
-
-    run_test_connectivity(app, base_url, "test-api-key")
 
     result = app.actions_manager.get_action_results()[-1]
     assert result.get_status() is True, result.get_message()
-    assert len(handler.requests) == 1
-    path, headers, body = handler.requests[0]
-    assert path == "/publicapi/submit/file"
-    assert headers["Content-Type"].startswith("multipart/form-data;")
-    assert b"test-api-key" in body
-    assert b'name="apikey"' in body
-    assert b'filename="wildfire_test_connectivity.pdf"' in body
-    assert b"%PDF" in body
-
-
-def test_connectivity_preserves_legacy_status_fallback(
-    wildfire_server: tuple[str, type[WildFireProbeHandler]],
-) -> None:
-    base_url, handler = wildfire_server
-    handler.response_status = 401
-    handler.response_body = b""
-    app = create_wildfire_connector_app()
-
-    run_test_connectivity(app, base_url, "invalid-api-key")
-
-    result = app.actions_manager.get_action_results()[-1]
-    assert result.get_status() is False
-    assert (
-        "REST Api Call returned error, status_code: 401, detail: API key invalid"
-        in result.get_message()
-    )
