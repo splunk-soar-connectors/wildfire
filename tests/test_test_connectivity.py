@@ -12,37 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-from collections.abc import Mapping
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 from soar_sdk.app import App
-from soar_sdk.shims.phantom.encryption_helper import encryption_helper
 
 
 @pytest.mark.live
 def test_connectivity_uploads_bundled_probe_to_wildfire(
-    wildfire_app: App, wildfire_asset_config: Mapping[str, str | bool]
+    wildfire_app: App,
+    wildfire_action_input: Callable[[str, str, list[dict[str, Any]]], dict[str, Any]],
 ) -> None:
-    asset_id = "wildfire-live-test"
-    input_data = {
-        "identifier": "test_connectivity",
-        "action": "test_connectivity",
-        "asset_id": asset_id,
-        "container_id": 456,
-        "config": {
-            "app_version": "4.0.0",
-            "directory": ".",
-            "main_module": "src.app:app",
-            "base_url": wildfire_asset_config["base_url"],
-            "verify_server_cert": wildfire_asset_config["verify_server_cert"],
-            "api_key": encryption_helper.encrypt(
-                wildfire_asset_config["api_key"], salt=asset_id
-            ),
-        },
-        "parameters": [{}],
-    }
-
-    wildfire_app.handle(json.dumps(input_data))
+    wildfire_app.handle(
+        json.dumps(
+            wildfire_action_input("test_connectivity", "test_connectivity", [{}])
+        )
+    )
 
     result = wildfire_app.actions_manager.get_action_results()[-1]
     assert result.get_status() is True, result.get_message()

@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-from typing import TypedDict
+from collections.abc import Callable
+from typing import Any, TypedDict
 
 import pytest
 from dotenv import find_dotenv, load_dotenv
 from soar_sdk.app import App
+from soar_sdk.shims.phantom.encryption_helper import encryption_helper
 
 from src.app import create_wildfire_connector_app
 
@@ -25,6 +27,9 @@ class WildFireAssetConfig(TypedDict):
     base_url: str
     api_key: str
     verify_server_cert: bool
+
+
+WildFireActionInputFactory = Callable[[str, str, list[dict[str, Any]]], dict[str, Any]]
 
 
 @pytest.fixture(scope="session")
@@ -61,3 +66,34 @@ def wildfire_asset_config() -> WildFireAssetConfig:
 def wildfire_app() -> App:
     """Create an isolated connector app for one test."""
     return create_wildfire_connector_app()
+
+
+@pytest.fixture
+def wildfire_action_input(
+    wildfire_asset_config: WildFireAssetConfig,
+) -> WildFireActionInputFactory:
+    """Build a connector action payload from the real WildFire asset config."""
+    asset_id = "wildfire-live-test"
+
+    def create(
+        identifier: str, action: str, parameters: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        return {
+            "identifier": identifier,
+            "action": action,
+            "asset_id": asset_id,
+            "container_id": 456,
+            "config": {
+                "app_version": "4.0.0",
+                "directory": ".",
+                "main_module": "src.app:app",
+                "base_url": wildfire_asset_config["base_url"],
+                "verify_server_cert": wildfire_asset_config["verify_server_cert"],
+                "api_key": encryption_helper.encrypt(
+                    wildfire_asset_config["api_key"], salt=asset_id
+                ),
+            },
+            "parameters": parameters,
+        }
+
+    return create
