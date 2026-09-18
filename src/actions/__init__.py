@@ -17,7 +17,7 @@ from .test_connectivity import test_connectivity
 from .detonate_file import detonate_file
 from .detonate_url import detonate_url
 from .get_url_reputation import UrlReputationSummary, get_url_reputation
-from .get_report import get_report
+from .get_report import GetReportSummary, get_report
 from .get_sample import get_sample
 from .get_pcap import get_pcap
 from .save_report import save_report
@@ -53,6 +53,9 @@ def register_actions(app: App) -> App:
         description="Query for results of an already completed detonation in WildFire",
         action_type="investigate",
         verbose="Each detonation report in WildFire is denoted by the sha256 and md5 of the file.",
+        read_only=True,
+        render_as="table",
+        summary_type=GetReportSummary,
     )
     app.register_action(
         action=get_sample,

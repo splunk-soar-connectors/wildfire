@@ -345,7 +345,7 @@ summary.total_objects_successful | numeric | | 1 |
 Query for results of an already completed detonation in WildFire
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 Each detonation report in WildFire is denoted by the sha256 and md5 of the file.
 
@@ -475,6 +475,9 @@ action_result.data.\*.task_info.report.\*.summary.entry.\*.@seq | string | | |
 action_result.data.\*.task_info.report.\*.task | string | | |
 action_result.data.\*.task_info.report.\*.timeline.entry.\*.@seq | string | | |
 action_result.data.\*.version | string | | |
+action_result.summary.verdict_code | numeric | | |
+action_result.summary.verdict | string | | |
+action_result.summary.summary_available | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

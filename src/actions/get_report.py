@@ -12,10 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+import math
+import time
+
+import httpx
+import xmltodict
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.exceptions import ActionFailure
+from soar_sdk.logging import getLogger
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+
+logger = getLogger()
+VERDICT_MESSAGES = {
+    0: "benign",
+    1: "malware",
+    2: "grayware",
+    4: "phishing",
+    -100: "pending, the sample exists, but there is currently no verdict",
+    -101: "error",
+    -102: "unknown, cannot find sample record in the WildFire database",
+    -103: "invalid hash value",
+}
+GET_REPORT_ERRORS = {
+    401: "API key invalid",
+    404: "The report was not found",
+    405: "HTTP method Not Allowed",
+    419: "Request report quota exceeded",
+    420: "Insufficient arguments",
+    421: "Invalid arguments",
+    500: "Internal error",
+}
+POLL_INTERVAL_SECONDS = 5
 
 
 class GetReportParams(Params):
@@ -329,7 +358,90 @@ class GetReportOutput(ActionOutput):
     version: str
 
 
+class GetReportSummary(ActionOutput):
+    verdict_code: float
+    verdict: str
+    summary_available: bool
+
+
+def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
+    try:
+        parsed = xmltodict.parse(response.text)
+    except Exception as exc:
+        raise ActionFailure(f"Unable to parse reply from device: {exc}") from exc
+
+    wildfire = parsed.get("wildfire")
+    if not isinstance(wildfire, dict):
+        raise ActionFailure("None 'wildfire' missing in reply from device")
+    return wildfire
+
+
+def _raise_for_error(response: httpx.Response) -> None:
+    if response.status_code == httpx.codes.OK:
+        return
+    detail = response.text.strip() or GET_REPORT_ERRORS.get(response.status_code, "N/A")
+    raise ActionFailure(
+        "REST Api Call returned error, "
+        f"status_code: {response.status_code}, detail: {detail}"
+    )
+
+
 def get_report(
     params: GetReportParams, soar: SOARClient, asset: Asset
 ) -> GetReportOutput:
-    raise NotImplementedError()
+    """Retrieve a WildFire report for an existing sample hash."""
+    del soar
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
+    timeout = httpx.Timeout(None)
+
+    try:
+        with httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client:
+            logger.progress("Getting verdict for: %s", params.id)
+            verdict_response = client.post(
+                "get/verdict",
+                data={"apikey": asset.api_key},
+                files={"hash": ("", params.id)},
+            )
+            _raise_for_error(verdict_response)
+            verdict_info = _parse_wildfire_xml(verdict_response).get("get-verdict-info")
+            if not isinstance(verdict_info, dict):
+                raise ActionFailure("Verdict could not be retrieved")
+
+            try:
+                verdict_code = int(verdict_info["verdict"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ActionFailure("Verdict could not be retrieved") from exc
+
+            verdict = VERDICT_MESSAGES.get(verdict_code, "unknown verdict code")
+            summary = {
+                "verdict_code": verdict_code,
+                "verdict": verdict,
+                "summary_available": verdict_code >= 0,
+            }
+            result = ActionResult(True, "Success", params.model_dump())
+            result.set_summary(summary)
+            if verdict_code < 0:
+                return result  # type: ignore[return-value]
+
+            max_attempts = math.ceil(asset.timeout * 60 / POLL_INTERVAL_SECONDS)
+            for attempt in range(1, max_attempts + 1):
+                logger.progress("Polling attempt %s of %s", attempt, max_attempts)
+                report_response = client.post(
+                    "get/report",
+                    data={
+                        "apikey": asset.api_key,
+                        "format": "xml",
+                        "hash": params.id,
+                    },
+                )
+                if report_response.status_code == httpx.codes.NOT_FOUND:
+                    time.sleep(POLL_INTERVAL_SECONDS)
+                    continue
+                _raise_for_error(report_response)
+                result.add_data(_parse_wildfire_xml(report_response))
+                return result  # type: ignore[return-value]
+    except httpx.HTTPError as exc:
+        raise ActionFailure(f"REST Api to server failed: {exc}") from exc
+
+    raise ActionFailure("Reached max polling attempts.")
