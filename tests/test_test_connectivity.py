@@ -11,12 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import hashlib
 import json
 from collections.abc import Callable
 from typing import Any
 
 import pytest
 from soar_sdk.app import App
+
+from src.actions.test_connectivity import TEST_PDF_PATH
+
+
+def test_connectivity_probe_uses_packaged_resource_directory() -> None:
+    assert TEST_PDF_PATH.parent.name == "templates"
+    assert TEST_PDF_PATH.is_file()
+    assert (
+        hashlib.sha256(TEST_PDF_PATH.read_bytes()).hexdigest()
+        == (
+            "504a5350aceed0a0935fe4d670ebbea872cbf1fbd80d5922161bdff39b6f32f8"  # pragma: allowlist secret
+        )
+    )
 
 
 @pytest.mark.live

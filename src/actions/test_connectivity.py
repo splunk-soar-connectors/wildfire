@@ -24,6 +24,7 @@ __test__ = False
 
 logger = getLogger()
 TEST_PDF_NAME = "wildfire_test_connectivity.pdf"
+TEST_PDF_PATH = Path(__file__).parents[2] / "templates" / TEST_PDF_NAME
 FILE_UPLOAD_ERRORS = {
     401: "API key invalid",
     405: "HTTP method Not Allowed",
@@ -47,9 +48,8 @@ def test_connectivity(soar: SOARClient, asset: Asset) -> None:
     """Upload the bundled test PDF to verify WildFire connectivity."""
     del soar
 
-    test_pdf = Path(__file__).parents[2] / TEST_PDF_NAME
-    if not test_pdf.is_file():
-        raise ActionFailure(f'Test pdf file not found at "{test_pdf}"')
+    if not TEST_PDF_PATH.is_file():
+        raise ActionFailure(f'Test pdf file not found at "{TEST_PDF_PATH}"')
 
     logger.progress("Detonating test pdf file for checking connectivity")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
@@ -58,7 +58,7 @@ def test_connectivity(soar: SOARClient, asset: Asset) -> None:
 
     try:
         with (
-            test_pdf.open("rb") as payload,
+            TEST_PDF_PATH.open("rb") as payload,
             httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client,
         ):
             response = client.post(
@@ -70,7 +70,7 @@ def test_connectivity(soar: SOARClient, asset: Asset) -> None:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
     except OSError as exc:
         raise ActionFailure(
-            f'Unable to open test pdf file at "{test_pdf}": {exc}'
+            f'Unable to open test pdf file at "{TEST_PDF_PATH}": {exc}'
         ) from exc
 
     if response.status_code != httpx.codes.OK:

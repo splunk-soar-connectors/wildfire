@@ -26,7 +26,9 @@ def test_get_report_returns_the_bundled_probe_report(
     wildfire_app: App,
     wildfire_action_input: Callable[[str, str, list[dict[str, Any]]], dict[str, Any]],
 ) -> None:
-    probe_path = Path(__file__).parents[1] / "wildfire_test_connectivity.pdf"
+    probe_path = (
+        Path(__file__).parents[1] / "templates" / "wildfire_test_connectivity.pdf"
+    )
     probe_sha256 = hashlib.sha256(probe_path.read_bytes()).hexdigest()
 
     wildfire_app.handle(
