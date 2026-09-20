@@ -39,4 +39,8 @@ def test_detonate_url_queries_real_wildfire_asset(
     summary = result.get_summary()
     assert set(summary) == {"verdict_code", "verdict", "summary_available"}
     assert summary["summary_available"] is (summary["verdict_code"] >= 0)
+    assert result.get_message() == (
+        f"Verdict code: {summary['verdict_code']}, Verdict: {summary['verdict']}, "
+        f"Summary available: {summary['summary_available']}"
+    )
     assert len(result.get_data()) == 1

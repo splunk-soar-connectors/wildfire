@@ -1454,15 +1454,23 @@ def detonate_url(
                 task_id=task_id,
                 url=None if task_id else params.url,
             )
-            result = ActionResult(True, "Success", params.model_dump())
+            summary_available = verdict_code >= 0
+            result = ActionResult(
+                True,
+                (
+                    f"Verdict code: {verdict_code}, Verdict: {verdict}, "
+                    f"Summary available: {summary_available}"
+                ),
+                params.model_dump(),
+            )
             result.set_summary(
                 {
                     "verdict_code": verdict_code,
                     "verdict": verdict,
-                    "summary_available": verdict_code >= 0,
+                    "summary_available": summary_available,
                 }
             )
-            if verdict_code >= 0:
+            if summary_available:
                 result.add_data(
                     _poll_report(
                         client,

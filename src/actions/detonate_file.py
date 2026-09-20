@@ -473,9 +473,9 @@ def detonate_file(
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 
     data = {**upload_data, **report_data}
-    result = ActionResult(True, "Success", params.model_dump())
-    result.add_data(data)
     file_info = report_data.get("file_info")
     malware = file_info.get("malware", "no") if isinstance(file_info, dict) else "no"
+    result = ActionResult(True, f"Malware: {malware}", params.model_dump())
+    result.add_data(data)
     result.set_summary({"malware": malware})
     return result  # type: ignore[return-value]
