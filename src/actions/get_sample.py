@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+import httpx
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ._download import download_to_vault
 
 
 class GetFileParams(Params):
@@ -32,14 +33,81 @@ class GetFileOutput(ActionOutput):
     vault_id: str = OutputField(cef_types=["vault id"])
 
 
-def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFileOutput:
-    name = f"{params.hash}.bin"
-    vault_id = download_to_vault(
-        soar=soar,
-        asset=asset,
-        endpoint="get/sample",
-        data={"hash": params.hash},
-        file_name=name,
-        contains="file",
+class GetFileSummary(ActionOutput):
+    name: str = OutputField(column_name="File Name")
+    hash: str = OutputField(column_name="Hash")
+    file_type: str = OutputField(column_name="File Type")
+    vault_id: str = OutputField(cef_types=["vault id"], column_name="Vault ID")
+
+
+def _classify_sample(content: bytes) -> tuple[str, str]:
+    signatures = (
+        ((b"MZ",), ".exe", "pe file"),
+        ((b"%PDF-",), ".pdf", "pdf"),
+        ((b"MDMP",), ".dmp", "process dump"),
+        ((b"FWS", b"CWS", b"ZWS"), ".flv", "flash"),
+        (
+            (
+                b"\xd4\xc3\xb2\xa1",
+                b"\xa1\xb2\xc3\xd4",
+                b"\x4d\x3c\xb2\xa1",
+                b"\xa1\xb2\x3c\x4d",
+            ),
+            ".pcap",
+            "pcap",
+        ),
     )
-    return GetFileOutput(name=name, vault_id=vault_id)
+    for prefixes, extension, file_type in signatures:
+        if content.startswith(prefixes):
+            return extension, file_type
+    return "", ""
+
+
+def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFileOutput:
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    try:
+        response = httpx.post(
+            f"{asset.base_url.rstrip('/')}/publicapi/get/sample",
+            data={"apikey": asset.api_key, "hash": params.hash},
+            verify=verify,
+            timeout=httpx.Timeout(None),
+        )
+    except httpx.HTTPError as exc:
+        raise ActionFailure(f"REST Api to server failed: {exc}") from exc
+
+    if response.status_code != httpx.codes.OK:
+        detail = response.text.strip() or "N/A"
+        raise ActionFailure(
+            "REST Api Call returned error, "
+            f"status_code: {response.status_code}, detail: {detail}"
+        )
+
+    extension, file_type = _classify_sample(response.content)
+    name = f"{params.hash}{extension}"
+    try:
+        vault_id = soar.vault.create_attachment(
+            soar.get_executing_container_id(),
+            response.content,
+            name,
+            metadata={"contains": [file_type] if file_type else []},  # type: ignore[dict-item]
+        )
+    except Exception as exc:
+        raise ActionFailure(
+            f"Unable to add downloaded file to the vault: {exc}"
+        ) from exc
+
+    result = ActionResult(
+        True,
+        f"Vault id: {vault_id}, Name: {name}, File type: {file_type}",
+        params.model_dump(),
+    )
+    result.add_data({"name": name, "vault_id": vault_id})
+    result.set_summary(
+        {
+            "name": name,
+            "hash": params.hash,
+            "file_type": file_type,
+            "vault_id": vault_id,
+        }
+    )
+    return result  # type: ignore[return-value]

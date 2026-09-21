@@ -505,6 +505,10 @@ action_result.message | string | | |
 action_result.parameter.hash | string | `md5` `sha256` `wildfire task id` | |
 action_result.data.\*.name | string | | |
 action_result.data.\*.vault_id | string | `vault id` | |
+action_result.summary.name | string | | |
+action_result.summary.hash | string | | |
+action_result.summary.file_type | string | | |
+action_result.summary.vault_id | string | `vault id` | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

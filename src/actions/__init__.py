@@ -18,7 +18,7 @@ from .detonate_file import detonate_file
 from .detonate_url import detonate_url
 from .get_url_reputation import UrlReputationSummary, get_url_reputation
 from .get_report import GetReportSummary, get_report
-from .get_sample import get_sample
+from .get_sample import GetFileSummary, get_sample
 from .get_pcap import get_pcap
 from .save_report import save_report
 
@@ -63,6 +63,8 @@ def register_actions(app: App) -> App:
         description="Download a sample from WildFire and add it to the vault",
         action_type="investigate",
         verbose="Do note that WildFire does not generally store samples that have been uploaded for detonation.",
+        render_as="table",
+        summary_type=GetFileSummary,
     )
     app.register_action(
         action=get_pcap,

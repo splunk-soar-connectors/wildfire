@@ -45,3 +45,14 @@ def test_generated_action_models_build_json_schemas() -> None:
     for action in app.actions_manager.get_actions_meta_list():
         action.parameters.model_json_schema()
         action.output.model_json_schema()
+
+
+def test_get_file_preserves_legacy_table_contract() -> None:
+    app = create_wildfire_connector_app()
+    action = app.actions_manager.get_action("get_sample").meta.model_dump()
+
+    assert action["render"] == {"type": "table"}
+    columns = {
+        field["column_name"] for field in action["output"] if "column_name" in field
+    }
+    assert columns == {"File Name", "Hash", "File Type", "Vault ID"}
