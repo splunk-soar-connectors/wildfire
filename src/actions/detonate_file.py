@@ -20,9 +20,11 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
+from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..views.report import build_report_context
 
 logger = getLogger()
 POLL_INTERVAL_SECONDS = 5
@@ -375,6 +377,15 @@ class DetonateFileOutput(ActionOutput):
     task_info: TaskInfoOutput
     upload_file_info: Upload_File_InfoOutput
     version: str
+
+
+def display_detonate_file_report(
+    context: ViewContext,
+    action: str,
+    outputs: list[DetonateFileOutput],
+) -> dict:
+    del action
+    return build_report_context(context, outputs, is_url=False)
 
 
 def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:

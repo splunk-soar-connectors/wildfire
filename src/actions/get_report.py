@@ -20,9 +20,11 @@ import xmltodict
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
+from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..views.report import build_report_context
 
 logger = getLogger()
 VERDICT_MESSAGES = {
@@ -362,6 +364,15 @@ class GetReportSummary(ActionOutput):
     verdict_code: float
     verdict: str
     summary_available: bool
+
+
+def display_get_report(
+    context: ViewContext,
+    action: str,
+    outputs: list[GetReportOutput],
+) -> dict:
+    del action
+    return build_report_context(context, outputs, is_url=False)
 
 
 def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:

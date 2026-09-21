@@ -21,9 +21,11 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
+from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..views.report import build_report_context
 
 logger = getLogger()
 VERDICT_MESSAGES = {
@@ -1347,6 +1349,15 @@ class DetonateUrlOutput(ActionOutput):
     success: bool = OutputField(example_values=[True])
     task_info: TaskInfoOutput
     version: str = OutputField(example_values=["2.0"])
+
+
+def display_detonate_url_report(
+    context: ViewContext,
+    action: str,
+    outputs: list[DetonateUrlOutput],
+) -> dict:
+    del action
+    return build_report_context(context, outputs, is_url=True)
 
 
 def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:

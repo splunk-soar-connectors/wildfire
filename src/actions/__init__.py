@@ -14,13 +14,13 @@
 from soar_sdk.app import App
 
 from .test_connectivity import test_connectivity
-from .detonate_file import detonate_file
-from .detonate_url import detonate_url
+from .detonate_file import detonate_file, display_detonate_file_report
+from .detonate_url import detonate_url, display_detonate_url_report
 from .get_url_reputation import (
     UrlReputationSummary,
     get_url_reputation,
 )
-from .get_report import GetReportSummary, get_report
+from .get_report import GetReportSummary, display_get_report, get_report
 from .get_sample import GetFileSummary, get_sample
 from .get_pcap import GetPcapSummary, get_pcap
 from .save_report import SaveReportSummary, save_report
@@ -34,12 +34,16 @@ def register_actions(app: App) -> App:
         description="Run the file in the WildFire sandbox and retrieve the analysis results",
         action_type="investigate",
         verbose="This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>When submitting supported script files, you must specify an accurate filename.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>.",
+        view_handler=display_detonate_file_report,
+        view_template="wildfire_display_report.html",
     )
     app.register_action(
         action=detonate_url,
         description="Submit a single website link for WildFire analysis",
         action_type="investigate",
         verbose="The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>If the hash is present in the WildFire database, then a report will be returned as:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.",
+        view_handler=display_detonate_url_report,
+        view_template="wildfire_display_report.html",
     )
     app.register_action(
         action=get_url_reputation,
@@ -57,7 +61,8 @@ def register_actions(app: App) -> App:
         action_type="investigate",
         verbose="Each detonation report in WildFire is denoted by the sha256 and md5 of the file.",
         read_only=True,
-        render_as="table",
+        view_handler=display_get_report,
+        view_template="wildfire_display_report.html",
         summary_type=GetReportSummary,
     )
     app.register_action(
