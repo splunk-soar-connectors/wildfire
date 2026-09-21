@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
@@ -32,6 +32,12 @@ class SaveReportOutput(ActionOutput):
     vault_id: str = OutputField(cef_types=["vault id"])
 
 
+class SaveReportSummary(ActionOutput):
+    name: str = OutputField(column_name="File Name")
+    vault_id: str = OutputField(cef_types=["vault id"], column_name="Vault ID")
+    file_type: str
+
+
 def save_report(
     params: SaveReportParams, soar: SOARClient, asset: Asset
 ) -> SaveReportOutput:
@@ -44,4 +50,11 @@ def save_report(
         file_name=name,
         contains="pdf",
     )
-    return SaveReportOutput(name=name, vault_id=vault_id)
+    result = ActionResult(
+        True,
+        f"Vault id: {vault_id}, Name: {name}, File type: pdf",
+        params.model_dump(),
+    )
+    result.add_data({"name": name, "vault_id": vault_id})
+    result.set_summary({"name": name, "vault_id": vault_id, "file_type": "pdf"})
+    return result  # type: ignore[return-value]

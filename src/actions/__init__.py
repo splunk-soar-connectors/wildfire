@@ -20,7 +20,7 @@ from .get_url_reputation import UrlReputationSummary, get_url_reputation
 from .get_report import GetReportSummary, get_report
 from .get_sample import GetFileSummary, get_sample
 from .get_pcap import get_pcap
-from .save_report import save_report
+from .save_report import SaveReportSummary, save_report
 
 
 def register_actions(app: App) -> App:
@@ -75,5 +75,7 @@ def register_actions(app: App) -> App:
         action=save_report,
         description="Save a PDF of the detonation report to the vault",
         action_type="investigate",
+        render_as="table",
+        summary_type=SaveReportSummary,
     )
     return app
