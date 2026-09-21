@@ -26,7 +26,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [detonate url](#action-detonate-url) - Submit a single website link for WildFire analysis <br>
 [url reputation](#action-url-reputation) - Submit a single website link for WildFire verdict <br>
 [get report](#action-get-report) - Query for results of an already completed detonation in WildFire <br>
-[get sample](#action-get-sample) - Download a sample from WildFire and add it to the vault <br>
+[get file](#action-get-file) - Download a sample from WildFire and add it to the vault <br>
 [get pcap](#action-get-pcap) - Download the pcap file of a sample from WildFire and add it to the vault <br>
 [save report](#action-save-report) - Save a PDF of the detonation report to the vault
 
@@ -481,7 +481,7 @@ action_result.summary.summary_available | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'get sample'
+## action: 'get file'
 
 Download a sample from WildFire and add it to the vault
 

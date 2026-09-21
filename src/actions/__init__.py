@@ -59,6 +59,7 @@ def register_actions(app: App) -> App:
     )
     app.register_action(
         action=get_sample,
+        name="get file",
         description="Download a sample from WildFire and add it to the vault",
         action_type="investigate",
         verbose="Do note that WildFire does not generally store samples that have been uploaded for detonation.",

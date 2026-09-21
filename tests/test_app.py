@@ -32,9 +32,11 @@ def test_factory_registers_all_generated_actions() -> None:
     app = create_wildfire_connector_app()
 
     assert isinstance(app, App)
-    assert [
-        action.identifier for action in app.actions_manager.get_actions_meta_list()
-    ] == EXPECTED_ACTIONS
+    actions = app.actions_manager.get_actions_meta_list()
+    assert [action.identifier for action in actions] == EXPECTED_ACTIONS
+    assert next(
+        action for action in actions if action.identifier == "get_sample"
+    ).action == ("get file")
 
 
 def test_generated_action_models_build_json_schemas() -> None:
