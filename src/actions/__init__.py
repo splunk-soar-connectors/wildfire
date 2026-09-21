@@ -16,7 +16,10 @@ from soar_sdk.app import App
 from .test_connectivity import test_connectivity
 from .detonate_file import detonate_file
 from .detonate_url import detonate_url
-from .get_url_reputation import UrlReputationSummary, get_url_reputation
+from .get_url_reputation import (
+    UrlReputationSummary,
+    get_url_reputation,
+)
 from .get_report import GetReportSummary, get_report
 from .get_sample import GetFileSummary, get_sample
 from .get_pcap import GetPcapSummary, get_pcap

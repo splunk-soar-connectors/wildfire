@@ -73,6 +73,16 @@ class UrlReputationSummary(ActionOutput):
     success: bool = OutputField(example_values=[True])
 
 
+class UrlReputationTableOutput(UrlReputationOutput):
+    """Manifest-only table metadata for the legacy URL reputation widget."""
+
+    verdict_code: float = OutputField(example_values=[-102], column_name="Verdict Code")
+    verdict_message: str = OutputField(
+        example_values=["unknown, cannot find sample record in the WildFire database"],
+        column_name="Message",
+    )
+
+
 def _parse_verdict_response(response: httpx.Response) -> dict[str, object]:
     try:
         parsed = xmltodict.parse(response.text)
@@ -106,7 +116,7 @@ def _parse_verdict_response(response: httpx.Response) -> dict[str, object]:
 
 def get_url_reputation(
     params: UrlReputationParams, soar: SOARClient, asset: Asset
-) -> UrlReputationOutput:
+) -> UrlReputationTableOutput:
     """Retrieve the WildFire verdict for a URL."""
     logger.progress("Getting verdict for: %s", params.url)
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
@@ -132,7 +142,7 @@ def get_url_reputation(
             f"status_code: {response.status_code}, detail: {detail}"
         )
 
-    output = UrlReputationOutput.model_validate(_parse_verdict_response(response))
+    output = UrlReputationTableOutput.model_validate(_parse_verdict_response(response))
     soar.set_summary(UrlReputationSummary(success=True))
     soar.set_message("Success: True")
     return output

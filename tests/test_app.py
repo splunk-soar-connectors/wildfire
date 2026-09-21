@@ -78,3 +78,14 @@ def test_get_pcap_preserves_legacy_table_contract() -> None:
         field["column_name"] for field in action["output"] if "column_name" in field
     }
     assert columns == {"File Name", "Vault ID", "File Type"}
+
+
+def test_url_reputation_preserves_legacy_table_contract() -> None:
+    app = create_wildfire_connector_app()
+    action = app.actions_manager.get_action("get_url_reputation").meta.model_dump()
+
+    assert action["render"] == {"type": "table"}
+    columns = {
+        field["column_name"] for field in action["output"] if "column_name" in field
+    }
+    assert columns == {"Verdict Code", "Message"}
