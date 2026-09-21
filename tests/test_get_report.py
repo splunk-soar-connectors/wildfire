@@ -39,6 +39,10 @@ def test_get_report_returns_the_bundled_probe_report(
 
     result = wildfire_app.actions_manager.get_action_results()[-1]
     assert result.get_status() is True, result.get_message()
+    assert (
+        result.get_message()
+        == "Verdict code: 0, Verdict: benign, Summary available: True"
+    )
     assert result.get_summary() == {
         "verdict_code": 0,
         "verdict": "benign",

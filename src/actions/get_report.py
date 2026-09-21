@@ -419,7 +419,14 @@ def get_report(
                 "verdict": verdict,
                 "summary_available": verdict_code >= 0,
             }
-            result = ActionResult(True, "Success", params.model_dump())
+            result = ActionResult(
+                True,
+                (
+                    f"Verdict code: {verdict_code}, Verdict: {verdict}, "
+                    f"Summary available: {verdict_code >= 0}"
+                ),
+                params.model_dump(),
+            )
             result.set_summary(summary)
             if verdict_code < 0:
                 return result  # type: ignore[return-value]
