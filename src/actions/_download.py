@@ -53,7 +53,7 @@ def download_to_vault(
             soar.get_executing_container_id(),
             response.content,
             file_name,
-            metadata={"contains": contains},
+            metadata={"contains": [contains]},  # type: ignore[dict-item]
         )
     except Exception as exc:
         raise ActionFailure(
