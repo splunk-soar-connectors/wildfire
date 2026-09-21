@@ -24,7 +24,7 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..views.report import build_report_context
+from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
 POLL_INTERVAL_SECONDS = 5
@@ -382,7 +382,7 @@ class DetonateFileOutput(ActionOutput):
 def display_detonate_file_report(
     context: ViewContext,
     action: str,
-    outputs: list[DetonateFileOutput],
+    outputs: list[WildFireReportViewOutput],
 ) -> dict:
     del action
     return build_report_context(context, outputs, is_url=False)

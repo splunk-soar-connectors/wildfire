@@ -14,7 +14,7 @@
 from pathlib import Path
 from typing import Any
 
-from soar_sdk.action_results import ActionOutput
+from soar_sdk.action_results import ActionOutput, ActionResult
 from soar_sdk.models.view import ViewContext
 from soar_sdk.views.template_renderer import get_template_renderer
 
@@ -48,6 +48,66 @@ def test_report_actions_register_sdk_custom_view() -> None:
         action = app.actions_manager.get_action(identifier)
         assert action.meta.render_as == "custom"
         assert action.meta.view_handler is not None
+
+
+def test_report_handlers_render_raw_action_results() -> None:
+    app = create_wildfire_connector_app()
+    fixtures = {
+        "detonate_file": {
+            "file_info": {
+                "sha256": "file-sha256",
+                "md5": "file-md5",
+                "size": "42",
+                "filetype": "PDF",
+                "malware": "no",
+            },
+            "task_info": {"report": []},
+            "version": "2.0",
+        },
+        "detonate_url": {
+            "result": {
+                "analysis_time": "2026-09-21T00:00:00Z",
+                "url_type": "original",
+                "report": {
+                    "sha256": "url-sha256",
+                    "software": "Web Browser",
+                    "verdict": "benign",
+                },
+            },
+            "version": "2.0",
+        },
+        "get_report": {
+            "file_info": {
+                "sha256": "report-sha256",
+                "md5": "report-md5",
+                "size": "42",
+                "filetype": "PDF",
+                "malware": "no",
+            },
+            "task_info": {"report": []},
+            "version": "2.0",
+        },
+    }
+
+    for identifier, data in fixtures.items():
+        action_result = ActionResult(True, "Success", {})
+        action_result.add_data(data)
+        view_handler = app.actions_manager.get_action(identifier).meta.view_handler
+        assert view_handler is not None
+
+        html = view_handler(
+            identifier,
+            [
+                (
+                    {"total_objects": 1, "total_objects_successful": 1},
+                    [action_result],
+                )
+            ],
+            _view_context().model_dump(),
+        )
+
+        assert 'class="wildfire-display-report"' in html
+        assert "View Function Error" not in html
 
 
 def test_file_report_context_renders_legacy_information() -> None:

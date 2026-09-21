@@ -24,7 +24,7 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..views.report import build_report_context
+from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
 VERDICT_MESSAGES = {
@@ -369,7 +369,7 @@ class GetReportSummary(ActionOutput):
 def display_get_report(
     context: ViewContext,
     action: str,
-    outputs: list[GetReportOutput],
+    outputs: list[WildFireReportViewOutput],
 ) -> dict:
     del action
     return build_report_context(context, outputs, is_url=False)

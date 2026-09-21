@@ -14,8 +14,15 @@
 from collections.abc import Sequence
 from typing import Any
 
+from pydantic import ConfigDict
 from soar_sdk.action_results import ActionOutput
 from soar_sdk.models.view import ViewContext
+
+
+class WildFireReportViewOutput(ActionOutput):
+    """Minimal permissive schema for report data consumed by custom views."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
 
 def _add_http_urls(report: dict[str, Any]) -> None:
