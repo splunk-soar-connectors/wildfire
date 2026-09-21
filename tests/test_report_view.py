@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import importlib
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +49,23 @@ def test_report_actions_register_sdk_custom_view() -> None:
         action = app.actions_manager.get_action(identifier)
         assert action.meta.render_as == "custom"
         assert action.meta.view_handler is not None
+
+
+def test_manifest_view_paths_resolve_through_action_modules() -> None:
+    app = create_wildfire_connector_app()
+
+    for identifier in ("detonate_file", "detonate_url", "get_report"):
+        action = app.actions_manager.get_action(identifier)
+        view_handler = action.meta.view_handler
+        assert view_handler is not None
+
+        view_path = f"{view_handler.__module__}.{view_handler.__name__}"
+        path_parts = view_path.split(".")
+        resolved: Any = importlib.import_module(path_parts[0])
+        for path_part in path_parts[1:]:
+            resolved = getattr(resolved, path_part)
+
+        assert resolved is view_handler
 
 
 def test_report_handlers_render_raw_action_results() -> None:
