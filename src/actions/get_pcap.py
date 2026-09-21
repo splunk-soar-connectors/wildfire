@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
@@ -108,6 +108,12 @@ class GetPcapOutput(ActionOutput):
     vault_id: str = OutputField(cef_types=["vault id"])
 
 
+class GetPcapSummary(ActionOutput):
+    name: str = OutputField(column_name="File Name")
+    vault_id: str = OutputField(cef_types=["vault id"], column_name="Vault ID")
+    file_type: str = OutputField(column_name="File Type")
+
+
 def get_pcap(params: GetPcapParams, soar: SOARClient, asset: Asset) -> GetPcapOutput:
     if params.platform not in PLATFORM_IDS:
         raise ValueError("Please provide valid platform name")
@@ -124,4 +130,11 @@ def get_pcap(params: GetPcapParams, soar: SOARClient, asset: Asset) -> GetPcapOu
         file_name=name,
         contains="pcap",
     )
-    return GetPcapOutput(name=name, vault_id=vault_id)
+    result = ActionResult(
+        True,
+        f"Vault id: {vault_id}, Name: {name}, File type: pcap",
+        params.model_dump(),
+    )
+    result.add_data({"name": name, "vault_id": vault_id})
+    result.set_summary({"name": name, "vault_id": vault_id, "file_type": "pcap"})
+    return result  # type: ignore[return-value]

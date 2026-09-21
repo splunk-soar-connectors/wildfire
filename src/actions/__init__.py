@@ -19,7 +19,7 @@ from .detonate_url import detonate_url
 from .get_url_reputation import UrlReputationSummary, get_url_reputation
 from .get_report import GetReportSummary, get_report
 from .get_sample import GetFileSummary, get_sample
-from .get_pcap import get_pcap
+from .get_pcap import GetPcapSummary, get_pcap
 from .save_report import SaveReportSummary, save_report
 
 
@@ -70,6 +70,8 @@ def register_actions(app: App) -> App:
         action=get_pcap,
         description="Download the pcap file of a sample from WildFire and add it to the vault",
         action_type="investigate",
+        render_as="table",
+        summary_type=GetPcapSummary,
     )
     app.register_action(
         action=save_report,
