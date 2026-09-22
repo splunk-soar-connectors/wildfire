@@ -70,6 +70,20 @@ def test_manifest_view_paths_resolve_through_action_modules() -> None:
 
 def test_report_handlers_render_raw_action_results() -> None:
     app = create_wildfire_connector_app()
+
+    def null_optional_report() -> dict[str, Any]:
+        return {
+            "sha256": "file-sha256",
+            "software": "PE Static Analyzer",
+            "network": None,
+            "timeline": None,
+            "process_list": None,
+            "process": None,
+            "registry": None,
+            "file": None,
+            "summary": None,
+        }
+
     fixtures = {
         "detonate_file": {
             "file_info": {
@@ -79,7 +93,7 @@ def test_report_handlers_render_raw_action_results() -> None:
                 "filetype": "PDF",
                 "malware": "no",
             },
-            "task_info": {"report": []},
+            "task_info": {"report": null_optional_report()},
             "version": "2.0",
         },
         "detonate_url": {
@@ -102,7 +116,7 @@ def test_report_handlers_render_raw_action_results() -> None:
                 "filetype": "PDF",
                 "malware": "no",
             },
-            "task_info": {"report": []},
+            "task_info": {"report": null_optional_report()},
             "version": "2.0",
         },
     }

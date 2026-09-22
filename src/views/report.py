@@ -50,9 +50,13 @@ def _add_template_defaults(report: dict[str, Any]) -> None:
         "file": ("file_deleted", "file_written"),
         "summary": ("entry",),
     }.items():
-        section = report.setdefault(key, {})
+        section = report.get(key)
+        if not isinstance(section, dict):
+            section = {}
+            report[key] = section
         for child in children:
-            section.setdefault(child, [])
+            if section.get(child) is None:
+                section[child] = []
 
 
 def build_report_context(
