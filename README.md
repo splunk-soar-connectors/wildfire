@@ -188,6 +188,7 @@ action_result.data.\*.upload_file_info.sha256 | string | | 79bc86e0e4134a0883655
 action_result.data.\*.upload_file_info.size | string | | 77756 |
 action_result.data.\*.upload_file_info.url | string | | |
 action_result.data.\*.version | string | | |
+action_result.summary.malware | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -304,6 +305,9 @@ action_result.data.\*.task_info.report.\*.timeline.entry.\*.#text | string | `fi
 action_result.data.\*.task_info.report.\*.timeline.entry.\*.@seq | string | | 1 |
 action_result.data.\*.task_info.report.\*.version | string | | 3.0 |
 action_result.data.\*.version | string | | 2.0 |
+action_result.summary.verdict_code | numeric | | 1 -102 |
+action_result.summary.verdict | string | | malware unknown, cannot find sample record in the WildFire database |
+action_result.summary.summary_available | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

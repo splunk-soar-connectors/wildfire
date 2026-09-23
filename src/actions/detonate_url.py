@@ -1351,6 +1351,17 @@ class DetonateUrlOutput(ActionOutput):
     version: str = OutputField(example_values=["2.0"])
 
 
+class DetonateUrlSummary(ActionOutput):
+    verdict_code: int = OutputField(example_values=[1, -102])
+    verdict: str = OutputField(
+        example_values=[
+            "malware",
+            "unknown, cannot find sample record in the WildFire database",
+        ]
+    )
+    summary_available: bool = OutputField(example_values=[True, False])
+
+
 def display_detonate_url_report(
     context: ViewContext,
     action: str,

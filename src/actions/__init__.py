@@ -15,10 +15,12 @@ from soar_sdk.app import App
 
 from .test_connectivity import test_connectivity
 from .detonate_file import (
+    DetonateFileSummary,
     detonate_file as detonate_file_action,
     display_detonate_file_report,
 )
 from .detonate_url import (
+    DetonateUrlSummary,
     detonate_url as detonate_url_action,
     display_detonate_url_report,
 )
@@ -46,6 +48,7 @@ def register_actions(app: App) -> App:
         verbose="This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>When submitting supported script files, you must specify an accurate filename.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>.",
         view_handler=display_detonate_file_report,
         view_template="wildfire_display_report.html",
+        summary_type=DetonateFileSummary,
     )
     app.register_action(
         action=detonate_url_action,
@@ -54,6 +57,7 @@ def register_actions(app: App) -> App:
         verbose="The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>If the hash is present in the WildFire database, then a report will be returned as:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.",
         view_handler=display_detonate_url_report,
         view_template="wildfire_display_report.html",
+        summary_type=DetonateUrlSummary,
     )
     app.register_action(
         action=get_url_reputation,

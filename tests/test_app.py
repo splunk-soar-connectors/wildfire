@@ -47,6 +47,27 @@ def test_generated_action_models_build_json_schemas() -> None:
         action.output.model_json_schema()
 
 
+def test_detonation_actions_publish_runtime_summary_contracts() -> None:
+    app = create_wildfire_connector_app()
+
+    expected_summary_paths = {
+        "detonate_file": {"action_result.summary.malware"},
+        "detonate_url": {
+            "action_result.summary.verdict_code",
+            "action_result.summary.verdict",
+            "action_result.summary.summary_available",
+        },
+    }
+    for identifier, expected_paths in expected_summary_paths.items():
+        action = app.actions_manager.get_action(identifier).meta.model_dump()
+        actual_paths = {
+            field["data_path"]
+            for field in action["output"]
+            if field["data_path"].startswith("action_result.summary.")
+        }
+        assert actual_paths == expected_paths
+
+
 def test_get_file_preserves_legacy_table_contract() -> None:
     app = create_wildfire_connector_app()
     action = app.actions_manager.get_action("get_sample").meta.model_dump()

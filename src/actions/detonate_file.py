@@ -379,6 +379,10 @@ class DetonateFileOutput(ActionOutput):
     version: str
 
 
+class DetonateFileSummary(ActionOutput):
+    malware: str
+
+
 def display_detonate_file_report(
     context: ViewContext,
     action: str,
