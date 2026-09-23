@@ -427,6 +427,7 @@ def get_report(
             )
             result.set_summary(summary)
             if verdict_code < 0:
+                result.add_data({})
                 return result  # type: ignore[return-value]
 
             max_attempts = math.ceil(asset.timeout * 60 / POLL_INTERVAL_SECONDS)

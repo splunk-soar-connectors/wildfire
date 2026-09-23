@@ -49,3 +49,24 @@ def test_get_report_returns_the_bundled_probe_report(
         "summary_available": True,
     }
     assert set(result.get_data()[0]) == {"file_info", "task_info", "version"}
+
+
+@pytest.mark.live
+def test_get_report_preserves_empty_data_row_when_no_report_is_available(
+    wildfire_app: App,
+    wildfire_action_input: Callable[[str, str, list[dict[str, Any]]], dict[str, Any]],
+) -> None:
+    wildfire_app.handle(
+        json.dumps(
+            wildfire_action_input(
+                "get_report",
+                "get report",
+                [{"id": "0" * 64}],
+            )
+        )
+    )
+
+    result = wildfire_app.actions_manager.get_action_results()[-1]
+    assert result.get_status() is True, result.get_message()
+    assert result.get_summary()["summary_available"] is False
+    assert result.get_data() == [{}]
