@@ -13,7 +13,6 @@
 # limitations under the License.
 from soar_sdk.app import App
 
-from .test_connectivity import test_connectivity
 from .detonate_file import (
     DetonateFileSummary,
     detonate_file as detonate_file_action,
@@ -40,7 +39,6 @@ from .save_report import SaveReportSummary, save_report
 
 def register_actions(app: App) -> App:
     """Register all WildFire actions on the provided app."""
-    app.test_connectivity()(test_connectivity)
     app.register_action(
         action=detonate_file_action,
         description="Run the file in the WildFire sandbox and retrieve the analysis results",

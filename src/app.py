@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
 
 from .actions import register_actions
 from .asset import Asset
+from .test_connectivity import run_test_connectivity
 
 
 def create_wildfire_connector_app() -> App:
@@ -33,6 +35,12 @@ def create_wildfire_connector_app() -> App:
         encrypt_ingest_state=True,
         asset_cls=Asset,
     )
+
+    @app.test_connectivity()
+    def test_connectivity(soar: SOARClient, asset: Asset) -> None:
+        """Upload the bundled test PDF to verify WildFire connectivity."""
+        run_test_connectivity(soar, asset)
+
     return register_actions(app)
 
 

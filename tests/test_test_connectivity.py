@@ -19,7 +19,7 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
-from src.actions.test_connectivity import TEST_PDF_PATH
+from src.test_connectivity import TEST_PDF_PATH
 
 
 def test_connectivity_probe_uses_packaged_resource_directory() -> None:

@@ -18,13 +18,13 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
-from ..asset import Asset
+from .asset import Asset
 
 __test__ = False
 
 logger = getLogger()
 TEST_PDF_NAME = "wildfire_test_connectivity.pdf"
-TEST_PDF_PATH = Path(__file__).parents[2] / "templates" / TEST_PDF_NAME
+TEST_PDF_PATH = Path(__file__).parents[1] / "templates" / TEST_PDF_NAME
 FILE_UPLOAD_ERRORS = {
     401: "API key invalid",
     405: "HTTP method Not Allowed",
@@ -44,7 +44,7 @@ def _error_detail(response: httpx.Response) -> str:
     return FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
 
 
-def test_connectivity(soar: SOARClient, asset: Asset) -> None:
+def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
     """Upload the bundled test PDF to verify WildFire connectivity."""
     del soar
 
