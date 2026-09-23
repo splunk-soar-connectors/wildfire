@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pydantic import PositiveInt
 from soar_sdk.asset import AssetField, BaseAsset
 
 
@@ -23,4 +24,6 @@ class Asset(BaseAsset):
         description="Verify server certificate", default=True
     )
     api_key: str = AssetField(description="API Key", sensitive=True)
-    timeout: float = AssetField(description="Detonate timeout in mins", default=10.0)
+    timeout: PositiveInt = AssetField(
+        description="Detonate timeout in mins", default=10
+    )
