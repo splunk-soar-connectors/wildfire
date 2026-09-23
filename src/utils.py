@@ -13,6 +13,7 @@
 # limitations under the License.
 import httpx
 import xmltodict
+from soar_sdk.abstract import SOARClient
 from soar_sdk.exceptions import ActionFailure
 
 
@@ -27,3 +28,24 @@ def parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
     if not isinstance(wildfire, dict):
         raise ActionFailure("None 'wildfire' missing in reply from device")
     return wildfire
+
+
+def add_bytes_to_vault(
+    soar: SOARClient,
+    content: bytes,
+    file_name: str,
+    *,
+    contains: list[str],
+) -> str:
+    """Attach downloaded bytes to the executing container's vault."""
+    try:
+        return soar.vault.create_attachment(
+            soar.get_executing_container_id(),
+            content,
+            file_name,
+            metadata={"contains": contains},  # type: ignore[dict-item]
+        )
+    except Exception as exc:
+        raise ActionFailure(
+            f"Unable to add downloaded file to the vault: {exc}"
+        ) from exc

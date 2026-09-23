@@ -18,6 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..utils import add_bytes_to_vault
 
 
 class GetFileParams(Params):
@@ -86,17 +87,12 @@ def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFile
 
     extension, file_type = _classify_sample(response.content)
     name = f"{params.hash}{extension}"
-    try:
-        vault_id = soar.vault.create_attachment(
-            soar.get_executing_container_id(),
-            response.content,
-            name,
-            metadata={"contains": [file_type] if file_type else []},  # type: ignore[dict-item]
-        )
-    except Exception as exc:
-        raise ActionFailure(
-            f"Unable to add downloaded file to the vault: {exc}"
-        ) from exc
+    vault_id = add_bytes_to_vault(
+        soar,
+        response.content,
+        name,
+        contains=[file_type] if file_type else [],
+    )
 
     result = ActionResult(
         True,

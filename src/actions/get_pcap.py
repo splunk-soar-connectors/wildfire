@@ -18,6 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..utils import add_bytes_to_vault
 
 PLATFORM_IDS = {
     "Default": None,
@@ -168,17 +169,7 @@ def get_pcap(params: GetPcapParams, soar: SOARClient, asset: Asset) -> GetPcapOu
     platform_id = PLATFORM_IDS[params.platform]
     name = f"{params.hash}.pcap"
     content = _download_pcap(asset, params.hash, platform_id)
-    try:
-        vault_id = soar.vault.create_attachment(
-            soar.get_executing_container_id(),
-            content,
-            name,
-            metadata={"contains": ["pcap"]},  # type: ignore[dict-item]
-        )
-    except Exception as exc:
-        raise ActionFailure(
-            f"Unable to add downloaded file to the vault: {exc}"
-        ) from exc
+    vault_id = add_bytes_to_vault(soar, content, name, contains=["pcap"])
     result = ActionResult(
         True,
         f"Vault id: {vault_id}, Name: {name}, File type: pcap",

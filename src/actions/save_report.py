@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import httpx
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ._download import download_to_vault
+from ..utils import add_bytes_to_vault
 
 
 class SaveReportParams(Params):
@@ -42,14 +44,27 @@ def save_report(
     params: SaveReportParams, soar: SOARClient, asset: Asset
 ) -> SaveReportOutput:
     name = f"{params.id}.pdf"
-    vault_id = download_to_vault(
-        soar=soar,
-        asset=asset,
-        endpoint="get/report",
-        data={"hash": params.id, "format": "pdf"},
-        file_name=name,
-        contains="pdf",
-    )
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    try:
+        response = httpx.post(
+            f"{asset.base_url.rstrip('/')}/publicapi/get/report",
+            data={"apikey": asset.api_key, "hash": params.id, "format": "pdf"},
+            verify=verify,
+            timeout=httpx.Timeout(None),
+        )
+    except httpx.HTTPError as exc:
+        raise ActionFailure(f"REST Api to server failed: {exc}") from exc
+
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        detail = response.text.strip() or "N/A"
+        raise ActionFailure(
+            "REST Api Call returned error, "
+            f"status_code: {response.status_code}, detail: {detail}"
+        ) from exc
+
+    vault_id = add_bytes_to_vault(soar, response.content, name, contains=["pdf"])
     result = ActionResult(
         True,
         f"Vault id: {vault_id}, Name: {name}, File type: pdf",
