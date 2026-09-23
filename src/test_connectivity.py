@@ -19,6 +19,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 from .asset import Asset
+from .utils import parse_wildfire_xml
 
 __test__ = False
 
@@ -82,4 +83,5 @@ def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
             f"status_code: {response.status_code}, detail: {detail}"
         ) from exc
 
+    parse_wildfire_xml(response)
     logger.progress("Test Connectivity Passed")
