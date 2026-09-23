@@ -57,7 +57,7 @@ summary.total_objects_successful | numeric | | 1 |
 Run the file in the WildFire sandbox and retrieve the analysis results
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.<br>When submitting supported script files, you must specify an accurate filename.<br>Currently the sandbox supports the following file types:<ul><li>PE</li><li>PDF</li><li>Flash</li><li>APK</li><li>JAR/Class</li><li>MS Office files like doc, xls and ppt</li></ul>.
 
@@ -197,7 +197,7 @@ summary.total_objects_successful | numeric | | 1 |
 Submit a single website link for WildFire analysis
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>If the hash is present in the WildFire database, then a report will be returned as:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.
 
@@ -490,7 +490,7 @@ summary.total_objects_successful | numeric | | 1 |
 Download a sample from WildFire and add it to the vault
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 Do note that WildFire does not generally store samples that have been uploaded for detonation.
 
@@ -521,7 +521,7 @@ summary.total_objects_successful | numeric | | 1 |
 Download the pcap file of a sample from WildFire and add it to the vault
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 #### Action Parameters
 
@@ -551,7 +551,7 @@ summary.total_objects_successful | numeric | | 1 |
 Save a PDF of the detonation report to the vault
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 #### Action Parameters
 

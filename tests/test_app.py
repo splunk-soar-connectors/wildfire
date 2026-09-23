@@ -47,6 +47,13 @@ def test_generated_action_models_build_json_schemas() -> None:
         action.output.model_json_schema()
 
 
+def test_all_actions_preserve_legacy_read_only_metadata() -> None:
+    app = create_wildfire_connector_app()
+
+    for action in app.actions_manager.get_actions_meta_list():
+        assert action.read_only is True, action.identifier
+
+
 def test_detonation_actions_publish_runtime_summary_contracts() -> None:
     app = create_wildfire_connector_app()
 
