@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import httpx
-import xmltodict
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
@@ -20,6 +19,7 @@ from soar_sdk.logging import getLogger
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..utils import parse_wildfire_xml
 
 logger = getLogger()
 VERDICT_MESSAGES = {
@@ -84,16 +84,7 @@ class UrlReputationTableOutput(UrlReputationOutput):
 
 
 def _parse_verdict_response(response: httpx.Response) -> dict[str, object]:
-    try:
-        parsed = xmltodict.parse(response.text)
-    except Exception as exc:
-        raise ActionFailure(f"Unable to parse reply from device: {exc}") from exc
-
-    wildfire = parsed.get("wildfire")
-    if not isinstance(wildfire, dict):
-        raise ActionFailure("None 'wildfire' missing in reply from device")
-
-    verdict_info = wildfire.get("get-verdict-info")
+    verdict_info = parse_wildfire_xml(response).get("get-verdict-info")
     if not isinstance(verdict_info, dict):
         raise ActionFailure("Verdict could not be retrieved")
 
@@ -133,14 +124,16 @@ def get_url_reputation(
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 
-    if response.status_code != httpx.codes.OK:
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
         detail = response.text.strip() or FILE_UPLOAD_ERRORS.get(
             response.status_code, "N/A"
         )
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, detail: {detail}"
-        )
+        ) from exc
 
     output = UrlReputationTableOutput.model_validate(_parse_verdict_response(response))
     soar.set_summary(UrlReputationSummary(success=True))

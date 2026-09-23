@@ -146,14 +146,16 @@ def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> b
             last_error = ActionFailure(f"REST Api to server failed: {exc}")
             continue
 
-        if response.status_code == httpx.codes.OK:
-            return response.content
-
-        detail = response.text.strip() or "N/A"
-        last_error = ActionFailure(
-            "REST Api Call returned error, "
-            f"status_code: {response.status_code}, detail: {detail}"
-        )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            detail = response.text.strip() or "N/A"
+            last_error = ActionFailure(
+                "REST Api Call returned error, "
+                f"status_code: {response.status_code}, detail: {detail}"
+            )
+            continue
+        return response.content
 
     if last_error is not None:
         raise last_error

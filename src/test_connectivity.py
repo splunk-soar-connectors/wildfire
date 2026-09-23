@@ -73,11 +73,13 @@ def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
             f'Unable to open test pdf file at "{TEST_PDF_PATH}": {exc}'
         ) from exc
 
-    if response.status_code != httpx.codes.OK:
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
         detail = _error_detail(response)
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, detail: {detail}"
-        )
+        ) from exc
 
     logger.progress("Test Connectivity Passed")

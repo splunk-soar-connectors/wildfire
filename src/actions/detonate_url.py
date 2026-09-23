@@ -16,7 +16,6 @@ import math
 import time
 
 import httpx
-import xmltodict
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
@@ -25,6 +24,7 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..utils import parse_wildfire_xml
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
@@ -1371,28 +1371,6 @@ def display_detonate_url_report(
     return build_report_context(context, outputs, is_url=True)
 
 
-def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
-    try:
-        parsed = xmltodict.parse(response.text)
-    except Exception as exc:
-        raise ActionFailure(f"Unable to parse reply from device: {exc}") from exc
-
-    wildfire = parsed.get("wildfire")
-    if not isinstance(wildfire, dict):
-        raise ActionFailure("None 'wildfire' missing in reply from device")
-    return wildfire
-
-
-def _raise_for_error(response: httpx.Response) -> None:
-    if response.status_code == httpx.codes.OK:
-        return
-    raise ActionFailure(
-        "REST Api Call returned error, "
-        f"status_code: {response.status_code}, "
-        f"detail: {response.text.strip() or 'N/A'}"
-    )
-
-
 def _get_verdict(
     client: httpx.Client, asset: Asset, *, task_id: str | None, url: str | None
 ) -> tuple[int, str]:
@@ -1402,8 +1380,15 @@ def _get_verdict(
         data={"apikey": asset.api_key},
         files={field: ("", value)},
     )
-    _raise_for_error(response)
-    verdict_info = _parse_wildfire_xml(response).get("get-verdict-info")
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise ActionFailure(
+            "REST Api Call returned error, "
+            f"status_code: {response.status_code}, "
+            f"detail: {response.text.strip() or 'N/A'}"
+        ) from exc
+    verdict_info = parse_wildfire_xml(response).get("get-verdict-info")
     if not isinstance(verdict_info, dict):
         raise ActionFailure("Verdict could not be retrieved")
     try:
@@ -1428,9 +1413,16 @@ def _poll_report(
         if response.status_code == httpx.codes.NOT_FOUND:
             time.sleep(POLL_INTERVAL_SECONDS)
             continue
-        _raise_for_error(response)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise ActionFailure(
+                "REST Api Call returned error, "
+                f"status_code: {response.status_code}, "
+                f"detail: {response.text.strip() or 'N/A'}"
+            ) from exc
         if task_id:
-            return _parse_wildfire_xml(response)
+            return parse_wildfire_xml(response)
         try:
             report = response.json()
             report_body = report.get("result", {}).get("report")
@@ -1461,8 +1453,15 @@ def detonate_url(
                     data={"apikey": asset.api_key},
                     files={"url": ("", params.url)},
                 )
-                _raise_for_error(response)
-                upload_info = _parse_wildfire_xml(response).get("upload-file-info")
+                try:
+                    response.raise_for_status()
+                except httpx.HTTPStatusError as exc:
+                    raise ActionFailure(
+                        "REST Api Call returned error, "
+                        f"status_code: {response.status_code}, "
+                        f"detail: {response.text.strip() or 'N/A'}"
+                    ) from exc
+                upload_info = parse_wildfire_xml(response).get("upload-file-info")
                 if not isinstance(upload_info, dict):
                     raise ActionFailure("Task id not part of response, can't continue")
                 task_id = upload_info.get("sha256") or upload_info.get("md5")

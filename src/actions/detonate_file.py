@@ -15,7 +15,6 @@ import math
 import time
 
 import httpx
-import xmltodict
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
@@ -24,6 +23,7 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
+from ..utils import parse_wildfire_xml
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
@@ -392,28 +392,6 @@ def display_detonate_file_report(
     return build_report_context(context, outputs, is_url=False)
 
 
-def _parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
-    try:
-        parsed = xmltodict.parse(response.text)
-    except Exception as exc:
-        raise ActionFailure(f"Unable to parse reply from device: {exc}") from exc
-
-    wildfire = parsed.get("wildfire")
-    if not isinstance(wildfire, dict):
-        raise ActionFailure("None 'wildfire' missing in reply from device")
-    return wildfire
-
-
-def _raise_for_error(response: httpx.Response) -> None:
-    if response.status_code == httpx.codes.OK:
-        return
-    raise ActionFailure(
-        "REST Api Call returned error, "
-        f"status_code: {response.status_code}, "
-        f"detail: {response.text.strip() or 'N/A'}"
-    )
-
-
 def _poll_report(client: httpx.Client, asset: Asset, task_id: str) -> dict[str, object]:
     max_attempts = math.ceil(asset.timeout * 60 / POLL_INTERVAL_SECONDS)
     for attempt in range(1, max_attempts + 1):
@@ -429,8 +407,15 @@ def _poll_report(client: httpx.Client, asset: Asset, task_id: str) -> dict[str, 
         if response.status_code == httpx.codes.NOT_FOUND:
             time.sleep(POLL_INTERVAL_SECONDS)
             continue
-        _raise_for_error(response)
-        return _parse_wildfire_xml(response)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise ActionFailure(
+                "REST Api Call returned error, "
+                f"status_code: {response.status_code}, "
+                f"detail: {response.text.strip() or 'N/A'}"
+            ) from exc
+        return parse_wildfire_xml(response)
     raise ActionFailure("Reached max polling attempts.")
 
 
@@ -463,7 +448,7 @@ def detonate_file(
             )
             upload_data: dict[str, object] = {}
             if report_response.status_code == httpx.codes.OK:
-                report_data = _parse_wildfire_xml(report_response)
+                report_data = parse_wildfire_xml(report_response)
             elif report_response.status_code == httpx.codes.NOT_FOUND:
                 logger.progress("Uploading the file")
                 with attachment.open("rb") as payload:
@@ -472,8 +457,15 @@ def detonate_file(
                         data={"apikey": asset.api_key},
                         files={"file": (file_name, payload)},
                     )
-                _raise_for_error(upload_response)
-                upload_data = _parse_wildfire_xml(upload_response)
+                try:
+                    upload_response.raise_for_status()
+                except httpx.HTTPStatusError as exc:
+                    raise ActionFailure(
+                        "REST Api Call returned error, "
+                        f"status_code: {upload_response.status_code}, "
+                        f"detail: {upload_response.text.strip() or 'N/A'}"
+                    ) from exc
+                upload_data = parse_wildfire_xml(upload_response)
                 upload_info = upload_data.get("upload-file-info")
                 if not isinstance(upload_info, dict):
                     raise ActionFailure("Task id not part of response, can't continue")
@@ -482,7 +474,14 @@ def detonate_file(
                     raise ActionFailure("Task id not part of response, can't continue")
                 report_data = _poll_report(client, asset, task_id)
             else:
-                _raise_for_error(report_response)
+                try:
+                    report_response.raise_for_status()
+                except httpx.HTTPStatusError as exc:
+                    raise ActionFailure(
+                        "REST Api Call returned error, "
+                        f"status_code: {report_response.status_code}, "
+                        f"detail: {report_response.text.strip() or 'N/A'}"
+                    ) from exc
                 raise ActionFailure("Unable to retrieve prior detonation report")
     except (OSError, httpx.HTTPError) as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc

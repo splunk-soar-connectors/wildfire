@@ -75,12 +75,14 @@ def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFile
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 
-    if response.status_code != httpx.codes.OK:
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
         detail = response.text.strip() or "N/A"
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, detail: {detail}"
-        )
+        ) from exc
 
     extension, file_type = _classify_sample(response.content)
     name = f"{params.hash}{extension}"
