@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import httpx
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ._download import download_to_vault
 
 PLATFORM_IDS = {
     "Default": None,
@@ -114,22 +115,68 @@ class GetPcapSummary(ActionOutput):
     file_type: str = OutputField(column_name="File Type")
 
 
+def _platform_attempts(platform_id: int | None) -> tuple[int | None, ...]:
+    if platform_id == 2:
+        return 2, 60, 20
+    if platform_id == 5:
+        return 5, 61
+    return (platform_id,)
+
+
+def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> bytes:
+    verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
+    last_error: ActionFailure | None = None
+
+    for candidate_id in _platform_attempts(platform_id):
+        data: dict[str, str | int] = {
+            "apikey": asset.api_key,
+            "hash": sample_hash,
+        }
+        if candidate_id is not None:
+            data["platform"] = candidate_id
+
+        try:
+            response = httpx.post(
+                f"{asset.base_url.rstrip('/')}/publicapi/get/pcap",
+                data=data,
+                verify=verify,
+                timeout=httpx.Timeout(None),
+            )
+        except httpx.HTTPError as exc:
+            last_error = ActionFailure(f"REST Api to server failed: {exc}")
+            continue
+
+        if response.status_code == httpx.codes.OK:
+            return response.content
+
+        detail = response.text.strip() or "N/A"
+        last_error = ActionFailure(
+            "REST Api Call returned error, "
+            f"status_code: {response.status_code}, detail: {detail}"
+        )
+
+    if last_error is not None:
+        raise last_error
+    raise ActionFailure("Unable to download pcap from WildFire")
+
+
 def get_pcap(params: GetPcapParams, soar: SOARClient, asset: Asset) -> GetPcapOutput:
     if params.platform not in PLATFORM_IDS:
         raise ValueError("Please provide valid platform name")
-    data: dict[str, str | int] = {"hash": params.hash}
     platform_id = PLATFORM_IDS[params.platform]
-    if platform_id is not None:
-        data["platform"] = platform_id
     name = f"{params.hash}.pcap"
-    vault_id = download_to_vault(
-        soar=soar,
-        asset=asset,
-        endpoint="get/pcap",
-        data=data,
-        file_name=name,
-        contains="pcap",
-    )
+    content = _download_pcap(asset, params.hash, platform_id)
+    try:
+        vault_id = soar.vault.create_attachment(
+            soar.get_executing_container_id(),
+            content,
+            name,
+            metadata={"contains": ["pcap"]},  # type: ignore[dict-item]
+        )
+    except Exception as exc:
+        raise ActionFailure(
+            f"Unable to add downloaded file to the vault: {exc}"
+        ) from exc
     result = ActionResult(
         True,
         f"Vault id: {vault_id}, Name: {name}, File type: pcap",
