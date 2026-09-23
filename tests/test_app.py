@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from soar_sdk.app import App
+import os
 
-from src.app import create_wildfire_connector_app
+from soar_sdk.app import App
+from soar_sdk.input_spec import EnvironmentVariable
+
+from src.app import _apply_soar_proxy_environment, create_wildfire_connector_app
 
 
 EXPECTED_ACTIONS = [
@@ -26,6 +29,26 @@ EXPECTED_ACTIONS = [
     "get_pcap",
     "save_report",
 ]
+
+
+def test_soar_proxy_environment_is_scoped_to_the_action_run() -> None:
+    previous_http_proxy = os.environ.get("HTTP_PROXY")
+    previous_https_proxy = os.environ.get("HTTPS_PROXY")
+    environment_variables = {
+        "HTTP_PROXY": EnvironmentVariable(
+            type="string", value="http://proxy.example.test:8080"
+        ),
+        "HTTPS_PROXY": EnvironmentVariable(
+            type="string", value="http://secure-proxy.example.test:8443"
+        ),
+    }
+
+    with _apply_soar_proxy_environment(environment_variables):
+        assert os.environ["HTTP_PROXY"] == "http://proxy.example.test:8080"
+        assert os.environ["HTTPS_PROXY"] == "http://secure-proxy.example.test:8443"
+
+    assert os.environ.get("HTTP_PROXY") == previous_http_proxy
+    assert os.environ.get("HTTPS_PROXY") == previous_https_proxy
 
 
 def test_factory_registers_all_generated_actions() -> None:
