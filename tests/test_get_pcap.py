@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import httpx
+import pytest
+from soar_sdk.exceptions import ActionFailure
 
-from src.actions.get_pcap import _error_detail, _platform_attempts
+from src.actions.get_pcap import _error_detail, _get_platform_id, _platform_attempts
 
 
 def test_platform_attempts_preserve_legacy_windows_xp_fallbacks() -> None:
@@ -27,6 +29,11 @@ def test_platform_attempts_preserve_legacy_windows_7_fallback() -> None:
 def test_platform_attempts_leave_other_platforms_unchanged() -> None:
     assert _platform_attempts(66) == (66,)
     assert _platform_attempts(None) == (None,)
+
+
+def test_invalid_platform_raises_actionable_failure() -> None:
+    with pytest.raises(ActionFailure, match="Please provide valid platform name"):
+        _get_platform_id("Unsupported platform")
 
 
 def test_get_pcap_error_detail_restores_legacy_status_message() -> None:

@@ -143,6 +143,13 @@ def _platform_attempts(platform_id: int | None) -> tuple[int | None, ...]:
     return (platform_id,)
 
 
+def _get_platform_id(platform: str) -> int | None:
+    try:
+        return PLATFORM_IDS[platform]
+    except KeyError as exc:
+        raise ActionFailure("Please provide valid platform name") from exc
+
+
 def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> bytes:
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     last_error: ActionFailure | None = None
@@ -182,9 +189,7 @@ def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> b
 
 
 def get_pcap(params: GetPcapParams, soar: SOARClient, asset: Asset) -> GetPcapOutput:
-    if params.platform not in PLATFORM_IDS:
-        raise ValueError("Please provide valid platform name")
-    platform_id = PLATFORM_IDS[params.platform]
+    platform_id = _get_platform_id(params.platform)
     name = f"{params.hash}.pcap"
     content = _download_pcap(asset, params.hash, platform_id)
     vault_id = add_bytes_to_vault(soar, content, name, contains=["pcap"])
