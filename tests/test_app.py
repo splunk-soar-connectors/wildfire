@@ -131,6 +131,18 @@ def test_get_pcap_preserves_legacy_table_contract() -> None:
     assert columns == {"File Name", "Vault ID", "File Type"}
 
 
+def test_download_actions_preserve_legacy_per_hash_locks() -> None:
+    app = create_wildfire_connector_app()
+
+    for identifier in ("get_sample", "get_pcap"):
+        action = app.actions_manager.get_action(identifier).meta.model_dump()
+        assert action["lock"] == {
+            "enabled": True,
+            "concurrency": False,
+            "data_path": "parameters.hash",
+        }
+
+
 def test_url_reputation_preserves_legacy_table_contract() -> None:
     app = create_wildfire_connector_app()
     action = app.actions_manager.get_action("get_url_reputation").meta.model_dump()

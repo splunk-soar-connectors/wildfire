@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from soar_sdk.app import App
+from soar_sdk.meta.actions import ActionLock
 
 from .detonate_file import (
     DetonateFileSummary,
@@ -85,6 +86,7 @@ def register_actions(app: App) -> App:
         description="Download a sample from WildFire and add it to the vault",
         action_type="investigate",
         read_only=True,
+        lock=ActionLock(data_path="parameters.hash"),
         verbose="Do note that WildFire does not generally store samples that have been uploaded for detonation.",
         render_as="table",
         summary_type=GetFileSummary,
@@ -94,6 +96,7 @@ def register_actions(app: App) -> App:
         description="Download the pcap file of a sample from WildFire and add it to the vault",
         action_type="investigate",
         read_only=True,
+        lock=ActionLock(data_path="parameters.hash"),
         render_as="table",
         summary_type=GetPcapSummary,
     )
