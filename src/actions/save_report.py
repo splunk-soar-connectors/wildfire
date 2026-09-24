@@ -18,7 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import add_bytes_to_vault
+from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
 
 
 class SaveReportParams(Params):
@@ -50,7 +50,7 @@ def save_report(
             f"{asset.base_url.rstrip('/')}/publicapi/get/report",
             data={"apikey": asset.api_key, "hash": params.id, "format": "pdf"},
             verify=verify,
-            timeout=httpx.Timeout(None),
+            timeout=WILDFIRE_HTTP_TIMEOUT,
         )
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc

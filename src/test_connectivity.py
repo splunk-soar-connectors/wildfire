@@ -19,7 +19,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 from .asset import Asset
-from .utils import parse_wildfire_xml
+from .utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
 
 __test__ = False
 
@@ -55,12 +55,12 @@ def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
     logger.progress("Detonating test pdf file for checking connectivity")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
-    timeout = httpx.Timeout(None)
-
     try:
         with (
             TEST_PDF_PATH.open("rb") as payload,
-            httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client,
+            httpx.Client(
+                base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+            ) as client,
         ):
             response = client.post(
                 "submit/file",

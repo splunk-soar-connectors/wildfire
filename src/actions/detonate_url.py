@@ -24,7 +24,7 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import parse_wildfire_xml
+from ..utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
@@ -1443,9 +1443,10 @@ def detonate_url(
         raise ActionFailure("Please provide a valid URL")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
-    timeout = httpx.Timeout(None)
     try:
-        with httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client:
+        with httpx.Client(
+            base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+        ) as client:
             task_id = None
             if params.is_file:
                 response = client.post(

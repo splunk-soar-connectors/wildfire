@@ -18,7 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import add_bytes_to_vault
+from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
 
 PLATFORM_IDS = {
     "Default": None,
@@ -141,7 +141,7 @@ def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> b
                 f"{asset.base_url.rstrip('/')}/publicapi/get/pcap",
                 data=data,
                 verify=verify,
-                timeout=httpx.Timeout(None),
+                timeout=WILDFIRE_HTTP_TIMEOUT,
             )
         except httpx.HTTPError as exc:
             last_error = ActionFailure(f"REST Api to server failed: {exc}")

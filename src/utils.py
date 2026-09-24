@@ -17,6 +17,14 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.exceptions import ActionFailure
 
 
+WILDFIRE_HTTP_TIMEOUT = httpx.Timeout(
+    connect=10.0,
+    read=60.0,
+    write=60.0,
+    pool=10.0,
+)
+
+
 def parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
     """Parse a WildFire XML response and return its payload."""
     try:

@@ -19,7 +19,7 @@ from soar_sdk.logging import getLogger
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import parse_wildfire_xml
+from ..utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
 
 logger = getLogger()
 VERDICT_MESSAGES = {
@@ -112,10 +112,10 @@ def get_url_reputation(
     logger.progress("Getting verdict for: %s", params.url)
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
-    timeout = httpx.Timeout(None)
-
     try:
-        with httpx.Client(base_url=base_url, verify=verify, timeout=timeout) as client:
+        with httpx.Client(
+            base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+        ) as client:
             response = client.post(
                 "get/verdict",
                 data={"apikey": asset.api_key},
