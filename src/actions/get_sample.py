@@ -20,6 +20,24 @@ from soar_sdk.params import Param, Params
 from ..asset import Asset
 from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
 
+GET_SAMPLE_ERRORS = {
+    401: "API key invalid",
+    403: "Permission Denied",
+    404: "The sample was not found",
+    405: "HTTP method Not Allowed",
+    419: "Request sample quota exceeded",
+    420: "Insufficient arguments",
+    421: "Invalid arguments",
+    500: "Internal error",
+}
+
+
+def _error_detail(response: httpx.Response) -> str:
+    detail = response.text.strip()
+    if detail:
+        return detail
+    return GET_SAMPLE_ERRORS.get(response.status_code, "N/A")
+
 
 class GetFileParams(Params):
     hash: str = Param(
@@ -79,10 +97,9 @@ def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFile
     try:
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        detail = response.text.strip() or "N/A"
         raise ActionFailure(
             "REST Api Call returned error, "
-            f"status_code: {response.status_code}, detail: {detail}"
+            f"status_code: {response.status_code}, detail: {_error_detail(response)}"
         ) from exc
 
     extension, file_type = _classify_sample(response.content)

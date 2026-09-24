@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from src.actions.get_sample import _classify_sample
+import httpx
+
+from src.actions.get_sample import _classify_sample, _error_detail
 
 
 def test_classify_sample_preserves_legacy_pe_metadata() -> None:
@@ -20,3 +22,11 @@ def test_classify_sample_preserves_legacy_pe_metadata() -> None:
 
 def test_classify_sample_leaves_unknown_files_untyped() -> None:
     assert _classify_sample(b"unknown") == ("", "")
+
+
+def test_get_sample_error_detail_restores_legacy_status_message() -> None:
+    assert _error_detail(httpx.Response(404)) == "The sample was not found"
+
+
+def test_get_sample_error_detail_prefers_response_body() -> None:
+    assert _error_detail(httpx.Response(404, text="Vendor detail")) == "Vendor detail"

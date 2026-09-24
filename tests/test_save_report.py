@@ -13,25 +13,12 @@
 # limitations under the License.
 import httpx
 
-from src.actions.get_pcap import _error_detail, _platform_attempts
+from src.actions.save_report import _error_detail
 
 
-def test_platform_attempts_preserve_legacy_windows_xp_fallbacks() -> None:
-    assert _platform_attempts(2) == (2, 60, 20)
+def test_save_report_error_detail_restores_legacy_status_message() -> None:
+    assert _error_detail(httpx.Response(404)) == "The report was not found"
 
 
-def test_platform_attempts_preserve_legacy_windows_7_fallback() -> None:
-    assert _platform_attempts(5) == (5, 61)
-
-
-def test_platform_attempts_leave_other_platforms_unchanged() -> None:
-    assert _platform_attempts(66) == (66,)
-    assert _platform_attempts(None) == (None,)
-
-
-def test_get_pcap_error_detail_restores_legacy_status_message() -> None:
-    assert _error_detail(httpx.Response(404)) == "The pcap was not found"
-
-
-def test_get_pcap_error_detail_prefers_response_body() -> None:
+def test_save_report_error_detail_prefers_response_body() -> None:
     assert _error_detail(httpx.Response(404, text="Vendor detail")) == "Vendor detail"

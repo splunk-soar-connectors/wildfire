@@ -20,6 +20,25 @@ from soar_sdk.params import Param, Params
 from ..asset import Asset
 from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
 
+GET_PCAP_ERRORS = {
+    401: "API key invalid",
+    403: "Permission Denied",
+    404: "The pcap was not found",
+    405: "HTTP method Not Allowed",
+    419: "Request sample quota exceeded",
+    420: "Insufficient arguments",
+    421: "Invalid arguments",
+    500: "Internal error",
+}
+
+
+def _error_detail(response: httpx.Response) -> str:
+    detail = response.text.strip()
+    if detail:
+        return detail
+    return GET_PCAP_ERRORS.get(response.status_code, "N/A")
+
+
 PLATFORM_IDS = {
     "Default": None,
     "Windows XP, Adobe Reader 9.3.3, Office 2003": 1,
@@ -150,10 +169,9 @@ def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> b
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError:
-            detail = response.text.strip() or "N/A"
             last_error = ActionFailure(
                 "REST Api Call returned error, "
-                f"status_code: {response.status_code}, detail: {detail}"
+                f"status_code: {response.status_code}, detail: {_error_detail(response)}"
             )
             continue
         return response.content
