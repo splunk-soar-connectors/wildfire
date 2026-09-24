@@ -14,6 +14,7 @@
 import json
 import math
 import time
+from urllib.parse import urlsplit
 
 import httpx
 from soar_sdk.abstract import SOARClient
@@ -39,6 +40,24 @@ VERDICT_MESSAGES = {
     -103: "invalid hash value",
 }
 POLL_INTERVAL_SECONDS = 5
+
+
+def _is_valid_http_url(value: str) -> bool:
+    """Validate a user-supplied WildFire URL without changing its value."""
+    if any(character.isspace() or ord(character) < 32 for character in value):
+        return False
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+    except ValueError:
+        return False
+    del port
+    return (
+        parsed.scheme in {"http", "https"}
+        and parsed.hostname is not None
+        and parsed.username is None
+        and parsed.password is None
+    )
 
 
 class DetonateUrlParams(Params):
@@ -1439,7 +1458,7 @@ def detonate_url(
     params: DetonateUrlParams, soar: SOARClient, asset: Asset
 ) -> DetonateUrlOutput:
     del soar
-    if not params.url.startswith(("http://", "https://")):
+    if not _is_valid_http_url(params.url):
         raise ActionFailure("Please provide a valid URL")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"

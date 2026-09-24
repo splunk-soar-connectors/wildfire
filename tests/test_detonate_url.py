@@ -18,6 +18,35 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
+from src.actions.detonate_url import _is_valid_http_url
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://example.com",
+        "https://example.com/path?query=value#fragment",
+        "https://192.0.2.1:8443/path",
+    ],
+)
+def test_http_url_validation_accepts_wildfire_urls(url: str) -> None:
+    assert _is_valid_http_url(url)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://",
+        "ftp://example.com",
+        "https://user:password@example.com",  # pragma: allowlist secret
+        "https://example.com/path with spaces",
+        "https://example.com/\ncontrol",
+        "https://example.com:invalid-port",
+    ],
+)
+def test_http_url_validation_rejects_malformed_urls(url: str) -> None:
+    assert not _is_valid_http_url(url)
+
 
 @pytest.mark.live
 def test_detonate_url_queries_real_wildfire_asset(
