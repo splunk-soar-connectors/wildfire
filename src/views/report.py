@@ -39,24 +39,41 @@ def _add_http_urls(report: dict[str, Any]) -> None:
         connection["url"] = f"{host}/{uri}" if uri else host
 
 
-def _add_template_defaults(report: dict[str, Any]) -> None:
-    """Supply empty collections where the legacy template traverses nested keys."""
-    for key, children in {
-        "network": ("url", "tcp", "udp", "dns"),
-        "timeline": ("entry",),
-        "process_list": ("process",),
-        "process": ("process_created", "process_terminated"),
-        "registry": ("createvaluekey", "setvaluekey", "deletevaluekey"),
-        "file": ("file_deleted", "file_written"),
-        "summary": ("entry",),
-    }.items():
-        section = report.get(key)
-        if not isinstance(section, dict):
-            section = {}
-            report[key] = section
-        for child in children:
-            if section.get(child) is None:
-                section[child] = []
+def _normalize_children_into_lists(value: object) -> dict[str, list[Any]]:
+    """Preserve the legacy XML normalization for a report section."""
+    if not isinstance(value, dict):
+        return {}
+    return {
+        key.lower(): child if isinstance(child, list) else [child]
+        for key, child in value.items()
+    }
+
+
+def _normalize_report_lists(report: dict[str, Any]) -> None:
+    """Normalize singleton XML elements before the report template iterates them."""
+    for key in ("network", "timeline", "summary", "process_list", "registry", "file"):
+        report[key] = _normalize_children_into_lists(report.get(key))
+
+    process_tree = report.get("process_tree")
+    if process_tree is not None and not isinstance(process_tree, list):
+        report["process_tree"] = [process_tree]
+
+    processes = report["process_list"].get("process", [])
+    for process in processes:
+        if not isinstance(process, dict):
+            continue
+        for key in ("service", "registry", "file", "mutex"):
+            process[key] = _normalize_children_into_lists(process.get(key))
+
+    summary_entries = report["summary"].get("entry", [])
+    for index, entry in enumerate(summary_entries):
+        if not isinstance(entry, dict):
+            summary_entries[index] = {
+                "#text": entry,
+                "@details": "N/A",
+                "@score": "N/A",
+                "@id": "N/A",
+            }
 
 
 def build_report_context(
@@ -105,7 +122,7 @@ def build_report_context(
                 report["type"] = "dynamic"
                 report["name"] = f"Dynamic Analysis {dynamic_count}"
                 dynamic_count += 1
-            _add_template_defaults(report)
+            _normalize_report_lists(report)
             _add_http_urls(report)
 
         result["reports"] = reports

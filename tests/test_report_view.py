@@ -206,6 +206,50 @@ def test_file_report_context_renders_legacy_information() -> None:
     assert "Complete Report Data" in html
 
 
+def test_file_report_context_normalizes_singleton_xml_collections() -> None:
+    output = FileReportOutput(
+        file_info={"sha256": "sample-sha256"},
+        task_info={
+            "report": {
+                "software": "WildFire Dynamic Analyzer",
+                "network": {
+                    "tcp": {"@ip": "192.0.2.1", "@port": "443"},
+                    "dns": {"@query": "example.test", "@response": "192.0.2.1"},
+                },
+                "process_list": {
+                    "process": {
+                        "@name": "sample.exe",
+                        "service": {"entry": {"@name": "sample-service"}},
+                    }
+                },
+                "timeline": {"entry": {"@seq": "1", "#text": "started"}},
+                "summary": {"entry": "Observed behavior"},
+            }
+        },
+    )
+
+    template_context = build_report_context(_view_context(), [output], is_url=False)
+    report = template_context["results"][0]["reports"][0]
+
+    assert report["network"]["tcp"] == [{"@ip": "192.0.2.1", "@port": "443"}]
+    assert report["network"]["dns"] == [
+        {"@query": "example.test", "@response": "192.0.2.1"}
+    ]
+    assert report["timeline"]["entry"] == [{"@seq": "1", "#text": "started"}]
+    assert report["process_list"]["process"][0]["@name"] == "sample.exe"
+    assert report["process_list"]["process"][0]["service"]["entry"] == [
+        {"@name": "sample-service"}
+    ]
+    assert report["summary"]["entry"] == [
+        {
+            "#text": "Observed behavior",
+            "@details": "N/A",
+            "@score": "N/A",
+            "@id": "N/A",
+        }
+    ]
+
+
 def test_url_report_context_renders_legacy_information() -> None:
     output = UrlReportOutput(
         result={
