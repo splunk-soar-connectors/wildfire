@@ -30,6 +30,22 @@ EXPECTED_ACTIONS = [
     "save_report",
 ]
 
+STABLE_DETONATE_URL_MAEC_PATHS = {
+    "action_result.data.*.result.report.maec_packages.*.id",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.analysis_type",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.conclusion",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.description",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.end_time",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.is_automated",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.start_time",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.tool_refs",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.id",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.instance_object_refs",
+    "action_result.data.*.result.report.maec_packages.*.maec_objects.*.type",
+    "action_result.data.*.result.report.maec_packages.*.schema_version",
+    "action_result.data.*.result.report.maec_packages.*.type",
+}
+
 
 def test_soar_proxy_environment_is_scoped_to_the_action_run() -> None:
     previous_http_proxy = os.environ.get("HTTP_PROXY")
@@ -96,6 +112,20 @@ def test_detonation_actions_publish_runtime_summary_contracts() -> None:
             if field["data_path"].startswith("action_result.summary.")
         }
         assert actual_paths == expected_paths
+
+
+def test_detonate_url_publishes_only_stable_maec_paths() -> None:
+    app = create_wildfire_connector_app()
+    action = app.actions_manager.get_action("detonate_url").meta.model_dump()
+
+    maec_paths = {
+        field["data_path"]
+        for field in action["output"]
+        if ".maec_packages." in field["data_path"]
+    }
+
+    assert maec_paths == STABLE_DETONATE_URL_MAEC_PATHS
+    assert not any(".observable_objects." in path for path in maec_paths)
 
 
 def test_get_file_preserves_legacy_table_contract() -> None:

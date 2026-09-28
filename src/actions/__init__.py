@@ -21,9 +21,9 @@ from .detonate_file import (
 )
 from .detonate_url import (
     DetonateUrlSummary,
-    detonate_url as detonate_url_action,
     display_detonate_url_report,
 )
+from .detonate_url_contract import detonate_url_with_contract
 from .get_url_reputation import (
     UrlReputationSummary,
     get_url_reputation,
@@ -51,7 +51,9 @@ def register_actions(app: App) -> App:
         summary_type=DetonateFileSummary,
     )
     app.register_action(
-        action=detonate_url_action,
+        action=detonate_url_with_contract,
+        name="detonate url",
+        identifier="detonate_url",
         description="Submit a single website link for WildFire analysis",
         action_type="investigate",
         read_only=True,

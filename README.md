@@ -312,6 +312,19 @@ action_result.data.\*.result.report.summary.entry.\*.@seq | string | | 1 |
 action_result.data.\*.result.report.timeline.entry.\*.#text | string | `file name` | Created Process c:\\documents and settings\\administrator\\sample.exe |
 action_result.data.\*.result.report.timeline.entry.\*.@seq | string | | 1 |
 action_result.data.\*.result.report.version | string | | 3.0 |
+action_result.data.\*.result.report.maec_packages.\*.id | string | | package--639659c2-6125-4089-8d17-e947f570893a |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.analysis_type | string | | combination |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.conclusion | string | | unknown |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.description | string | | Automated analysis inside a web browser |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.end_time | string | | 2021-04-15T07:31:29.519230471Z |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.is_automated | boolean | | True False |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.start_time | string | | 2021-04-15T07:31:19.220000028Z |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.analysis_metadata.\*.tool_refs | string | | 1 |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.id | string | | malware-instance--04a3393d-5a51-4517-2b87-a4dc27bb7a30 |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.instance_object_refs | string | | 1 |
+action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.type | string | | malware-instance |
+action_result.data.\*.result.report.maec_packages.\*.schema_version | string | | 5.0 |
+action_result.data.\*.result.report.maec_packages.\*.type | string | | package |
 action_result.data.\*.result.url_type | string | | original |
 action_result.data.\*.submit_link_info.md5 | string | `md5` | ad01ab9b2bcd7f5c859521dbcd680774 |
 action_result.data.\*.submit_link_info.sha256 | string | `sha256` | 14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f |

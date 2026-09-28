@@ -73,3 +73,9 @@ def test_detonate_url_queries_real_wildfire_asset(
         f"Summary available: {summary['summary_available']}"
     )
     assert len(result.get_data()) == 1
+    if summary["summary_available"]:
+        report = result.get_data()[0]["result"]["report"]
+        maec_packages = report["maec_packages"]
+        assert maec_packages
+        assert "observable_objects" in maec_packages[0]
+        assert all(key.isdigit() for key in maec_packages[0]["observable_objects"])
