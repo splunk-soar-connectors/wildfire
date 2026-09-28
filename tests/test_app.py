@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import subprocess
+import sys
 
 from soar_sdk.app import App
 from soar_sdk.input_spec import EnvironmentVariable
@@ -76,6 +78,19 @@ def test_factory_registers_all_generated_actions() -> None:
     assert next(
         action for action in actions if action.identifier == "get_sample"
     ).action == ("get file")
+
+
+def test_module_cli_resolves_every_registered_action() -> None:
+    for identifier in EXPECTED_ACTIONS:
+        result = subprocess.run(
+            [sys.executable, "-m", "src.app", "action", identifier, "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        assert result.returncode == 0, result.stderr
+        assert f"app.py action {identifier}" in result.stdout
 
 
 def test_generated_action_models_build_json_schemas() -> None:
