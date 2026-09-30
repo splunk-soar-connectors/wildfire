@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pydantic import PositiveInt
+from urllib.parse import urlsplit
+
+from pydantic import PositiveInt, field_validator
 from soar_sdk.asset import AssetField, BaseAsset
 
 
@@ -27,3 +29,21 @@ class Asset(BaseAsset):
     timeout: PositiveInt = AssetField(
         description="Detonate timeout in mins", default=10
     )
+
+    @field_validator("base_url")
+    @classmethod
+    def validate_base_url(cls, value: str) -> str:
+        """Require an absolute HTTP(S) URL without changing the configured value."""
+        if any(character.isspace() for character in value):
+            raise ValueError("base_url must be an absolute HTTP(S) URL")
+
+        parsed_url = urlsplit(value)
+        if parsed_url.scheme not in {"http", "https"} or not parsed_url.hostname:
+            raise ValueError("base_url must be an absolute HTTP(S) URL")
+
+        try:
+            _ = parsed_url.port
+        except ValueError as error:
+            raise ValueError("base_url must be an absolute HTTP(S) URL") from error
+
+        return value

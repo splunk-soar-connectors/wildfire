@@ -17,6 +17,40 @@ from pydantic import ValidationError
 from src.asset import Asset
 
 
+@pytest.mark.parametrize(
+    "base_url",
+    [
+        "wildfire.example.com",
+        "/wildfire",
+        "ftp://wildfire.example.com",
+        "https://",
+        "https://wildfire.example.com:invalid",
+        "https://wild fire.example.com",
+    ],
+)
+def test_asset_rejects_invalid_base_url(base_url: str) -> None:
+    with pytest.raises(
+        ValidationError, match=r"base_url must be an absolute HTTP\(S\) URL"
+    ):
+        Asset(base_url=base_url, api_key="redacted")  # pragma: allowlist secret
+
+
+@pytest.mark.parametrize(
+    "base_url",
+    [
+        "http://wildfire.example.com",
+        "https://wildfire.example.com",
+        "https://wildfire.example.com:8443/service/",
+    ],
+)
+def test_asset_accepts_absolute_http_base_url_without_modification(
+    base_url: str,
+) -> None:
+    asset = Asset(base_url=base_url, api_key="redacted")  # pragma: allowlist secret
+
+    assert asset.base_url == base_url
+
+
 @pytest.mark.parametrize("timeout", [-7, 0, 1.5])
 def test_asset_rejects_non_positive_or_fractional_timeout(timeout: float) -> None:
     with pytest.raises(ValidationError):
