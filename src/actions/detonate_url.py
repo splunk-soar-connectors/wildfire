@@ -40,6 +40,33 @@ VERDICT_MESSAGES = {
     -103: "invalid hash value",
 }
 POLL_INTERVAL_SECONDS = 5
+FILE_UPLOAD_ERRORS = {
+    401: "API key invalid",
+    405: "HTTP method Not Allowed",
+    413: "Sample file size over max limit",
+    418: "Sample file type is not supported",
+    419: "Max number of uploads per day exceeded",
+    422: "URL download error",
+    500: "Internal error",
+    513: "File upload failed",
+}
+GET_REPORT_ERRORS = {
+    401: "API key invalid",
+    404: "The report was not found",
+    405: "HTTP method Not Allowed",
+    419: "Request report quota exceeded",
+    420: "Insufficient arguments",
+    421: "Invalid arguments",
+    500: "Internal error",
+}
+
+
+def _file_upload_error_detail(response: httpx.Response) -> str:
+    return response.text.strip() or FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
+
+
+def _report_error_detail(response: httpx.Response) -> str:
+    return response.text.strip() or GET_REPORT_ERRORS.get(response.status_code, "N/A")
 
 
 def _is_valid_http_url(value: str) -> bool:
@@ -1405,7 +1432,7 @@ def _get_verdict(
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, "
-            f"detail: {response.text.strip() or 'N/A'}"
+            f"detail: {_file_upload_error_detail(response)}"
         ) from exc
     verdict_info = parse_wildfire_xml(response).get("get-verdict-info")
     if not isinstance(verdict_info, dict):
@@ -1438,7 +1465,7 @@ def _poll_report(
             raise ActionFailure(
                 "REST Api Call returned error, "
                 f"status_code: {response.status_code}, "
-                f"detail: {response.text.strip() or 'N/A'}"
+                f"detail: {_report_error_detail(response)}"
             ) from exc
         if task_id:
             return parse_wildfire_xml(response)
@@ -1479,7 +1506,7 @@ def detonate_url(
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {response.status_code}, "
-                        f"detail: {response.text.strip() or 'N/A'}"
+                        f"detail: {_file_upload_error_detail(response)}"
                     ) from exc
                 upload_info = parse_wildfire_xml(response).get("upload-file-info")
                 if not isinstance(upload_info, dict):
