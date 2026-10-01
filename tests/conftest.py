@@ -46,7 +46,7 @@ def wildfire_asset_config() -> WildFireAssetConfig:
         if not os.getenv(name)
     ]
     if missing:
-        pytest.fail(
+        pytest.skip(
             "Missing required WildFire live-test environment variables: "
             + ", ".join(missing)
         )
