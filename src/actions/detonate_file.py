@@ -23,7 +23,11 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
+from ..utils import (
+    WILDFIRE_HTTP_TIMEOUT,
+    normalize_wildfire_report_response,
+    parse_wildfire_xml,
+)
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
@@ -514,7 +518,7 @@ def detonate_file(
     except (OSError, httpx.HTTPError) as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 
-    data = {**upload_data, **report_data}
+    data = normalize_wildfire_report_response({**upload_data, **report_data})
     file_info = report_data.get("file_info")
     malware = file_info.get("malware", "no") if isinstance(file_info, dict) else "no"
     result = ActionResult(True, f"Malware: {malware}", params.model_dump())

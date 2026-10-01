@@ -23,7 +23,11 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
+from ..utils import (
+    WILDFIRE_HTTP_TIMEOUT,
+    normalize_wildfire_report_response,
+    parse_wildfire_xml,
+)
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
@@ -454,7 +458,10 @@ def get_report(
                         "REST Api Call returned error, "
                         f"status_code: {report_response.status_code}, detail: {detail}"
                     ) from exc
-                result.add_data(parse_wildfire_xml(report_response))
+                report_data = normalize_wildfire_report_response(
+                    parse_wildfire_xml(report_response)
+                )
+                result.add_data(report_data)
                 return result  # type: ignore[return-value]
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc

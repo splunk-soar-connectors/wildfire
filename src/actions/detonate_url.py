@@ -25,7 +25,11 @@ from soar_sdk.models.view import ViewContext
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
+from ..utils import (
+    WILDFIRE_HTTP_TIMEOUT,
+    normalize_wildfire_report_response,
+    parse_wildfire_xml,
+)
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
@@ -1468,7 +1472,7 @@ def _poll_report(
                 f"detail: {_report_error_detail(response)}"
             ) from exc
         if task_id:
-            return parse_wildfire_xml(response)
+            return normalize_wildfire_report_response(parse_wildfire_xml(response))
         try:
             report = response.json()
             report_body = report.get("result", {}).get("report")
