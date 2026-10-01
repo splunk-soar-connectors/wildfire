@@ -94,6 +94,16 @@ def build_report_context(
                 report["name"] = f"Dynamic Analysis {dynamic_count}"
                 dynamic_count += 1
             normalize_wildfire_report(report)
+            for section in (
+                "network",
+                "timeline",
+                "summary",
+                "process_list",
+                "registry",
+                "file",
+            ):
+                if not isinstance(report.get(section), dict):
+                    report[section] = {}
             _add_http_urls(report)
 
         result["reports"] = reports

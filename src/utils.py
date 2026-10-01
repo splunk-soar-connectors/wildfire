@@ -50,34 +50,36 @@ def _normalize_children_into_lists(value: object) -> dict[str, list[Any]]:
 
 
 def normalize_wildfire_report(report: dict[str, Any]) -> None:
-    """Preserve the legacy list shape for one parsed WildFire XML report."""
-    report["network"] = _normalize_children_into_lists(report.get("network"))
-    report["timeline"] = _normalize_children_into_lists(report.get("timeline"))
-    report["process"] = _normalize_children_into_lists(report.get("process_created"))
-    report["summary"] = _normalize_children_into_lists(report.get("summary"))
-    report["process_list"] = _normalize_children_into_lists(report.get("process_list"))
+    """Normalize existing XML collections declared as lists by output contracts."""
+    for key in ("network", "timeline", "summary", "process_list", "registry", "file"):
+        if isinstance(report.get(key), dict):
+            report[key] = _normalize_children_into_lists(report[key])
 
     process_tree = report.get("process_tree")
     if process_tree is not None and not isinstance(process_tree, list):
         report["process_tree"] = [process_tree]
 
-    for process in report["process_list"].get("process", []):
+    process_list = report.get("process_list", {})
+    if not isinstance(process_list, dict):
+        process_list = {}
+    for process in process_list.get("process", []):
         if not isinstance(process, dict):
             continue
         for key in ("service", "registry", "file", "mutex"):
-            process[key] = _normalize_children_into_lists(process.get(key))
+            if isinstance(process.get(key), dict):
+                process[key] = _normalize_children_into_lists(process[key])
 
-    for index, entry in enumerate(report["summary"].get("entry", [])):
+    summary = report.get("summary", {})
+    if not isinstance(summary, dict):
+        summary = {}
+    for index, entry in enumerate(summary.get("entry", [])):
         if not isinstance(entry, dict):
-            report["summary"]["entry"][index] = {
+            summary["entry"][index] = {
                 "#text": entry,
                 "@details": "N/A",
                 "@score": "N/A",
                 "@id": "N/A",
             }
-
-    report["registry"] = _normalize_children_into_lists(report.get("registry"))
-    report["file"] = _normalize_children_into_lists(report.get("file"))
 
 
 def normalize_wildfire_report_response(
