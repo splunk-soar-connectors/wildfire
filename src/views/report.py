@@ -60,9 +60,15 @@ def build_report_context(
 
         if is_url:
             url_result = data.get("result", {})
-            reports = url_result.get("report")
-            result["url_type"] = url_result.get("url_type")
-            result["analysis_time"] = url_result.get("analysis_time")
+            task_info = data.get("task_info")
+            is_file_mode = isinstance(task_info, dict) and "report" in task_info
+            result["param"]["is_file"] = is_file_mode
+            if is_file_mode:
+                reports = task_info.get("report")
+            else:
+                reports = url_result.get("report")
+                result["url_type"] = url_result.get("url_type")
+                result["analysis_time"] = url_result.get("analysis_time")
         else:
             reports = data.get("task_info", {}).get("report")
 

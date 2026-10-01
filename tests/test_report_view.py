@@ -32,6 +32,11 @@ class UrlReportOutput(ActionOutput):
     result: dict[str, Any]
 
 
+class UrlFileReportOutput(ActionOutput):
+    file_info: dict[str, Any]
+    task_info: dict[str, Any]
+
+
 def _view_context() -> ViewContext:
     return ViewContext(
         QS={},
@@ -274,3 +279,27 @@ def test_url_report_context_renders_legacy_information() -> None:
     assert "original" in html
     assert "Analysis Time" in html
     assert "Clean" in html
+
+
+def test_url_file_report_context_reads_task_info_report() -> None:
+    output = UrlFileReportOutput(
+        file_info={"sha256": "url-file-sha256"},
+        task_info={
+            "report": {
+                "sha256": "url-file-sha256",
+                "software": "WildFire Dynamic Analyzer",
+                "verdict": "malware",
+            }
+        },
+    )
+
+    template_context = build_report_context(_view_context(), [output], is_url=True)
+    renderer = get_template_renderer(
+        "jinja", str(Path(__file__).parents[1] / "templates")
+    )
+
+    assert template_context["results"][0]["param"]["is_file"] is True
+    assert template_context["results"][0]["reports"][0]["sha256"] == ("url-file-sha256")
+    html = renderer.render_template("wildfire_display_report.html", template_context)
+    assert "url-file-sha256" in html
+    assert "No report data found" not in html
