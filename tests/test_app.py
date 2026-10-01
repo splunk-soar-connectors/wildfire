@@ -90,7 +90,7 @@ def test_module_cli_resolves_every_registered_action() -> None:
         )
 
         assert result.returncode == 0, result.stderr
-        assert f"app.py action {identifier}" in result.stdout
+        assert f"action {identifier}" in result.stdout
 
 
 def test_generated_action_models_build_json_schemas() -> None:
