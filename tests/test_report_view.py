@@ -47,6 +47,14 @@ def _view_context() -> ViewContext:
     )
 
 
+def test_report_template_extends_widget_before_emitting_content() -> None:
+    template = Path(__file__).parents[1] / "templates" / "wildfire_display_report.html"
+
+    assert template.read_text().startswith(
+        "{% extends 'widgets/widget_template.html' %}"
+    )
+
+
 def test_report_actions_register_sdk_custom_view() -> None:
     app = create_wildfire_connector_app()
 
