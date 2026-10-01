@@ -38,7 +38,14 @@ class Asset(BaseAsset):
             raise ValueError("base_url must be an absolute HTTP(S) URL")
 
         parsed_url = urlsplit(value)
-        if parsed_url.scheme not in {"http", "https"} or not parsed_url.hostname:
+        if (
+            parsed_url.scheme not in {"http", "https"}
+            or not parsed_url.hostname
+            or parsed_url.username is not None
+            or parsed_url.password is not None
+            or parsed_url.query
+            or parsed_url.fragment
+        ):
             raise ValueError("base_url must be an absolute HTTP(S) URL")
 
         try:

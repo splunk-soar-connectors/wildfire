@@ -26,6 +26,10 @@ from src.asset import Asset
         "https://",
         "https://wildfire.example.com:invalid",
         "https://wild fire.example.com",
+        "https://user@wildfire.example.com",
+        "https://user:password@wildfire.example.com",  # pragma: allowlist secret
+        "https://wildfire.example.com?region=test",
+        "https://wildfire.example.com/#report",
     ],
 )
 def test_asset_rejects_invalid_base_url(base_url: str) -> None:
