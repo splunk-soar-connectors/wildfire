@@ -14,7 +14,6 @@
 import json
 import math
 import time
-from urllib.parse import urlsplit
 
 import httpx
 from soar_sdk.abstract import SOARClient
@@ -26,69 +25,18 @@ from soar_sdk.params import Param, Params
 
 from ..asset import Asset
 from ..utils import (
+    FILE_UPLOAD_ERRORS,
+    GET_REPORT_ERRORS,
+    VERDICT_MESSAGES,
     WILDFIRE_HTTP_TIMEOUT,
+    is_valid_http_url,
     normalize_wildfire_report_response,
     parse_wildfire_xml,
 )
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
-VERDICT_MESSAGES = {
-    0: "benign",
-    1: "malware",
-    2: "grayware",
-    4: "phishing",
-    -100: "pending, the sample exists, but there is currently no verdict",
-    -101: "error",
-    -102: "unknown, cannot find sample record in the WildFire database",
-    -103: "invalid hash value",
-}
 POLL_INTERVAL_SECONDS = 5
-FILE_UPLOAD_ERRORS = {
-    401: "API key invalid",
-    405: "HTTP method Not Allowed",
-    413: "Sample file size over max limit",
-    418: "Sample file type is not supported",
-    419: "Max number of uploads per day exceeded",
-    422: "URL download error",
-    500: "Internal error",
-    513: "File upload failed",
-}
-GET_REPORT_ERRORS = {
-    401: "API key invalid",
-    404: "The report was not found",
-    405: "HTTP method Not Allowed",
-    419: "Request report quota exceeded",
-    420: "Insufficient arguments",
-    421: "Invalid arguments",
-    500: "Internal error",
-}
-
-
-def _file_upload_error_detail(response: httpx.Response) -> str:
-    return response.text.strip() or FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
-
-
-def _report_error_detail(response: httpx.Response) -> str:
-    return response.text.strip() or GET_REPORT_ERRORS.get(response.status_code, "N/A")
-
-
-def _is_valid_http_url(value: str) -> bool:
-    """Validate a user-supplied WildFire URL without changing its value."""
-    if any(character.isspace() or ord(character) < 32 for character in value):
-        return False
-    try:
-        parsed = urlsplit(value)
-        port = parsed.port
-    except ValueError:
-        return False
-    del port
-    return (
-        parsed.scheme in {"http", "https"}
-        and parsed.hostname is not None
-        and parsed.username is None
-        and parsed.password is None
-    )
 
 
 class DetonateUrlParams(Params):
@@ -1433,10 +1381,13 @@ def _get_verdict(
     try:
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
+        detail = response.text.strip() or FILE_UPLOAD_ERRORS.get(
+            response.status_code, "N/A"
+        )
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, "
-            f"detail: {_file_upload_error_detail(response)}"
+            f"detail: {detail}"
         ) from exc
     verdict_info = parse_wildfire_xml(response).get("get-verdict-info")
     if not isinstance(verdict_info, dict):
@@ -1466,10 +1417,13 @@ def _poll_report(
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
+            detail = response.text.strip() or GET_REPORT_ERRORS.get(
+                response.status_code, "N/A"
+            )
             raise ActionFailure(
                 "REST Api Call returned error, "
                 f"status_code: {response.status_code}, "
-                f"detail: {_report_error_detail(response)}"
+                f"detail: {detail}"
             ) from exc
         if task_id:
             return normalize_wildfire_report_response(parse_wildfire_xml(response))
@@ -1489,7 +1443,7 @@ def detonate_url(
     params: DetonateUrlParams, soar: SOARClient, asset: Asset
 ) -> DetonateUrlOutput:
     del soar
-    if not _is_valid_http_url(params.url):
+    if not is_valid_http_url(params.url):
         raise ActionFailure("Please provide a valid URL")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
@@ -1507,10 +1461,13 @@ def detonate_url(
                 try:
                     response.raise_for_status()
                 except httpx.HTTPStatusError as exc:
+                    detail = response.text.strip() or FILE_UPLOAD_ERRORS.get(
+                        response.status_code, "N/A"
+                    )
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {response.status_code}, "
-                        f"detail: {_file_upload_error_detail(response)}"
+                        f"detail: {detail}"
                     ) from exc
                 upload_info = parse_wildfire_xml(response).get("upload-file-info")
                 if not isinstance(upload_info, dict):

@@ -17,6 +17,40 @@ from typing import Any
 
 import pytest
 from soar_sdk.app import App
+from soar_sdk.shims.phantom.encryption_helper import encryption_helper
+
+from src.app import create_wildfire_connector_app
+
+
+def test_url_reputation_rejects_invalid_url_before_request() -> None:
+    app = create_wildfire_connector_app()
+    asset_id = "wildfire-url-validation-test"
+    app.handle(
+        json.dumps(
+            {
+                "identifier": "get_url_reputation",
+                "action": "url reputation",
+                "asset_id": asset_id,
+                "container_id": 456,
+                "config": {
+                    "app_version": "4.0.0",
+                    "directory": ".",
+                    "main_module": "src.app:app",
+                    "base_url": "https://wildfire.invalid",
+                    "verify_server_cert": True,
+                    "api_key": encryption_helper.encrypt("unused", salt=asset_id),
+                },
+                "parameters": [{"url": "ftp://example.com"}],
+            }
+        )
+    )
+
+    result = app.actions_manager.get_action_results()[-1]
+    assert result.get_status() is False
+    assert (
+        result.get_message()
+        == "Action failure in url reputation: Please provide a valid URL"
+    )
 
 
 @pytest.mark.live

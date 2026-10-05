@@ -24,6 +24,8 @@ from soar_sdk.params import Param, Params
 
 from ..asset import Asset
 from ..utils import (
+    FILE_UPLOAD_ERRORS,
+    GET_REPORT_ERRORS,
     WILDFIRE_HTTP_TIMEOUT,
     normalize_wildfire_report_response,
     parse_wildfire_xml,
@@ -32,33 +34,6 @@ from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
 POLL_INTERVAL_SECONDS = 5
-FILE_UPLOAD_ERRORS = {
-    401: "API key invalid",
-    405: "HTTP method Not Allowed",
-    413: "Sample file size over max limit",
-    418: "Sample file type is not supported",
-    419: "Max number of uploads per day exceeded",
-    422: "URL download error",
-    500: "Internal error",
-    513: "File upload failed",
-}
-GET_REPORT_ERRORS = {
-    401: "API key invalid",
-    404: "The report was not found",
-    405: "HTTP method Not Allowed",
-    419: "Request report quota exceeded",
-    420: "Insufficient arguments",
-    421: "Invalid arguments",
-    500: "Internal error",
-}
-
-
-def _file_upload_error_detail(response: httpx.Response) -> str:
-    return response.text.strip() or FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
-
-
-def _report_error_detail(response: httpx.Response) -> str:
-    return response.text.strip() or GET_REPORT_ERRORS.get(response.status_code, "N/A")
 
 
 class DetonateFileParams(Params):
@@ -441,10 +416,13 @@ def _poll_report(client: httpx.Client, asset: Asset, task_id: str) -> dict[str, 
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
+            detail = response.text.strip() or GET_REPORT_ERRORS.get(
+                response.status_code, "N/A"
+            )
             raise ActionFailure(
                 "REST Api Call returned error, "
                 f"status_code: {response.status_code}, "
-                f"detail: {_report_error_detail(response)}"
+                f"detail: {detail}"
             ) from exc
         return parse_wildfire_xml(response)
     raise ActionFailure("Reached max polling attempts.")
@@ -492,10 +470,13 @@ def detonate_file(
                 try:
                     upload_response.raise_for_status()
                 except httpx.HTTPStatusError as exc:
+                    detail = upload_response.text.strip() or FILE_UPLOAD_ERRORS.get(
+                        upload_response.status_code, "N/A"
+                    )
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {upload_response.status_code}, "
-                        f"detail: {_file_upload_error_detail(upload_response)}"
+                        f"detail: {detail}"
                     ) from exc
                 upload_data = parse_wildfire_xml(upload_response)
                 upload_info = upload_data.get("upload-file-info")
@@ -509,10 +490,13 @@ def detonate_file(
                 try:
                     report_response.raise_for_status()
                 except httpx.HTTPStatusError as exc:
+                    detail = report_response.text.strip() or GET_REPORT_ERRORS.get(
+                        report_response.status_code, "N/A"
+                    )
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {report_response.status_code}, "
-                        f"detail: {_report_error_detail(report_response)}"
+                        f"detail: {detail}"
                     ) from exc
                 raise ActionFailure("Unable to retrieve prior detonation report")
     except (OSError, httpx.HTTPError) as exc:

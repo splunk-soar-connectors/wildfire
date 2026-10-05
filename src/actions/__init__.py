@@ -16,9 +16,9 @@ from soar_sdk.meta.actions import ActionLock
 
 from .detonate_file import (
     DetonateFileSummary,
-    detonate_file as detonate_file_action,
     display_detonate_file_report,
 )
+from .detonate_file_contract import detonate_file_with_contract
 from .detonate_url import (
     DetonateUrlSummary,
     display_detonate_url_report,
@@ -31,8 +31,8 @@ from .get_url_reputation import (
 from .get_report import (
     GetReportSummary,
     display_get_report,
-    get_report as get_report_action,
 )
+from .get_report_contract import get_report_with_contract
 from .get_sample import GetFileSummary, get_sample
 from .get_pcap import GetPcapSummary, get_pcap
 from .save_report import SaveReportSummary, save_report
@@ -41,7 +41,9 @@ from .save_report import SaveReportSummary, save_report
 def register_actions(app: App) -> App:
     """Register all WildFire actions on the provided app."""
     app.register_action(
-        action=detonate_file_action,
+        action=detonate_file_with_contract,
+        name="detonate file",
+        identifier="detonate_file",
         description="Run the file in the WildFire sandbox and retrieve the analysis results",
         action_type="investigate",
         read_only=True,
@@ -67,13 +69,15 @@ def register_actions(app: App) -> App:
         name="url reputation",
         description="Submit a single website link for WildFire verdict",
         action_type="investigate",
-        verbose="The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be queried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.",
+        verbose="The submitted URL is queried directly in the WildFire database, returning one of the following verdicts:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If a verdict cannot be concluded, one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find the URL in the WildFire database</li><li>-103: invalid URL value</li></ul>.",
         read_only=True,
         render_as="table",
         summary_type=UrlReputationSummary,
     )
     app.register_action(
-        action=get_report_action,
+        action=get_report_with_contract,
+        name="get report",
+        identifier="get_report",
         description="Query for results of an already completed detonation in WildFire",
         action_type="investigate",
         verbose="Each detonation report in WildFire is denoted by the sha256 and md5 of the file.",

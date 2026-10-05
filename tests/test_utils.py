@@ -27,6 +27,7 @@ def test_report_response_normalizes_legacy_singleton_collections() -> None:
             "report": {
                 "network": {"TCP": {"@ip": "192.0.2.1"}},
                 "timeline": {"entry": {"@seq": "1"}},
+                "process_created": {"entry": {"@pid": "7"}},
                 "process_tree": {"@pid": "7"},
                 "process_list": {
                     "process": {
@@ -51,7 +52,7 @@ def test_report_response_normalizes_legacy_singleton_collections() -> None:
     assert isinstance(reports, list)
     assert report["network"]["tcp"] == [{"@ip": "192.0.2.1"}]
     assert report["timeline"]["entry"] == [{"@seq": "1"}]
-    assert "process" not in report
+    assert report["process"]["entry"] == [{"@pid": "7"}]
     assert report["process_tree"] == [{"@pid": "7"}]
     assert report["process_list"]["process"][0]["mutex"]["createmutex"] == [
         {"@name": "sample-mutex"}

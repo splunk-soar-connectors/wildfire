@@ -19,23 +19,13 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 from .asset import Asset
-from .utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
+from .utils import FILE_UPLOAD_ERRORS, WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
 
 __test__ = False
 
 logger = getLogger()
 TEST_PDF_NAME = "wildfire_test_connectivity.pdf"
 TEST_PDF_PATH = Path(__file__).parents[1] / "templates" / TEST_PDF_NAME
-FILE_UPLOAD_ERRORS = {
-    401: "API key invalid",
-    405: "HTTP method Not Allowed",
-    413: "Sample file size over max limit",
-    418: "Sample file type is not supported",
-    419: "Max number of uploads per day exceeded",
-    422: "URL download error",
-    500: "Internal error",
-    513: "File upload failed",
-}
 
 
 def _error_detail(response: httpx.Response) -> str:

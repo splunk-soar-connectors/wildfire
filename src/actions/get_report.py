@@ -24,6 +24,8 @@ from soar_sdk.params import Param, Params
 
 from ..asset import Asset
 from ..utils import (
+    GET_REPORT_ERRORS,
+    VERDICT_MESSAGES,
     WILDFIRE_HTTP_TIMEOUT,
     normalize_wildfire_report_response,
     parse_wildfire_xml,
@@ -31,25 +33,6 @@ from ..utils import (
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
-VERDICT_MESSAGES = {
-    0: "benign",
-    1: "malware",
-    2: "grayware",
-    4: "phishing",
-    -100: "pending, the sample exists, but there is currently no verdict",
-    -101: "error",
-    -102: "unknown, cannot find sample record in the WildFire database",
-    -103: "invalid hash value",
-}
-GET_REPORT_ERRORS = {
-    401: "API key invalid",
-    404: "The report was not found",
-    405: "HTTP method Not Allowed",
-    419: "Request report quota exceeded",
-    420: "Insufficient arguments",
-    421: "Invalid arguments",
-    500: "Internal error",
-}
 POLL_INTERVAL_SECONDS = 5
 
 

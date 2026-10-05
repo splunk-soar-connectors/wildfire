@@ -48,6 +48,140 @@ STABLE_DETONATE_URL_MAEC_PATHS = {
     "action_result.data.*.result.report.maec_packages.*.type",
 }
 
+LEGACY_COMPATIBILITY_PATHS = {
+    "detonate_file": set(
+        """\
+action_result.data.*.file_info.file_signer
+action_result.data.*.file_info.filetype
+action_result.data.*.file_info.malware
+action_result.data.*.file_info.md5
+action_result.data.*.file_info.sha1
+action_result.data.*.file_info.sha256
+action_result.data.*.file_info.size
+action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@behavior
+action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@behavior_id
+action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@description
+action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@family
+action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@matched_ioc_hash
+action_result.data.*.task_info.report.*.evidence
+action_result.data.*.task_info.report.*.evidence.file
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5
+action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id
+action_result.data.*.task_info.report.*.evidence.file.entry.@md5
+action_result.data.*.task_info.report.*.extracted_urls.entry.*.@url
+action_result.data.*.task_info.report.*.extracted_urls.entry.*.@verdict
+action_result.data.*.task_info.report.*.extracted_urls.entry.@url
+action_result.data.*.task_info.report.*.extracted_urls.entry.@verdict
+action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file
+action_result.data.*.task_info.report.*.file.file_written.*.@written_file
+action_result.data.*.task_info.report.*.process_list.process.*.@command
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type
+action_result.data.*.task_info.report.*.process_list.process.*.java_api
+action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
+action_result.data.*.task_info.report.*.process_list.process.*.process_activity
+action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@name
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@text
+action_result.data.*.task_info.report.*.summary.entry.*.@behavior
+action_result.data.*.task_info.report.*.summary.entry.*.@details
+action_result.data.*.task_info.report.*.summary.entry.*.@id
+action_result.data.*.task_info.report.*.summary.entry.*.@score
+action_result.data.*.upload-file-info.filename
+action_result.data.*.upload-file-info.filetype
+action_result.data.*.upload-file-info.md5
+action_result.data.*.upload-file-info.sha256
+action_result.data.*.upload-file-info.size
+action_result.data.*.upload-file-info.url
+""".splitlines()
+    ),
+    "detonate_url": set(
+        """\
+action_result.data.*.result.report.da_packages
+action_result.data.*.result.report.detection_reasons.*.artifacts.*.object_id
+action_result.data.*.result.report.detection_reasons.*.artifacts.*.package
+action_result.data.*.result.report.detection_reasons.*.artifacts.*.type
+action_result.data.*.result.report.detection_reasons.*.description
+action_result.data.*.result.report.detection_reasons.*.name
+action_result.data.*.result.report.detection_reasons.*.type
+action_result.data.*.result.report.detection_reasons.*.verdict
+action_result.data.*.result.report.sa_package
+action_result.data.*.result.report.schema_version
+action_result.data.*.result.report.type
+action_result.data.*.result.report.verdict
+action_result.data.*.submit-link-info.md5
+action_result.data.*.submit-link-info.sha256
+action_result.data.*.submit-link-info.url
+action_result.data.*.task_info.report.*.evidence.file.entry.*.#text
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256
+action_result.data.*.task_info.report.*.process_list.process.*.@command
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type
+action_result.data.*.task_info.report.*.process_list.process.*.java_api
+action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
+action_result.data.*.task_info.report.*.process_list.process.*.process_activity
+action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_pid
+action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_process_image
+action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@command
+action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key
+action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey
+action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
+action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key
+action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey
+action_result.data.*.task_info.report.*.summary.entry.*.@details
+action_result.data.*.task_info.report.*.summary.entry.*.@id
+action_result.data.*.task_info.report.*.summary.entry.*.@score
+""".splitlines()
+    ),
+    "get_report": set(
+        """\
+action_result.data.*.file_info.file_signer
+action_result.data.*.file_info.filetype
+action_result.data.*.file_info.malware
+action_result.data.*.file_info.md5
+action_result.data.*.file_info.sha1
+action_result.data.*.file_info.sha256
+action_result.data.*.file_info.size
+action_result.data.*.task_info.report.*.@md5
+action_result.data.*.task_info.report.*.@sha256
+action_result.data.*.task_info.report.*.evidence
+action_result.data.*.task_info.report.*.evidence.file
+action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id
+action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id
+action_result.data.*.task_info.report.*.extracted_urls.entry.*.@url
+action_result.data.*.task_info.report.*.extracted_urls.entry.*.@verdict
+action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file
+action_result.data.*.task_info.report.*.file.file_written.*.@written_file
+action_result.data.*.task_info.report.*.process_list.process.*.@command
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size
+action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type
+action_result.data.*.task_info.report.*.process_list.process.*.java_api
+action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
+action_result.data.*.task_info.report.*.process_list.process.*.process_activity
+action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@name
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@text
+action_result.data.*.task_info.report.*.summary.entry.*.@details
+action_result.data.*.task_info.report.*.summary.entry.*.@id
+action_result.data.*.task_info.report.*.summary.entry.*.@score
+""".splitlines()
+    ),
+}
+
 
 def test_soar_proxy_environment_is_scoped_to_the_action_run() -> None:
     previous_http_proxy = os.environ.get("HTTP_PROXY")
@@ -143,6 +277,31 @@ def test_detonate_url_publishes_only_stable_maec_paths() -> None:
     assert not any(".observable_objects." in path for path in maec_paths)
 
 
+def test_detonation_actions_publish_stable_legacy_datapaths() -> None:
+    app = create_wildfire_connector_app()
+
+    for identifier, expected_paths in LEGACY_COMPATIBILITY_PATHS.items():
+        action = app.actions_manager.get_action(identifier).meta.model_dump()
+        actual_paths = {field["data_path"] for field in action["output"]}
+
+        assert expected_paths <= actual_paths
+
+    detonate_file_paths = {
+        field["data_path"]
+        for field in app.actions_manager.get_action("detonate_file").meta.model_dump()[
+            "output"
+        ]
+    }
+    detonate_url_paths = {
+        field["data_path"]
+        for field in app.actions_manager.get_action("detonate_url").meta.model_dump()[
+            "output"
+        ]
+    }
+    assert not any(".upload_file_info." in path for path in detonate_file_paths)
+    assert not any(".submit_link_info." in path for path in detonate_url_paths)
+
+
 def test_get_file_preserves_legacy_table_contract() -> None:
     app = create_wildfire_connector_app()
     action = app.actions_manager.get_action("get_sample").meta.model_dump()
@@ -197,3 +356,11 @@ def test_url_reputation_preserves_legacy_table_contract() -> None:
         field["column_name"] for field in action["output"] if "column_name" in field
     }
     assert columns == {"Verdict Code", "Message"}
+
+
+def test_url_reputation_describes_direct_url_lookup() -> None:
+    app = create_wildfire_connector_app()
+    action = app.actions_manager.get_action("get_url_reputation").meta.model_dump()
+
+    assert "queried directly" in action["verbose"]
+    assert "returns a hash" not in action["verbose"]

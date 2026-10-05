@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 import xmltodict
@@ -25,6 +26,53 @@ WILDFIRE_HTTP_TIMEOUT = httpx.Timeout(
     write=60.0,
     pool=10.0,
 )
+VERDICT_MESSAGES = {
+    0: "benign",
+    1: "malware",
+    2: "grayware",
+    4: "phishing",
+    -100: "pending, the sample exists, but there is currently no verdict",
+    -101: "error",
+    -102: "unknown, cannot find sample record in the WildFire database",
+    -103: "invalid hash value",
+}
+FILE_UPLOAD_ERRORS = {
+    401: "API key invalid",
+    405: "HTTP method Not Allowed",
+    413: "Sample file size over max limit",
+    418: "Sample file type is not supported",
+    419: "Max number of uploads per day exceeded",
+    422: "URL download error",
+    500: "Internal error",
+    513: "File upload failed",
+}
+GET_REPORT_ERRORS = {
+    401: "API key invalid",
+    404: "The report was not found",
+    405: "HTTP method Not Allowed",
+    419: "Request report quota exceeded",
+    420: "Insufficient arguments",
+    421: "Invalid arguments",
+    500: "Internal error",
+}
+
+
+def is_valid_http_url(value: str) -> bool:
+    """Validate a user-supplied HTTP(S) URL without changing its value."""
+    if any(character.isspace() or ord(character) < 32 for character in value):
+        return False
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+    except ValueError:
+        return False
+    del port
+    return (
+        parsed.scheme in {"http", "https"}
+        and parsed.hostname is not None
+        and parsed.username is None
+        and parsed.password is None
+    )
 
 
 def parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
@@ -51,6 +99,9 @@ def _normalize_children_into_lists(value: object) -> dict[str, list[Any]]:
 
 def normalize_wildfire_report(report: dict[str, Any]) -> None:
     """Normalize existing XML collections declared as lists by output contracts."""
+    report["process"] = _normalize_children_into_lists(
+        report.get("process_created", {})
+    )
     for key in ("network", "timeline", "summary", "process_list", "registry", "file"):
         if isinstance(report.get(key), dict):
             report[key] = _normalize_children_into_lists(report[key])

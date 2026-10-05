@@ -18,7 +18,7 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
-from src.actions.detonate_url import _is_valid_http_url
+from src.utils import is_valid_http_url
 
 
 @pytest.mark.parametrize(
@@ -30,7 +30,7 @@ from src.actions.detonate_url import _is_valid_http_url
     ],
 )
 def test_http_url_validation_accepts_wildfire_urls(url: str) -> None:
-    assert _is_valid_http_url(url)
+    assert is_valid_http_url(url)
 
 
 @pytest.mark.parametrize(
@@ -45,7 +45,7 @@ def test_http_url_validation_accepts_wildfire_urls(url: str) -> None:
     ],
 )
 def test_http_url_validation_rejects_malformed_urls(url: str) -> None:
-    assert not _is_valid_http_url(url)
+    assert not is_valid_http_url(url)
 
 
 @pytest.mark.live

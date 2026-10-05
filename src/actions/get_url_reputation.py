@@ -19,29 +19,15 @@ from soar_sdk.logging import getLogger
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
+from ..utils import (
+    FILE_UPLOAD_ERRORS,
+    VERDICT_MESSAGES,
+    WILDFIRE_HTTP_TIMEOUT,
+    is_valid_http_url,
+    parse_wildfire_xml,
+)
 
 logger = getLogger()
-VERDICT_MESSAGES = {
-    0: "benign",
-    1: "malware",
-    2: "grayware",
-    4: "phishing",
-    -100: "pending, the sample exists, but there is currently no verdict",
-    -101: "error",
-    -102: "unknown, cannot find sample record in the WildFire database",
-    -103: "invalid hash value",
-}
-FILE_UPLOAD_ERRORS = {
-    401: "API key invalid",
-    405: "HTTP method Not Allowed",
-    413: "Sample file size over max limit",
-    418: "Sample file type is not supported",
-    419: "Max number of uploads per day exceeded",
-    422: "URL download error",
-    500: "Internal error",
-    513: "File upload failed",
-}
 
 
 class UrlReputationParams(Params):
@@ -109,6 +95,8 @@ def get_url_reputation(
     params: UrlReputationParams, soar: SOARClient, asset: Asset
 ) -> UrlReputationTableOutput:
     """Retrieve the WildFire verdict for a URL."""
+    if not is_valid_http_url(params.url):
+        raise ActionFailure("Please provide a valid URL")
     logger.progress("Getting verdict for: %s", params.url)
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"

@@ -11,30 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import httpx
-
 from src.actions.detonate_file import (
     FILE_UPLOAD_ERRORS as DETONATE_FILE_UPLOAD_ERRORS,
 )
 from src.actions.detonate_file import (
     GET_REPORT_ERRORS as DETONATE_FILE_REPORT_ERRORS,
 )
-from src.actions.detonate_file import (
-    _file_upload_error_detail as detonate_file_upload_error_detail,
-)
-from src.actions.detonate_file import (
-    _report_error_detail as detonate_file_report_error_detail,
-)
 from src.actions.detonate_url import (
     FILE_UPLOAD_ERRORS as DETONATE_URL_UPLOAD_ERRORS,
 )
 from src.actions.detonate_url import GET_REPORT_ERRORS as DETONATE_URL_REPORT_ERRORS
-from src.actions.detonate_url import (
-    _file_upload_error_detail as detonate_url_upload_error_detail,
+from src.actions.detonate_url import VERDICT_MESSAGES as DETONATE_URL_VERDICTS
+from src.actions.get_report import GET_REPORT_ERRORS as GET_REPORT_ERRORS_USED
+from src.actions.get_report import VERDICT_MESSAGES as GET_REPORT_VERDICTS
+from src.actions.get_url_reputation import (
+    FILE_UPLOAD_ERRORS as URL_REPUTATION_UPLOAD_ERRORS,
 )
-from src.actions.detonate_url import (
-    _report_error_detail as detonate_url_report_error_detail,
-)
+from src.actions.get_url_reputation import VERDICT_MESSAGES as URL_REPUTATION_VERDICTS
+from src.test_connectivity import FILE_UPLOAD_ERRORS as CONNECTIVITY_UPLOAD_ERRORS
+from src.utils import FILE_UPLOAD_ERRORS, GET_REPORT_ERRORS, VERDICT_MESSAGES
 
 
 LEGACY_FILE_UPLOAD_ERRORS = {
@@ -65,28 +60,14 @@ def test_detonation_actions_preserve_legacy_error_maps() -> None:
     assert DETONATE_URL_REPORT_ERRORS == LEGACY_GET_REPORT_ERRORS
 
 
-def test_detonation_actions_use_legacy_empty_body_fallbacks() -> None:
-    upload_response = httpx.Response(418)
-    report_response = httpx.Response(404)
-
-    assert detonate_file_upload_error_detail(upload_response) == (
-        "Sample file type is not supported"
-    )
-    assert detonate_url_upload_error_detail(upload_response) == (
-        "Sample file type is not supported"
-    )
-    assert detonate_file_report_error_detail(report_response) == (
-        "The report was not found"
-    )
-    assert detonate_url_report_error_detail(report_response) == (
-        "The report was not found"
-    )
-
-
-def test_detonation_actions_prefer_vendor_error_details() -> None:
-    response = httpx.Response(500, text="vendor detail")
-
-    assert detonate_file_upload_error_detail(response) == "vendor detail"
-    assert detonate_file_report_error_detail(response) == "vendor detail"
-    assert detonate_url_upload_error_detail(response) == "vendor detail"
-    assert detonate_url_report_error_detail(response) == "vendor detail"
+def test_actions_share_error_and_verdict_mappings() -> None:
+    assert DETONATE_FILE_UPLOAD_ERRORS is FILE_UPLOAD_ERRORS
+    assert DETONATE_URL_UPLOAD_ERRORS is FILE_UPLOAD_ERRORS
+    assert URL_REPUTATION_UPLOAD_ERRORS is FILE_UPLOAD_ERRORS
+    assert CONNECTIVITY_UPLOAD_ERRORS is FILE_UPLOAD_ERRORS
+    assert DETONATE_FILE_REPORT_ERRORS is GET_REPORT_ERRORS
+    assert DETONATE_URL_REPORT_ERRORS is GET_REPORT_ERRORS
+    assert GET_REPORT_ERRORS_USED is GET_REPORT_ERRORS
+    assert DETONATE_URL_VERDICTS is VERDICT_MESSAGES
+    assert GET_REPORT_VERDICTS is VERDICT_MESSAGES
+    assert URL_REPUTATION_VERDICTS is VERDICT_MESSAGES

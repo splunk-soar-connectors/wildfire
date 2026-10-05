@@ -232,13 +232,52 @@ action_result.data.\*.task_info.report.\*.syscall.file.\*.@path | string | | /li
 action_result.data.\*.task_info.report.\*.task | string | | |
 action_result.data.\*.task_info.report.\*.timeline.entry.\*.@seq | string | | |
 action_result.data.\*.task_info.report.\*.version | string | | |
-action_result.data.\*.upload_file_info.filename | string | | Test |
-action_result.data.\*.upload_file_info.filetype | string | | Adobe PDF document |
-action_result.data.\*.upload_file_info.md5 | string | | 735539f0d18befd6dd13aadd95038c39 |
-action_result.data.\*.upload_file_info.sha256 | string | | 79bc86e0e4134a0883655deadda46ce1a8d8e6e98faf8eab17f14d47b8dfbcc2 |
-action_result.data.\*.upload_file_info.size | string | | 77756 |
-action_result.data.\*.upload_file_info.url | string | | |
+action_result.data.\*.upload-file-info.filename | string | | Test |
+action_result.data.\*.upload-file-info.filetype | string | | Adobe PDF document |
+action_result.data.\*.upload-file-info.md5 | string | | 735539f0d18befd6dd13aadd95038c39 |
+action_result.data.\*.upload-file-info.sha256 | string | | 79bc86e0e4134a0883655deadda46ce1a8d8e6e98faf8eab17f14d47b8dfbcc2 |
+action_result.data.\*.upload-file-info.size | string | | 77756 |
+action_result.data.\*.upload-file-info.url | string | | |
 action_result.data.\*.version | string | | |
+action_result.data.\*.file_info.file_signer | string | | None |
+action_result.data.\*.file_info.filetype | string | | |
+action_result.data.\*.file_info.malware | string | | |
+action_result.data.\*.file_info.md5 | string | `md5` `hash` | |
+action_result.data.\*.file_info.sha1 | string | `sha1` `hash` | |
+action_result.data.\*.file_info.sha256 | string | `sha256` `hash` | |
+action_result.data.\*.file_info.size | string | | |
+action_result.data.\*.task_info.report.\*.elf_info.suspicious.entry.\*.@behavior | string | | elf_sa_matched_ssdeep |
+action_result.data.\*.task_info.report.\*.elf_info.suspicious.entry.\*.@behavior_id | string | | 7094 |
+action_result.data.\*.task_info.report.\*.elf_info.suspicious.entry.\*.@description | string | | Sample was identified to a known malware family via fuzzy hash |
+action_result.data.\*.task_info.report.\*.elf_info.suspicious.entry.\*.@family | string | | unknown |
+action_result.data.\*.task_info.report.\*.elf_info.suspicious.entry.\*.@matched_ioc_hash | string | | |
+action_result.data.\*.task_info.report.\*.evidence | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@behavior_id | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@md5 | string | `md5` `hash` | |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.@behavior_id | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.@md5 | string | `md5` `hash` | |
+action_result.data.\*.task_info.report.\*.extracted_urls.entry.\*.@url | string | | accounts.google.com/signoutoptions?hl=en-gb&continue=https://www.google.com%3fhl%3den-gb |
+action_result.data.\*.task_info.report.\*.extracted_urls.entry.\*.@verdict | string | | unknown |
+action_result.data.\*.task_info.report.\*.extracted_urls.entry.@url | string | | www.virustotal.com/#/file/0d6c7e4e3c3e22b50283248ed6e9663743720e998a5bfafcaef0b819cc7c8fcf/detection |
+action_result.data.\*.task_info.report.\*.extracted_urls.entry.@verdict | string | | unknown |
+action_result.data.\*.task_info.report.\*.file.file_deleted.\*.@deleted_file | string | | |
+action_result.data.\*.task_info.report.\*.file.file_written.\*.@written_file | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.@command | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@md5 | string | `md5` `hash` | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@name | string | `file path` | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@size | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@type | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.java_api | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.mutex.createmutex.\*.@name | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@data | string | | |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@name | string | | sample |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@text | string | | %HOME/Downloads/sample |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@behavior | string | | elf_sa_em_x86_64 |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@details | string | | |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@id | string | | |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@score | string | | |
 action_result.summary.malware | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
@@ -326,9 +365,9 @@ action_result.data.\*.result.report.maec_packages.\*.maec_objects.\*.type | stri
 action_result.data.\*.result.report.maec_packages.\*.schema_version | string | | 5.0 |
 action_result.data.\*.result.report.maec_packages.\*.type | string | | package |
 action_result.data.\*.result.url_type | string | | original |
-action_result.data.\*.submit_link_info.md5 | string | `md5` | ad01ab9b2bcd7f5c859521dbcd680774 |
-action_result.data.\*.submit_link_info.sha256 | string | `sha256` | 14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f |
-action_result.data.\*.submit_link_info.url | string | `url` | https://www.paloaltonetworks.com |
+action_result.data.\*.submit-link-info.md5 | string | `md5` | ad01ab9b2bcd7f5c859521dbcd680774 |
+action_result.data.\*.submit-link-info.sha256 | string | `sha256` | 14a74b84361079e3c7c927629520d45e836de7b34f23efdcfef4294d010bc03f |
+action_result.data.\*.submit-link-info.url | string | `url` | https://www.paloaltonetworks.com |
 action_result.data.\*.success | boolean | | True False |
 action_result.data.\*.task_info.report.\*.evidence.file.create.\*.@key | string | | HKEY_LOCAL_MACHINE |
 action_result.data.\*.task_info.report.\*.evidence.file.create.\*.@subkey | string | | SOFTWARE\\5da059a482fd494db3f252126fbc3d5b |
@@ -369,6 +408,44 @@ action_result.data.\*.task_info.report.\*.timeline.entry.\*.#text | string | `fi
 action_result.data.\*.task_info.report.\*.timeline.entry.\*.@seq | string | | 1 |
 action_result.data.\*.task_info.report.\*.version | string | | 3.0 |
 action_result.data.\*.version | string | | 2.0 |
+action_result.data.\*.result.report.da_packages | string | | package--37192805-9038-40ee-e0ee-2eb1c05cd94d |
+action_result.data.\*.result.report.detection_reasons.\*.artifacts.\*.object_id | string | | 1 |
+action_result.data.\*.result.report.detection_reasons.\*.artifacts.\*.package | string | | package--c5e1f03a-f162-4792-ced8-102cd8f6d80a |
+action_result.data.\*.result.report.detection_reasons.\*.artifacts.\*.type | string | | artifact-ref |
+action_result.data.\*.result.report.detection_reasons.\*.description | string | | Previously identified as malicious |
+action_result.data.\*.result.report.detection_reasons.\*.name | string | | known_as_malicious_by_historical_reasons |
+action_result.data.\*.result.report.detection_reasons.\*.type | string | | detection-reason |
+action_result.data.\*.result.report.detection_reasons.\*.verdict | string | | malware |
+action_result.data.\*.result.report.sa_package | string | | package--c5e1f03a-f162-4792-ced8-102cd8f6d80a |
+action_result.data.\*.result.report.schema_version | string | | 1.0 |
+action_result.data.\*.result.report.type | string | | wf-report |
+action_result.data.\*.result.report.verdict | string | | malware |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.#text | string | `file path` `file name` | C:\\Documents and Settings\\<USER>\\Local Settings\\Temp\\is-DNEQE.tmp\\\_isetup\\\_shfoldr.dll |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@behavior_id | string | | 35 |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@md5 | string | `md5` | 92dc6ef532fbb4a5c3201469a5b5eb63 |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@sha1 | string | `sha1` | 3e89ff837147c16b4e41c30d6c796374e0b8e62c |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@sha256 | string | `sha256` | 9884e9d1b4f8a873ccbd81f8ad0ae257776d2348d027d811a56475e028360d87 |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.@command | string | `file path` `file name` | "C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp" /SL5="$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe" |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@md5 | string | `md5` | 92dc6ef532fbb4a5c3201469a5b5eb63 |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@name | string | `file path` `file name` | C:\\Documents and Settings\\Administrator\\Local Settings\\Temp\\is-DNEQE.tmp\\\_isetup\\\_shfoldr.dll |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@sha1 | string | `sha1` | 3e89ff837147c16b4e41c30d6c796374e0b8e62c |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@sha256 | string | `sha256` | 9884e9d1b4f8a873ccbd81f8ad0ae257776d2348d027d811a56475e028360d87 |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@size | string | | 23312 |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@type | string | | dll |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.java_api | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.mutex.createmutex.\*.@name | string | | Local\\RstrMgr3887CAB8-533F-4C85-B0DC-3E5639F8D511 |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity.Create.@child_pid | string | | 140 |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity.Create.@child_process_image | string | | "C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp" /SL5="$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe" |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity.Create.@command | string | | "C:\\DOCUME~1\\ADMINI~1\\LOCALS~1\\Temp\\is-PCLT8.tmp\\sample.tmp" /SL5="$A00B4 541248 56832 c:\\documents and settings\\administrator\\sample.exe" |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.create.\*.@key | string | | HKEY_LOCAL_MACHINE |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.create.\*.@subkey | string | | SOFTWARE\\5da059a482fd494db3f252126fbc3d5b |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@data | string | `file path` `md5` | 1? |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@key | string | | \\REGISTRY\\MACHINE\\SOFTWARE\\5da059a482fd494db3f252126fbc3egs |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@subkey | string | | FX |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@details | string | | Entropy is a measurement of the randomness in data. Overlays with high entropy indicate encoded or encrypted data. |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@id | string | | 3030 |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@score | string | | 0.0 |
 action_result.summary.verdict_code | numeric | | 1 -102 |
 action_result.summary.verdict | string | | malware unknown, cannot find sample record in the WildFire database |
 action_result.summary.summary_available | boolean | | True False |
@@ -382,7 +459,7 @@ Submit a single website link for WildFire verdict
 Type: **investigate** <br>
 Read only: **True**
 
-The URL submitted returns a hash, which is then queried in the WildFire database.<br><br>The hash will be queried on the WildFire database, returning one of the following:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If not, then a verdict cannot be concluded and one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find sample record in database</li><li>-103: invalid hash value</li></ul>.
+The submitted URL is queried directly in the WildFire database, returning one of the following verdicts:<br><ul><li>0: benign</li><li>1: malware</li><li>2: grayware</li><li>4: phishing</li></ul>If a verdict cannot be concluded, one of the following will be returned:<ul><li>-100: pending, the sample exists, but there is currently no verdict</li><li>-101: error</li><li>-102: unknown, cannot find the URL in the WildFire database</li><li>-103: invalid URL value</li></ul>.
 
 #### Action Parameters
 
@@ -543,6 +620,39 @@ action_result.data.\*.task_info.report.\*.summary.entry.\*.@seq | string | | |
 action_result.data.\*.task_info.report.\*.task | string | | |
 action_result.data.\*.task_info.report.\*.timeline.entry.\*.@seq | string | | |
 action_result.data.\*.version | string | | |
+action_result.data.\*.file_info.file_signer | string | | None |
+action_result.data.\*.file_info.filetype | string | | |
+action_result.data.\*.file_info.malware | string | | |
+action_result.data.\*.file_info.md5 | string | `md5` `hash` | |
+action_result.data.\*.file_info.sha1 | string | `sha1` `hash` | |
+action_result.data.\*.file_info.sha256 | string | `sha256` `hash` | |
+action_result.data.\*.file_info.size | string | | |
+action_result.data.\*.task_info.report.\*.@md5 | string | `md5` `hash` | |
+action_result.data.\*.task_info.report.\*.@sha256 | string | `sha256` `hash` | |
+action_result.data.\*.task_info.report.\*.evidence | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.\*.@behavior_id | string | | |
+action_result.data.\*.task_info.report.\*.evidence.file.entry.@behavior_id | string | | |
+action_result.data.\*.task_info.report.\*.extracted_urls.entry.\*.@url | string | | www.google.com.hk/imghp?hl=en&tab=ri&authuser=0&ogbl |
+action_result.data.\*.task_info.report.\*.extracted_urls.entry.\*.@verdict | string | | unknown |
+action_result.data.\*.task_info.report.\*.file.file_deleted.\*.@deleted_file | string | | |
+action_result.data.\*.task_info.report.\*.file.file_written.\*.@written_file | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.@command | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@md5 | string | `md5` `hash` | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@name | string | `file path` | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@sha1 | string | `sha1` `hash` | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@sha256 | string | `sha256` `hash` | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@size | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.file.create.\*.@type | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.java_api | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.mutex.createmutex.\*.@name | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity | string | | |
+action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@data | string | | |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@name | string | | sample |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@text | string | | %HOME/Downloads/sample |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@details | string | | |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@id | string | | |
+action_result.data.\*.task_info.report.\*.summary.entry.\*.@score | string | | |
 action_result.summary.verdict_code | numeric | | |
 action_result.summary.verdict | string | | |
 action_result.summary.summary_available | boolean | | True False |
