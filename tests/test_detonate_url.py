@@ -27,6 +27,8 @@ from src.utils import is_valid_http_url
         "http://example.com",
         "https://example.com/path?query=value#fragment",
         "https://192.0.2.1:8443/path",
+        "https://[aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa]",
+        "https://aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa",
     ],
 )
 def test_http_url_validation_accepts_wildfire_urls(url: str) -> None:
@@ -42,6 +44,7 @@ def test_http_url_validation_accepts_wildfire_urls(url: str) -> None:
         "https://example.com/path with spaces",
         "https://example.com/\ncontrol",
         "https://example.com:invalid-port",
+        "https://aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:gggg",
     ],
 )
 def test_http_url_validation_rejects_malformed_urls(url: str) -> None:

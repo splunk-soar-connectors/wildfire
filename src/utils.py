@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from ipaddress import IPv6Address
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -63,16 +64,23 @@ def is_valid_http_url(value: str) -> bool:
         return False
     try:
         parsed = urlsplit(value)
-        port = parsed.port
     except ValueError:
         return False
-    del port
-    return (
-        parsed.scheme in {"http", "https"}
-        and parsed.hostname is not None
-        and parsed.username is None
-        and parsed.password is None
-    )
+    if (
+        parsed.scheme not in {"http", "https"}
+        or parsed.hostname is None
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        return False
+    try:
+        _ = parsed.port
+    except ValueError:
+        try:
+            IPv6Address(parsed.netloc)
+        except ValueError:
+            return False
+    return True
 
 
 def parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
