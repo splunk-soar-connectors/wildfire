@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from soar_sdk.app import App
 from soar_sdk.input_spec import EnvironmentVariable
@@ -48,6 +50,29 @@ STABLE_DETONATE_URL_MAEC_PATHS = {
     "action_result.data.*.result.report.maec_packages.*.type",
 }
 
+SDK_NATIVE_UNREPRESENTABLE_PATHS = {
+    "detonate_file": {
+        "action_result.data.*.task_info.report.*.evidence",
+        "action_result.data.*.task_info.report.*.evidence.file",
+        "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+        "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
+        "action_result.data.*.task_info.report.*.extracted_urls.entry.@url",
+        "action_result.data.*.task_info.report.*.extracted_urls.entry.@verdict",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@name",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@text",
+    },
+    "detonate_url": {
+        "action_result.data.*.task_info.report.*.process_list.process.*.process_activity",
+    },
+    "get_report": {
+        "action_result.data.*.task_info.report.*.evidence",
+        "action_result.data.*.task_info.report.*.evidence.file",
+        "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@name",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@text",
+    },
+}
+
 LEGACY_COMPATIBILITY_PATHS = {
     "detonate_file": set(
         """\
@@ -63,16 +88,10 @@ action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@behavior_id
 action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@description
 action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@family
 action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@matched_ioc_hash
-action_result.data.*.task_info.report.*.evidence
-action_result.data.*.task_info.report.*.evidence.file
 action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id
 action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5
-action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id
-action_result.data.*.task_info.report.*.evidence.file.entry.@md5
 action_result.data.*.task_info.report.*.extracted_urls.entry.*.@url
 action_result.data.*.task_info.report.*.extracted_urls.entry.*.@verdict
-action_result.data.*.task_info.report.*.extracted_urls.entry.@url
-action_result.data.*.task_info.report.*.extracted_urls.entry.@verdict
 action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file
 action_result.data.*.task_info.report.*.file.file_written.*.@written_file
 action_result.data.*.task_info.report.*.process_list.process.*.@command
@@ -84,8 +103,8 @@ action_result.data.*.task_info.report.*.process_list.process.*.java_api
 action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity
 action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
-action_result.data.*.task_info.report.*.process_tree.*.process.*.@name
-action_result.data.*.task_info.report.*.process_tree.*.process.*.@text
+action_result.data.*.task_info.report.*.process_tree.*.process.@name
+action_result.data.*.task_info.report.*.process_tree.*.process.@text
 action_result.data.*.task_info.report.*.summary.entry.*.@behavior
 action_result.data.*.task_info.report.*.summary.entry.*.@details
 action_result.data.*.task_info.report.*.summary.entry.*.@id
@@ -129,7 +148,6 @@ action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@si
 action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type
 action_result.data.*.task_info.report.*.process_list.process.*.java_api
 action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
-action_result.data.*.task_info.report.*.process_list.process.*.process_activity
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_pid
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_process_image
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@command
@@ -154,10 +172,7 @@ action_result.data.*.file_info.sha256
 action_result.data.*.file_info.size
 action_result.data.*.task_info.report.*.@md5
 action_result.data.*.task_info.report.*.@sha256
-action_result.data.*.task_info.report.*.evidence
-action_result.data.*.task_info.report.*.evidence.file
 action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id
-action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id
 action_result.data.*.task_info.report.*.extracted_urls.entry.*.@url
 action_result.data.*.task_info.report.*.extracted_urls.entry.*.@verdict
 action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file
@@ -173,8 +188,8 @@ action_result.data.*.task_info.report.*.process_list.process.*.java_api
 action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity
 action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
-action_result.data.*.task_info.report.*.process_tree.*.process.*.@name
-action_result.data.*.task_info.report.*.process_tree.*.process.*.@text
+action_result.data.*.task_info.report.*.process_tree.*.process.@name
+action_result.data.*.task_info.report.*.process_tree.*.process.@text
 action_result.data.*.task_info.report.*.summary.entry.*.@details
 action_result.data.*.task_info.report.*.summary.entry.*.@id
 action_result.data.*.task_info.report.*.summary.entry.*.@score
@@ -242,7 +257,7 @@ def test_all_actions_preserve_legacy_read_only_metadata() -> None:
         assert action.read_only is True, action.identifier
 
 
-def test_detonation_actions_publish_runtime_summary_contracts() -> None:
+def test_detonation_actions_publish_summary_contracts() -> None:
     app = create_wildfire_connector_app()
 
     expected_summary_paths = {
@@ -251,6 +266,15 @@ def test_detonation_actions_publish_runtime_summary_contracts() -> None:
             "action_result.summary.verdict_code",
             "action_result.summary.verdict",
             "action_result.summary.summary_available",
+            "action_result.summary.md5",
+            "action_result.summary.sha256",
+            "action_result.summary.task_id",
+        },
+        "get_report": {
+            "action_result.summary.verdict_code",
+            "action_result.summary.verdict",
+            "action_result.summary.summary_available",
+            "action_result.summary.malware",
         },
     }
     for identifier, expected_paths in expected_summary_paths.items():
@@ -261,6 +285,33 @@ def test_detonation_actions_publish_runtime_summary_contracts() -> None:
             if field["data_path"].startswith("action_result.summary.")
         }
         assert actual_paths == expected_paths
+
+
+def test_sdk_output_contract_preserves_stable_legacy_paths_and_metadata() -> None:
+    fixture_path = (
+        Path(__file__).parent / "fixtures" / "legacy_stable_output_contract.json"
+    )
+    fixture = json.loads(fixture_path.read_text())
+    app = create_wildfire_connector_app()
+
+    for identifier, legacy_fields in fixture["actions"].items():
+        action = app.actions_manager.get_action(identifier).meta.model_dump()
+        sdk_fields = {field["data_path"]: field for field in action["output"]}
+
+        for legacy_field in legacy_fields:
+            if (
+                legacy_field["data_path"]
+                in SDK_NATIVE_UNREPRESENTABLE_PATHS[identifier]
+            ):
+                continue
+            sdk_field = sdk_fields.get(legacy_field["data_path"])
+            assert sdk_field is not None, legacy_field["data_path"]
+            assert sdk_field["data_type"] == legacy_field["data_type"]
+            assert set(legacy_field.get("contains", ())) <= set(
+                sdk_field.get("contains", ())
+            )
+
+        assert SDK_NATIVE_UNREPRESENTABLE_PATHS[identifier].isdisjoint(sdk_fields)
 
 
 def test_detonate_url_publishes_only_stable_maec_paths() -> None:
@@ -275,6 +326,10 @@ def test_detonate_url_publishes_only_stable_maec_paths() -> None:
 
     assert maec_paths == STABLE_DETONATE_URL_MAEC_PATHS
     assert not any(".observable_objects." in path for path in maec_paths)
+    assert not any(
+        ".primary_malware_instances." in field["data_path"]
+        for field in action["output"]
+    )
 
 
 def test_detonation_actions_publish_stable_legacy_datapaths() -> None:

@@ -16,14 +16,14 @@ from soar_sdk.meta.actions import ActionLock
 
 from .detonate_file import (
     DetonateFileSummary,
+    detonate_file as run_detonate_file,
     display_detonate_file_report,
 )
-from .detonate_file_contract import detonate_file_with_contract
 from .detonate_url import (
     DetonateUrlSummary,
+    detonate_url as run_detonate_url,
     display_detonate_url_report,
 )
-from .detonate_url_contract import detonate_url_with_contract
 from .get_url_reputation import (
     UrlReputationSummary,
     get_url_reputation,
@@ -31,8 +31,8 @@ from .get_url_reputation import (
 from .get_report import (
     GetReportSummary,
     display_get_report,
+    get_report as run_get_report,
 )
-from .get_report_contract import get_report_with_contract
 from .get_sample import GetFileSummary, get_sample
 from .get_pcap import GetPcapSummary, get_pcap
 from .save_report import SaveReportSummary, save_report
@@ -41,7 +41,7 @@ from .save_report import SaveReportSummary, save_report
 def register_actions(app: App) -> App:
     """Register all WildFire actions on the provided app."""
     app.register_action(
-        action=detonate_file_with_contract,
+        action=run_detonate_file,
         name="detonate file",
         identifier="detonate_file",
         description="Run the file in the WildFire sandbox and retrieve the analysis results",
@@ -53,7 +53,7 @@ def register_actions(app: App) -> App:
         summary_type=DetonateFileSummary,
     )
     app.register_action(
-        action=detonate_url_with_contract,
+        action=run_detonate_url,
         name="detonate url",
         identifier="detonate_url",
         description="Submit a single website link for WildFire analysis",
@@ -75,7 +75,7 @@ def register_actions(app: App) -> App:
         summary_type=UrlReputationSummary,
     )
     app.register_action(
-        action=get_report_with_contract,
+        action=run_get_report,
         name="get report",
         identifier="get_report",
         description="Query for results of an already completed detonation in WildFire",

@@ -13,7 +13,7 @@
 # limitations under the License.
 from soar_sdk.abstract import SOARClient
 import httpx
-from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -111,18 +111,13 @@ def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFile
         contains=[file_type] if file_type else [],
     )
 
-    result = ActionResult(
-        True,
-        f"Vault id: {vault_id}, Name: {name}, File type: {file_type}",
-        params.model_dump(),
+    soar.set_message(f"Vault id: {vault_id}, Name: {name}, File type: {file_type}")
+    soar.set_summary(
+        GetFileSummary(
+            name=name,
+            hash=params.hash,
+            file_type=file_type,
+            vault_id=vault_id,
+        )
     )
-    result.add_data({"name": name, "vault_id": vault_id})
-    result.set_summary(
-        {
-            "name": name,
-            "hash": params.hash,
-            "file_type": file_type,
-            "vault_id": vault_id,
-        }
-    )
-    return result  # type: ignore[return-value]
+    return GetFileOutput(name=name, vault_id=vault_id)

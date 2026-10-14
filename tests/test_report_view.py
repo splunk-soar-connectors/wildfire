@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import importlib
+import re
 from pathlib import Path
 from typing import Any
 
+import pytest
 from soar_sdk.action_results import ActionOutput, ActionResult
 from soar_sdk.models.view import ViewContext
 from soar_sdk.views.template_renderer import get_template_renderer
@@ -286,7 +288,51 @@ def test_url_report_context_renders_legacy_information() -> None:
     assert "URLtype" in html
     assert "original" in html
     assert "Analysis Time" in html
-    assert "Clean" in html
+    assert "benign" in html
+
+
+@pytest.mark.parametrize("mode", ["file", "url", "url_file"])
+@pytest.mark.parametrize(
+    ("verdict_data", "expected"),
+    [
+        ({"verdict": "benign"}, "benign"),
+        ({"verdict": "malware"}, "malware"),
+        ({"verdict": "grayware", "malware": "no"}, "grayware"),
+        ({"verdict": "phishing", "malware": "yes"}, "phishing"),
+        ({"verdict": "new vendor verdict", "malware": "no"}, "new vendor verdict"),
+        ({"malware": "yes"}, "Malware"),
+        ({"malware": "no"}, "Clean"),
+        ({"malware": "unexpected"}, "Unknown"),
+        ({"verdict": ""}, "Unknown"),
+        ({"verdict": None, "malware": None}, "Unknown"),
+        ({}, "Unknown"),
+        (
+            {"verdict": "<script>alert(1)</script>"},
+            "&lt;script&gt;alert(1)&lt;/script&gt;",
+        ),
+    ],
+)
+def test_verdict_labels_preserve_vendor_classification(
+    mode: str, verdict_data: dict[str, Any], expected: str
+) -> None:
+    report = {"sha256": "sample-sha256", **verdict_data}
+    if mode == "url":
+        output = UrlReportOutput(result={"report": report})
+    else:
+        output = FileReportOutput(
+            file_info={"sha256": "sample-sha256", **verdict_data},
+            task_info={"report": report},
+        )
+
+    context = build_report_context(_view_context(), [output], is_url=mode != "file")
+    renderer = get_template_renderer(
+        "jinja", str(Path(__file__).parents[1] / "templates")
+    )
+    html = renderer.render_template("wildfire_display_report.html", context)
+    labels = re.findall(r"<th>Verdict</th>\s*<td>(.*?)</td>", html, re.DOTALL)
+
+    assert len(labels) == 2
+    assert [label.strip() for label in labels] == [expected, expected]
 
 
 def test_url_file_report_context_reads_task_info_report() -> None:

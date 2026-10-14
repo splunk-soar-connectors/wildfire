@@ -13,7 +13,7 @@
 # limitations under the License.
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -193,11 +193,6 @@ def get_pcap(params: GetPcapParams, soar: SOARClient, asset: Asset) -> GetPcapOu
     name = f"{params.hash}.pcap"
     content = _download_pcap(asset, params.hash, platform_id)
     vault_id = add_bytes_to_vault(soar, content, name, contains=["pcap"])
-    result = ActionResult(
-        True,
-        f"Vault id: {vault_id}, Name: {name}, File type: pcap",
-        params.model_dump(),
-    )
-    result.add_data({"name": name, "vault_id": vault_id})
-    result.set_summary({"name": name, "vault_id": vault_id, "file_type": "pcap"})
-    return result  # type: ignore[return-value]
+    soar.set_message(f"Vault id: {vault_id}, Name: {name}, File type: pcap")
+    soar.set_summary(GetPcapSummary(name=name, vault_id=vault_id, file_type="pcap"))
+    return GetPcapOutput(name=name, vault_id=vault_id)

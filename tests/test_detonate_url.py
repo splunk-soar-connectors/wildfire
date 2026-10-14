@@ -18,7 +18,29 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
+from src.actions.detonate_url import _detonation_result_data
 from src.utils import is_valid_http_url
+
+SAMPLE_MD5 = "0123456789abcdef0123456789abcdef"  # pragma: allowlist secret
+SAMPLE_SHA256 = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  # pragma: allowlist secret
+
+
+def test_pending_file_url_detonation_preserves_submission_hashes() -> None:
+    submission_data = {
+        "upload-file-info": {
+            "md5": SAMPLE_MD5,
+            "sha256": SAMPLE_SHA256,
+        }
+    }
+
+    result_data = _detonation_result_data(submission_data, report_data=None)
+
+    assert result_data == submission_data
+    upload_info = result_data["upload-file-info"]
+    assert upload_info["md5"] == SAMPLE_MD5
+    assert upload_info["sha256"] == SAMPLE_SHA256
+    report_data = {"result": {"report": {"verdict": "benign"}}}
+    assert _detonation_result_data(submission_data, report_data) == report_data
 
 
 @pytest.mark.parametrize(

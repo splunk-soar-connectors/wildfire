@@ -15,7 +15,6 @@ import os
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 
-from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
 from soar_sdk.input_spec import EnvironmentVariable, InputSpecification
 
@@ -78,9 +77,9 @@ def create_wildfire_connector_app() -> App:
     )
 
     @app.test_connectivity()
-    def test_connectivity(soar: SOARClient, asset: Asset) -> None:
+    def test_connectivity(asset: Asset) -> None:
         """Upload the bundled test PDF to verify WildFire connectivity."""
-        run_test_connectivity(soar, asset)
+        run_test_connectivity(asset)
 
     return register_actions(app)
 

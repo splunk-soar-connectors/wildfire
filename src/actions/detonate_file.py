@@ -16,7 +16,7 @@ import time
 
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 from soar_sdk.models.view import ViewContext
@@ -47,7 +47,17 @@ class DetonateFileParams(Params):
     )
 
 
-class FileInfoOutput(ActionOutput):
+class CommonFileInfoOutput(ActionOutput):
+    file_signer: str | None = OutputField(example_values=["None"])
+    filetype: str | None = OutputField()
+    malware: str | None = OutputField()
+    md5: str | None = OutputField(cef_types=["md5", "hash"])
+    sha1: str | None = OutputField(cef_types=["sha1", "hash"])
+    sha256: str | None = OutputField(cef_types=["sha256", "hash"])
+    size: str | None = OutputField()
+
+
+class ApkFileInfoOutput(ActionOutput):
     APK_Certificate: str = OutputField(
         example_values=["E579936D9FCA68C394F3AE8C604EBB4C"]
     )
@@ -152,7 +162,41 @@ class EntryOutput(ActionOutput):
     seq: str = OutputField(alias="@seq")
 
 
-class FileOutput(ActionOutput):
+class SummaryEntryOutput(ActionOutput):
+    behavior: str | None = OutputField(
+        alias="@behavior", example_values=["elf_sa_em_x86_64"]
+    )
+    details: str | None = OutputField(alias="@details")
+    id: str | None = OutputField(alias="@id")
+    score: str | None = OutputField(alias="@score")
+
+
+class ExtractedUrlEntryOutput(ActionOutput):
+    url: str | None = OutputField(
+        alias="@url",
+        example_values=[
+            "www.virustotal.com/#/file/0d6c7e4e3c3e22b50283248ed6e9663743720e998a5bfafcaef0b819cc7c8fcf/detection"
+        ],
+    )
+    verdict: str | None = OutputField(alias="@verdict", example_values=["unknown"])
+
+
+class ElfSuspiciousEntryOutput(ActionOutput):
+    behavior: str | None = OutputField(
+        alias="@behavior", example_values=["elf_sa_matched_ssdeep"]
+    )
+    behavior_id: str | None = OutputField(alias="@behavior_id", example_values=["7094"])
+    description: str | None = OutputField(
+        alias="@description",
+        example_values=[
+            "Sample was identified to a known malware family via fuzzy hash"
+        ],
+    )
+    family: str | None = OutputField(alias="@family", example_values=["unknown"])
+    matched_ioc_hash: str | None = OutputField(alias="@matched_ioc_hash")
+
+
+class SyscallFileOutput(ActionOutput):
     action: str = OutputField(example_values=["read"], alias="@action")
     path: str = OutputField(example_values=["/lib64/helper64.so"], alias="@path")
 
@@ -193,7 +237,7 @@ class UrlOutput(ActionOutput):
     user_agent: str = OutputField(alias="@user_agent")
 
 
-class CreateOutput(ActionOutput):
+class ProcessFileCreatedOutput(ActionOutput):
     md5: str = OutputField(cef_types=["md5", "hash"], alias="@md5")
     name: str = OutputField(cef_types=["file path"], alias="@name")
     size: str = OutputField(alias="@size")
@@ -208,9 +252,9 @@ class SetOutput(ActionOutput):
     data: str = OutputField(alias="@data")
 
 
-class ProcessOutput(ActionOutput):
-    name: str = OutputField(cef_types=["process name"], alias="@name")
-    text: str = OutputField(alias="@text")
+class ProcessTreeNodeOutput(ActionOutput):
+    name: str | None = OutputField(cef_types=["process name"], alias="@name")
+    text: str | None = OutputField(alias="@text")
 
 
 class DefinedReceiversOutput(ActionOutput):
@@ -251,18 +295,27 @@ class ApkApiOutput(ActionOutput):
 
 
 class SuspiciousOutput(ActionOutput):
-    entry: list[EntryOutput]
+    entry: list[ElfSuspiciousEntryOutput]
+
+
+class EvidenceEntryOutput(ActionOutput):
+    behavior_id: str | None = OutputField(alias="@behavior_id")
+    md5: str | None = OutputField(alias="@md5", cef_types=["md5", "hash"])
+
+
+class EvidenceFileOutput(ActionOutput):
+    entry: list[EvidenceEntryOutput]
 
 
 class EvidenceOutput(ActionOutput):
-    file: FileOutput
+    file: EvidenceFileOutput
     mutex: str
     process: str
     registry: str
 
 
 class ExtractedUrlsOutput(ActionOutput):
-    entry: EntryOutput
+    entry: list[ExtractedUrlEntryOutput]
 
 
 class SectionsOutput(ActionOutput):
@@ -276,20 +329,35 @@ class NetworkOutput(ActionOutput):
     url: list[UrlOutput]
 
 
-class MutexOutput(ActionOutput):
+class ProcessMutexOutput(ActionOutput):
     createmutex: list[CreatemutexOutput]
 
 
-class RegistryOutput(ActionOutput):
+class ProcessRegistryOutput(ActionOutput):
     set: list[SetOutput]
 
 
+class ProcessFileActivityOutput(ActionOutput):
+    create: list[ProcessFileCreatedOutput]
+
+
+class ProcessRecordOutput(ActionOutput):
+    command: str | None = OutputField(alias="@command")
+    name: str | None = OutputField(cef_types=["process name"], alias="@name")
+    text: str | None = OutputField(alias="@text")
+    file: ProcessFileActivityOutput | None
+    java_api: str | None
+    mutex: ProcessMutexOutput | None
+    process_activity: str | None
+    registry: ProcessRegistryOutput | None
+
+
 class ProcessListOutput(ActionOutput):
-    process: list[ProcessOutput]
+    process: list[ProcessRecordOutput]
 
 
-class ProcessTreeOutput(ActionOutput):
-    process: ProcessOutput
+class ProcessTreeEntryOutput(ActionOutput):
+    process: ProcessTreeNodeOutput
 
 
 class StaticAnalysisOutput(ActionOutput):
@@ -299,11 +367,16 @@ class StaticAnalysisOutput(ActionOutput):
 
 
 class SummaryOutput(ActionOutput):
-    entry: list[EntryOutput]
+    entry: list[SummaryEntryOutput]
 
 
 class SyscallOutput(ActionOutput):
-    file: list[FileOutput]
+    file: list[SyscallFileOutput]
+
+
+class ReportFileActivityOutput(ActionOutput):
+    file_deleted: list[FileDeletedOutput]
+    file_written: list[FileWrittenOutput]
 
 
 class TimelineOutput(ActionOutput):
@@ -354,15 +427,15 @@ class ReportOutput(ActionOutput):
     embedded_urls: str
     evidence: EvidenceOutput
     extracted_urls: ExtractedUrlsOutput
-    file: FileOutput
-    file_info: FileInfoOutput
+    file: ReportFileActivityOutput
+    file_info: ApkFileInfoOutput
     malware: str
     md5: str = OutputField(cef_types=["md5", "hash"])
     metadata: MetadataOutput
     network: NetworkOutput
     platform: str
     process_list: ProcessListOutput
-    process_tree: list[ProcessTreeOutput]
+    process_tree: list[ProcessTreeEntryOutput]
     sha256: str = OutputField(cef_types=["sha256", "hash"])
     size: str
     software: str
@@ -378,10 +451,10 @@ class TaskInfoOutput(ActionOutput):
     report: list[ReportOutput]
 
 
-class DetonateFileOutput(ActionOutput):
-    file_info: FileInfoOutput
+class DetonateFileOutput(PermissiveActionOutput):
+    file_info: CommonFileInfoOutput
     task_info: TaskInfoOutput
-    upload_file_info: Upload_File_InfoOutput
+    upload_file_info: Upload_File_InfoOutput = OutputField(alias="upload-file-info")
     version: str
 
 
@@ -505,7 +578,6 @@ def detonate_file(
     data = normalize_wildfire_report_response({**upload_data, **report_data})
     file_info = report_data.get("file_info")
     malware = file_info.get("malware", "no") if isinstance(file_info, dict) else "no"
-    result = ActionResult(True, f"Malware: {malware}", params.model_dump())
-    result.add_data(data)
-    result.set_summary({"malware": malware})
-    return result  # type: ignore[return-value]
+    soar.set_message(f"Malware: {malware}")
+    soar.set_summary(PermissiveActionOutput(malware=malware))
+    return DetonateFileOutput(**data)

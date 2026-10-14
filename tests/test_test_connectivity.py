@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import hashlib
+import inspect
 import json
 from collections.abc import Callable
 from typing import Any
@@ -19,7 +20,16 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
-from src.test_connectivity import TEST_PDF_PATH
+from src.app import create_wildfire_connector_app
+from src.test_connectivity import TEST_PDF_PATH, run_test_connectivity
+
+
+def test_connectivity_requests_only_asset_injection() -> None:
+    app = create_wildfire_connector_app()
+    callback = app.actions_manager.get_action("test_connectivity")
+
+    assert list(inspect.signature(callback).parameters) == ["asset"]
+    assert list(inspect.signature(run_test_connectivity).parameters) == ["asset"]
 
 
 def test_connectivity_probe_uses_packaged_resource_directory() -> None:

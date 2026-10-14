@@ -16,7 +16,7 @@ import math
 import time
 
 import httpx
-from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 from soar_sdk.models.view import ViewContext
@@ -44,7 +44,17 @@ class GetReportParams(Params):
     )
 
 
-class FileInfoOutput(ActionOutput):
+class CommonFileInfoOutput(ActionOutput):
+    file_signer: str | None = OutputField(example_values=["None"])
+    filetype: str | None = OutputField()
+    malware: str | None = OutputField()
+    md5: str | None = OutputField(cef_types=["md5", "hash"])
+    sha1: str | None = OutputField(cef_types=["sha1", "hash"])
+    sha256: str | None = OutputField(cef_types=["sha256", "hash"])
+    size: str | None = OutputField()
+
+
+class ApkFileInfoOutput(ActionOutput):
     APK_Certificate: str = OutputField(
         example_values=["E579936D9FCA68C394F3AE8C604EBB4C"]
     )
@@ -202,7 +212,7 @@ class UrlOutput(ActionOutput):
     user_agent: str = OutputField(alias="@user_agent")
 
 
-class CreateOutput(ActionOutput):
+class ProcessFileCreatedOutput(ActionOutput):
     md5: str = OutputField(cef_types=["md5", "hash"], alias="@md5")
     name: str = OutputField(cef_types=["file path"], alias="@name")
     sha1: str = OutputField(cef_types=["sha1", "hash"], alias="@sha1")
@@ -219,8 +229,9 @@ class SetOutput(ActionOutput):
     data: str = OutputField(alias="@data")
 
 
-class ProcessOutput(ActionOutput):
-    name: str = OutputField(cef_types=["process name"], alias="@name")
+class ProcessTreeNodeOutput(ActionOutput):
+    name: str | None = OutputField(cef_types=["process name"], alias="@name")
+    text: str | None = OutputField(alias="@text")
 
 
 class StaticAnalysisOutput(ActionOutput):
@@ -244,12 +255,33 @@ class ApkApiOutput(ActionOutput):
     Suspicious_Strings: list[SuspiciousStringsOutput]
 
 
-class FileOutput(ActionOutput):
-    create: list[CreateOutput]
+class ProcessFileActivityOutput(ActionOutput):
+    create: list[ProcessFileCreatedOutput]
+
+
+class ReportFileActivityOutput(ActionOutput):
+    file_deleted: list[FileDeletedOutput]
+    file_written: list[FileWrittenOutput]
+
+
+class EvidenceEntryOutput(ActionOutput):
+    behavior_id: str | None = OutputField(alias="@behavior_id")
+
+
+class EvidenceFileOutput(ActionOutput):
+    entry: list[EvidenceEntryOutput]
+
+
+class ExtractedUrlEntryOutput(ActionOutput):
+    url: str | None = OutputField(
+        alias="@url",
+        example_values=["www.google.com.hk/imghp?hl=en&tab=ri&authuser=0&ogbl"],
+    )
+    verdict: str | None = OutputField(alias="@verdict", example_values=["unknown"])
 
 
 class ExtractedUrlsOutput(ActionOutput):
-    entry: list[EntryOutput]
+    entry: list[ExtractedUrlEntryOutput]
 
 
 class SectionsOutput(ActionOutput):
@@ -263,24 +295,40 @@ class NetworkOutput(ActionOutput):
     url: list[UrlOutput]
 
 
-class MutexOutput(ActionOutput):
+class ProcessMutexOutput(ActionOutput):
     createmutex: list[CreatemutexOutput]
 
 
-class RegistryOutput(ActionOutput):
+class ProcessRegistryOutput(ActionOutput):
     set: list[SetOutput]
 
 
+class ProcessRecordOutput(ActionOutput):
+    command: str | None = OutputField(alias="@command")
+    name: str | None = OutputField(cef_types=["process name"], alias="@name")
+    file: ProcessFileActivityOutput | None
+    java_api: str | None
+    mutex: ProcessMutexOutput | None
+    process_activity: str | None
+    registry: ProcessRegistryOutput | None
+
+
 class ProcessListOutput(ActionOutput):
-    process: list[ProcessOutput]
+    process: list[ProcessRecordOutput]
 
 
-class ProcessTreeOutput(ActionOutput):
-    process: ProcessOutput
+class ProcessTreeEntryOutput(ActionOutput):
+    process: ProcessTreeNodeOutput
+
+
+class SummaryEntryOutput(ActionOutput):
+    details: str | None = OutputField(alias="@details")
+    id: str | None = OutputField(alias="@id")
+    score: str | None = OutputField(alias="@score")
 
 
 class SummaryOutput(ActionOutput):
-    entry: list[EntryOutput]
+    entry: list[SummaryEntryOutput]
 
 
 class TimelineOutput(ActionOutput):
@@ -288,7 +336,7 @@ class TimelineOutput(ActionOutput):
 
 
 class EvidenceOutput(ActionOutput):
-    file: FileOutput
+    file: EvidenceFileOutput
     mutex: str
     process: str
     registry: str
@@ -307,11 +355,15 @@ class ReportOutput(ActionOutput):
     SDK: str = OutputField(alias="@SDK")
     SDK_Status: str = OutputField(alias="@SDK_Status")
     key: str = OutputField(alias="@key")
+    attribute_md5: str | None = OutputField(cef_types=["md5", "hash"], alias="@md5")
     md5: str = OutputField(cef_types=["md5", "hash"])
     pid: str = OutputField(cef_types=["pid"], alias="@pid")
     process_image: str = OutputField(cef_types=["process name"], alias="@process_image")
     reg_key: str = OutputField(alias="@reg_key")
     sha1: str = OutputField(cef_types=["sha1", "hash"], alias="@sha1")
+    attribute_sha256: str | None = OutputField(
+        cef_types=["sha256", "hash"], alias="@sha256"
+    )
     sha256: str = OutputField(cef_types=["sha256", "hash"])
     subkey: str = OutputField(alias="@subkey")
     apk_api: ApkApiOutput
@@ -321,14 +373,14 @@ class ReportOutput(ActionOutput):
     entry: str = OutputField(example_values=["com.panw.panwapktest.MainActivity"])
     evidence: EvidenceOutput
     extracted_urls: ExtractedUrlsOutput
-    file: FileOutput
-    file_info: FileInfoOutput
+    file: ReportFileActivityOutput
+    file_info: ApkFileInfoOutput
     malware: str
     metadata: MetadataOutput
     network: NetworkOutput
     platform: str
     process_list: ProcessListOutput
-    process_tree: list[ProcessTreeOutput]
+    process_tree: list[ProcessTreeEntryOutput]
     size: str
     software: str
     static_analysis: StaticAnalysisOutput
@@ -341,8 +393,8 @@ class TaskInfoOutput(ActionOutput):
     report: list[ReportOutput]
 
 
-class GetReportOutput(ActionOutput):
-    file_info: FileInfoOutput
+class GetReportOutput(PermissiveActionOutput):
+    file_info: CommonFileInfoOutput
     task_info: TaskInfoOutput
     version: str
 
@@ -351,6 +403,7 @@ class GetReportSummary(ActionOutput):
     verdict_code: float
     verdict: str
     summary_available: bool
+    malware: str | None
 
 
 def display_get_report(
@@ -366,7 +419,6 @@ def get_report(
     params: GetReportParams, soar: SOARClient, asset: Asset
 ) -> GetReportOutput:
     """Retrieve a WildFire report for an existing sample hash."""
-    del soar
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
     try:
@@ -404,18 +456,14 @@ def get_report(
                 "verdict": verdict,
                 "summary_available": verdict_code >= 0,
             }
-            result = ActionResult(
-                True,
-                (
-                    f"Verdict code: {verdict_code}, Verdict: {verdict}, "
-                    f"Summary available: {verdict_code >= 0}"
-                ),
-                params.model_dump(),
+            message = (
+                f"Verdict code: {verdict_code}, Verdict: {verdict}, "
+                f"Summary available: {verdict_code >= 0}"
             )
-            result.set_summary(summary)
+            soar.set_message(message)
+            soar.set_summary(PermissiveActionOutput(**summary))
             if verdict_code < 0:
-                result.add_data({})
-                return result  # type: ignore[return-value]
+                return GetReportOutput()
 
             max_attempts = math.ceil(asset.timeout * 60 / POLL_INTERVAL_SECONDS)
             for attempt in range(1, max_attempts + 1):
@@ -444,8 +492,7 @@ def get_report(
                 report_data = normalize_wildfire_report_response(
                     parse_wildfire_xml(report_response)
                 )
-                result.add_data(report_data)
-                return result  # type: ignore[return-value]
+                return GetReportOutput(**report_data)
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 

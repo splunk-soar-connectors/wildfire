@@ -13,7 +13,7 @@
 # limitations under the License.
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -81,11 +81,6 @@ def save_report(
         ) from exc
 
     vault_id = add_bytes_to_vault(soar, response.content, name, contains=["pdf"])
-    result = ActionResult(
-        True,
-        f"Vault id: {vault_id}, Name: {name}, File type: pdf",
-        params.model_dump(),
-    )
-    result.add_data({"name": name, "vault_id": vault_id})
-    result.set_summary({"name": name, "vault_id": vault_id, "file_type": "pdf"})
-    return result  # type: ignore[return-value]
+    soar.set_message(f"Vault id: {vault_id}, Name: {name}, File type: pdf")
+    soar.set_summary(SaveReportSummary(name=name, vault_id=vault_id, file_type="pdf"))
+    return SaveReportOutput(name=name, vault_id=vault_id)

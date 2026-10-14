@@ -20,6 +20,68 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
+from src.actions.get_report import (
+    GetReportOutput,
+    SummaryEntryOutput,
+    SummaryOutput,
+    TimelineOutput,
+    EntryOutput,
+)
+from src.app import create_wildfire_connector_app
+
+
+def test_report_summary_uses_distinct_manifest_declared_entry_model() -> None:
+    assert SummaryOutput.model_fields["entry"].annotation == list[SummaryEntryOutput]
+    assert TimelineOutput.model_fields["entry"].annotation == list[EntryOutput]
+    fields = {field["data_path"]: field for field in GetReportOutput._to_json_schema()}
+    prefix = "action_result.data.*.task_info.report.*."
+    for name in ("details", "id", "score"):
+        assert fields[f"{prefix}summary.entry.*.@{name}"]["data_type"] == "string"
+    assert f"{prefix}summary.entry.*.@seq" not in fields
+    assert f"{prefix}timeline.entry.*.@seq" in fields
+    assert SummaryEntryOutput().model_dump(by_alias=True) == {
+        "@details": None,
+        "@id": None,
+        "@score": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {},
+        {
+            "file_info": {"sha256": "sample-sha256", "vendor_field": None},
+            "task_info": {
+                "report": [
+                    {
+                        "summary": {
+                            "entry": [
+                                {
+                                    "@details": "Observed behavior",
+                                    "@id": "rule-1",
+                                    "@score": "7",
+                                    "#text": "extra text",
+                                }
+                            ]
+                        },
+                        "vendor_extension": {"007": [False, 0, None]},
+                    }
+                ],
+            },
+            "version": "2.0",
+        },
+    ],
+)
+def test_named_permissive_report_output_preserves_raw_data(
+    data: dict[str, Any],
+) -> None:
+    output = GetReportOutput(**data)
+    assert output.model_dump(by_alias=True) == data
+    app = create_wildfire_connector_app()
+    assert App._adapt_action_result(output, app.actions_manager)
+    assert app.actions_manager.get_results()[-1].get_data() == [data]
+
 
 @pytest.mark.live
 def test_get_report_returns_the_bundled_probe_report(

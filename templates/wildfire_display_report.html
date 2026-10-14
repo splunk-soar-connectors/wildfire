@@ -1,4 +1,15 @@
 {% extends 'widgets/widget_template.html' %}
+{% macro verdict_label(data) -%}
+  {%- if data.verdict -%}
+    {{ data.verdict }}
+  {%- elif data.malware == "yes" -%}
+    Malware
+  {%- elif data.malware == "no" -%}
+    Clean
+  {%- else -%}
+    Unknown
+  {%- endif -%}
+{%- endmacro %}
 {% block title %}WildFire Analysis Report{% endblock %}
 {% block widget_content %}
   <!--
@@ -98,10 +109,10 @@
               <td>{{ result.file_info.filetype }}</td>
             </tr>
           {% endif %}
-          {% if result.file_info.malware %}
+          {% if result.file_info or result.param.is_file %}
             <tr>
               <th>Verdict</th>
-              <td>{{ "Malware" if result.file_info.malware == "yes" else "Clean" }}</td>
+              <td>{{ verdict_label(result.file_info) }}</td>
             </tr>
           {% endif %}
           {% if not result.param.is_file %}
@@ -124,12 +135,10 @@
                   <td>{{ result.analysis_time }}</td>
                 </tr>
               {% endif %}
-              {% if report.verdict %}
-                <tr>
-                  <th>Verdict</th>
-                  <td>{{ "Malware" if report.verdict == "malware" else "Clean" }}</td>
-                </tr>
-              {% endif %}
+              <tr>
+                <th>Verdict</th>
+                <td>{{ verdict_label(report) }}</td>
+              </tr>
             {% endfor %}
           {% endif %}
         </tbody>
@@ -166,7 +175,7 @@
               {% endif %}
               <tr>
                 <th>Verdict</th>
-                <td>{{ "Malware" if report.malware == "yes" or report.verdict == "malware" else "Clean" }}</td>
+                <td>{{ verdict_label(report) }}</td>
               </tr>
             </tbody>
           </table>

@@ -17,7 +17,7 @@ import time
 
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 from soar_sdk.models.view import ViewContext
@@ -361,7 +361,7 @@ class UrlOutput(ActionOutput):
     user_agent: str = OutputField(example_values=["WinHttpClient"], alias="@user_agent")
 
 
-class CreateOutput(ActionOutput):
+class RegistryCreatedOutput(ActionOutput):
     key: str = OutputField(example_values=["HKEY_LOCAL_MACHINE"], alias="@key")
     subkey: str = OutputField(
         example_values=["SOFTWARE\\5da059a482fd494db3f252126fbc3d5b"], alias="@subkey"
@@ -388,7 +388,7 @@ class SetOutput(ActionOutput):
     subkey: str = OutputField(example_values=["FX"], alias="@subkey")
 
 
-class ChildProcessOutput(ActionOutput):
+class ProcessTreeChildNodeOutput(ActionOutput):
     name: str = OutputField(
         cef_types=["file name"], example_values=["sample.exe"], alias="@name"
     )
@@ -400,11 +400,11 @@ class ChildProcessOutput(ActionOutput):
     )
 
 
-class ChildOutput(ActionOutput):
-    process: ChildProcessOutput
+class ProcessTreeChildOutput(ActionOutput):
+    process: ProcessTreeChildNodeOutput
 
 
-class ProcessOutput(ActionOutput):
+class ProcessTreeNodeOutput(ActionOutput):
     name: str = OutputField(
         cef_types=["file name"], example_values=["sample.exe"], alias="@name"
     )
@@ -414,7 +414,26 @@ class ProcessOutput(ActionOutput):
         example_values=["c:\\documents and settings\\administrator\\sample.exe"],
         alias="@text",
     )
-    child: ChildOutput
+    child: ProcessTreeChildOutput
+
+
+class ProcessFileCreatedOutput(ActionOutput):
+    md5: str | None = OutputField(alias="@md5", cef_types=["md5"])
+    name: str | None = OutputField(alias="@name", cef_types=["file path", "file name"])
+    sha1: str | None = OutputField(alias="@sha1", cef_types=["sha1"])
+    sha256: str | None = OutputField(alias="@sha256", cef_types=["sha256"])
+    size: str | None = OutputField(alias="@size")
+    type: str | None = OutputField(alias="@type")
+
+
+class ProcessCreatedOutput(ActionOutput):
+    child_pid: str | None = OutputField(alias="@child_pid")
+    child_process_image: str | None = OutputField(
+        alias="@child_process_image", cef_types=["file path", "file name"]
+    )
+    command: str | None = OutputField(
+        alias="@command", cef_types=["file path", "file name"]
+    )
 
 
 class DetectionReasonsOutput(ActionOutput):
@@ -453,8 +472,8 @@ class n122Output(ActionOutput):
     type: str = OutputField(example_values=["artifact"])
 
 
-class FileOutput(ActionOutput):
-    create: list[CreateOutput]
+class ProcessFileActivityOutput(ActionOutput):
+    create: list[ProcessFileCreatedOutput]
 
 
 class NetworkOutput(ActionOutput):
@@ -463,29 +482,59 @@ class NetworkOutput(ActionOutput):
     url: list[UrlOutput]
 
 
-class MutexOutput(ActionOutput):
+class ProcessMutexOutput(ActionOutput):
     createmutex: list[CreatemutexOutput]
 
 
 class ProcessActivityOutput(ActionOutput):
-    Create: CreateOutput
+    Create: ProcessCreatedOutput
 
 
-class RegistryOutput(ActionOutput):
-    create: list[CreateOutput]
+class ProcessRegistryOutput(ActionOutput):
+    create: list[RegistryCreatedOutput]
     set: list[SetOutput]
 
 
+class ProcessRecordOutput(ActionOutput):
+    command: str | None = OutputField(
+        alias="@command", cef_types=["file path", "file name"]
+    )
+    name: str | None = OutputField(alias="@name", cef_types=["file name"])
+    pid: str | None = OutputField(alias="@pid")
+    text: str | None = OutputField(alias="@text", cef_types=["file path", "file name"])
+    file: ProcessFileActivityOutput | None
+    java_api: str | None
+    mutex: ProcessMutexOutput | None
+    process_activity: ProcessActivityOutput | None
+    registry: ProcessRegistryOutput | None
+
+
 class ProcessListOutput(ActionOutput):
-    process: list[ProcessOutput]
+    process: list[ProcessRecordOutput]
 
 
-class ProcessTreeOutput(ActionOutput):
-    process: ProcessOutput
+class ProcessTreeEntryOutput(ActionOutput):
+    process: ProcessTreeNodeOutput
+
+
+class SummaryEntryOutput(ActionOutput):
+    text: str | None = OutputField(
+        alias="#text",
+        cef_types=["file name"],
+        example_values=["Contains overlay data with high entropy"],
+    )
+    details: str | None = OutputField(
+        alias="@details",
+        example_values=[
+            "Entropy is a measurement of the randomness in data. Overlays with high entropy indicate encoded or encrypted data."
+        ],
+    )
+    id: str | None = OutputField(alias="@id", example_values=["3030"])
+    score: str | None = OutputField(alias="@score", example_values=["0.0"])
 
 
 class SummaryOutput(ActionOutput):
-    entry: list[EntryOutput]
+    entry: list[SummaryEntryOutput]
 
 
 class TimelineOutput(ActionOutput):
@@ -497,8 +546,20 @@ class ExtensionsOutput(ActionOutput):
     x_wf_http_response_ext: X_Wf_Http_Response_ExtOutput
 
 
+class EvidenceEntryOutput(ActionOutput):
+    text: str | None = OutputField(alias="#text", cef_types=["file path", "file name"])
+    behavior_id: str | None = OutputField(alias="@behavior_id")
+    md5: str | None = OutputField(alias="@md5", cef_types=["md5"])
+    sha1: str | None = OutputField(alias="@sha1", cef_types=["sha1"])
+    sha256: str | None = OutputField(alias="@sha256", cef_types=["sha256"])
+
+
+class EvidenceFileOutput(ActionOutput):
+    entry: list[EvidenceEntryOutput]
+
+
 class EvidenceOutput(ActionOutput):
-    file: FileOutput
+    file: EvidenceFileOutput
     mutex: str
     process: str
     registry: str
@@ -1168,7 +1229,7 @@ class n99Output(ActionOutput):
     type: str = OutputField(example_values=["network-traffic"])
 
 
-class ReportOutput(ActionOutput):
+class FileReportOutput(ActionOutput):
     evidence: EvidenceOutput
     malware: str = OutputField(example_values=["no"])
     md5: str = OutputField(
@@ -1177,7 +1238,7 @@ class ReportOutput(ActionOutput):
     network: NetworkOutput
     platform: str = OutputField(example_values=["204"])
     process_list: ProcessListOutput
-    process_tree: list[ProcessTreeOutput]
+    process_tree: list[ProcessTreeEntryOutput]
     sha256: str = OutputField(
         cef_types=["sha256"],
         example_values=[
@@ -1320,30 +1381,44 @@ class ObservableObjectsOutput(ActionOutput):
     n99: n99Output
 
 
-class ResultOutput(ActionOutput):
-    analysis_time: str = OutputField(example_values=["2020-08-19T16:57:40Z"])
-    report: ReportOutput
-    url_type: str = OutputField(example_values=["original"])
-
-
 class TaskInfoOutput(ActionOutput):
-    report: list[ReportOutput]
+    report: list[FileReportOutput]
 
 
-class MaecPackagesOutput(ActionOutput):
+class StableMaecPackageOutput(ActionOutput):
     id: str = OutputField(
         example_values=["package--639659c2-6125-4089-8d17-e947f570893a"]
     )
     maec_objects: list[MaecObjectsOutput]
-    observable_objects: ObservableObjectsOutput
     schema_version: str = OutputField(example_values=["5.0"])
     type: str = OutputField(example_values=["package"])
 
 
-class DetonateUrlOutput(ActionOutput):
+class UrlReportOutput(ActionOutput):
+    da_packages: str | None = OutputField(
+        example_values=["package--37192805-9038-40ee-e0ee-2eb1c05cd94d"]
+    )
+    detection_reasons: list[DetectionReasonsOutput]
+    maec_packages: list[StableMaecPackageOutput]
+    sa_package: str | None = OutputField(
+        example_values=["package--c5e1f03a-f162-4792-ced8-102cd8f6d80a"]
+    )
+    schema_version: str | None = OutputField(example_values=["1.0"])
+    sha256: str | None = OutputField(cef_types=["sha256"])
+    type: str | None = OutputField(example_values=["wf-report"])
+    verdict: str | None = OutputField(example_values=["malware"])
+
+
+class ResultOutput(ActionOutput):
+    analysis_time: str = OutputField(example_values=["2020-08-19T16:57:40Z"])
+    report: UrlReportOutput
+    url_type: str = OutputField(example_values=["original"])
+
+
+class DetonateUrlOutput(PermissiveActionOutput):
     file_info: FileInfoOutput
     result: ResultOutput
-    submit_link_info: Submit_Link_InfoOutput
+    submit_link_info: Submit_Link_InfoOutput = OutputField(alias="submit-link-info")
     success: bool = OutputField(example_values=[True])
     task_info: TaskInfoOutput
     version: str = OutputField(example_values=["2.0"])
@@ -1358,6 +1433,9 @@ class DetonateUrlSummary(ActionOutput):
         ]
     )
     summary_available: bool = OutputField(example_values=[True, False])
+    md5: str | None = OutputField(cef_types=["md5"])
+    sha256: str | None = OutputField(cef_types=["sha256"])
+    task_id: str | None = OutputField(cef_types=["sha256"])
 
 
 def display_detonate_url_report(
@@ -1439,10 +1517,16 @@ def _poll_report(
     raise ActionFailure("Reached max polling attempts.")
 
 
+def _detonation_result_data(
+    submission_data: dict[str, object], report_data: dict[str, object] | None
+) -> dict[str, object]:
+    """Use the report when available; otherwise retain the submission response."""
+    return report_data if report_data is not None else submission_data
+
+
 def detonate_url(
     params: DetonateUrlParams, soar: SOARClient, asset: Asset
 ) -> DetonateUrlOutput:
-    del soar
     if not is_valid_http_url(params.url):
         raise ActionFailure("Please provide a valid URL")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
@@ -1452,6 +1536,7 @@ def detonate_url(
             base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
         ) as client:
             task_id = None
+            response_data: dict[str, object] = {}
             if params.is_file:
                 response = client.post(
                     "submit/url",
@@ -1469,7 +1554,8 @@ def detonate_url(
                         f"status_code: {response.status_code}, "
                         f"detail: {detail}"
                     ) from exc
-                upload_info = parse_wildfire_xml(response).get("upload-file-info")
+                response_data = parse_wildfire_xml(response)
+                upload_info = response_data.get("upload-file-info")
                 if not isinstance(upload_info, dict):
                     raise ActionFailure("Task id not part of response, can't continue")
                 task_id = upload_info.get("sha256") or upload_info.get("md5")
@@ -1484,32 +1570,27 @@ def detonate_url(
                 url=None if task_id else params.url,
             )
             summary_available = verdict_code >= 0
-            result = ActionResult(
-                True,
-                (
-                    f"Verdict code: {verdict_code}, Verdict: {verdict}, "
-                    f"Summary available: {summary_available}"
-                ),
-                params.model_dump(),
+            message = (
+                f"Verdict code: {verdict_code}, Verdict: {verdict}, "
+                f"Summary available: {summary_available}"
             )
-            result.set_summary(
-                {
-                    "verdict_code": verdict_code,
-                    "verdict": verdict,
-                    "summary_available": summary_available,
-                }
-            )
+            summary = {
+                "verdict_code": verdict_code,
+                "verdict": verdict,
+                "summary_available": summary_available,
+            }
             if summary_available:
-                result.add_data(
-                    _poll_report(
-                        client,
-                        asset,
-                        task_id=task_id,
-                        url=None if task_id else params.url,
-                    )
+                report_data = _poll_report(
+                    client,
+                    asset,
+                    task_id=task_id,
+                    url=None if task_id else params.url,
                 )
             else:
-                result.add_data({})
-            return result  # type: ignore[return-value]
+                report_data = None
+            soar.set_message(message)
+            soar.set_summary(PermissiveActionOutput(**summary))
+            result_data = _detonation_result_data(response_data, report_data)
+            return DetonateUrlOutput(**result_data)
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc

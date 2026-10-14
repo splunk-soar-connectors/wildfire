@@ -14,7 +14,6 @@
 from pathlib import Path
 
 import httpx
-from soar_sdk.abstract import SOARClient
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
@@ -35,10 +34,8 @@ def _error_detail(response: httpx.Response) -> str:
     return FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
 
 
-def run_test_connectivity(soar: SOARClient, asset: Asset) -> None:
+def run_test_connectivity(asset: Asset) -> None:
     """Upload the bundled test PDF to verify WildFire connectivity."""
-    del soar
-
     if not TEST_PDF_PATH.is_file():
         raise ActionFailure(f'Test pdf file not found at "{TEST_PDF_PATH}"')
 

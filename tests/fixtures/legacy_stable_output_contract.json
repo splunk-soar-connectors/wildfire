@@ -1,0 +1,1754 @@
+{
+  "actions": {
+    "detonate_file": [
+      {
+        "data_path": "action_result.status",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file name"
+        ],
+        "data_path": "action_result.parameter.file_name",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "pe file",
+          "pdf",
+          "flash",
+          "apk",
+          "jar",
+          "doc",
+          "xls",
+          "ppt"
+        ],
+        "data_path": "action_result.parameter.vault_id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.file_signer",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.filetype",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.malware",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.file_info.md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.file_info.sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.file_info.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.#text",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@File_Location",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@SDK",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@SDK_Status",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@SHA1",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@SHA256",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "ip"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@ip",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@key",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "pid"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@pid",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@port",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "process name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@process_image",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@reg_key",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@subkey",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@Format",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@Issuer",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@MD5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@Owner",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Embedded_URLs.*.@Known_Malicious_URL",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Embedded_URLs.*.@URL",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Internal_File.*.@Format",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_API_Calls.*.@API_Calls",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_API_Calls.*.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Action_Monitored.*.@Action",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Action_Monitored.*.@Details",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Behavior.@Behavior",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Behavior.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Behavior.@Target",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Files.*.@File_Type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Files.*.@Reason",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Pattern.*.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Pattern.*.@Feature",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Strings.*.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Strings.*.@String",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.doc_embedded_files",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_api",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.Domains",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.IP_Addresses",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.Shell_Commands.entry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.URLs",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@behavior",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@behavior_id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@family",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.elf_info.suspicious.entry.*.@matched_ioc_hash",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.embedded_files",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.embedded_urls",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.mutex",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.process",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.registry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.extracted_urls.entry.*.@url",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.extracted_urls.entry.*.@verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.extracted_urls.entry.@url",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.extracted_urls.entry.@verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Certificate",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Package_Name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Signer",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.App_Icon",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.App_Name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.File_Type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Max_SDK_Requirement",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Min_SDK_Requirement",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Repackaged",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Target_SDK",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.malware",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.md5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.compilation_timestamp",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@raw_size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@virtual_addr",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@virtual_size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.platform",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "process name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file path"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.java_api",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.*.@text",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "process name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.software",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Defined_Receivers.entry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Defined_Sensors.entry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Embedded_Libraries",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@behavior",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.syscall.file.*.@action",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.syscall.file.*.@path",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.task",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.upload-file-info.filename",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.upload-file-info.filetype",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.upload-file-info.md5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.upload-file-info.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.upload-file-info.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.upload-file-info.url",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.malware",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.message",
+        "data_type": "string"
+      },
+      {
+        "data_path": "summary.total_objects",
+        "data_type": "numeric"
+      },
+      {
+        "data_path": "summary.total_objects_successful",
+        "data_type": "numeric"
+      }
+    ],
+    "detonate_url": [
+      {
+        "data_path": "action_result.status",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.parameter.is_file",
+        "data_type": "boolean"
+      },
+      {
+        "contains": [
+          "url"
+        ],
+        "data_path": "action_result.parameter.url",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.filetype",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.malware",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5"
+        ],
+        "data_path": "action_result.data.*.file_info.md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1"
+        ],
+        "data_path": "action_result.data.*.file_info.sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.data.*.file_info.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.analysis_time",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.da_packages",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.artifacts.*.object_id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.artifacts.*.package",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.artifacts.*.type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.detection_reasons.*.verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.analysis_type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.conclusion",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.end_time",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.is_automated",
+        "data_type": "boolean"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.start_time",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.analysis_metadata.*.tool_refs",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.instance_object_refs",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.maec_objects.*.type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.schema_version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.maec_packages.*.type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.sa_package",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.schema_version",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.data.*.result.report.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.report.verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.result.url_type",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5"
+        ],
+        "data_path": "action_result.data.*.submit-link-info.md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.data.*.submit-link-info.sha256",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "url"
+        ],
+        "data_path": "action_result.data.*.submit-link-info.url",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.success",
+        "data_type": "boolean"
+      },
+      {
+        "contains": [
+          "file path",
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.#text",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.mutex",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.process",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.registry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.malware",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.md5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "ip"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "ip"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.platform",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file path",
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@pid",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file path",
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.java_api",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_pid",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@child_process_image",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity.Create.@command",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@key",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.create.*.@subkey",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file path",
+          "md5"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@key",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@subkey",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@pid",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file path",
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.child.process.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.child.process.@pid",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.child.process.@text",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.software",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.#text",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.#text",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.version",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5"
+        ],
+        "data_path": "action_result.summary.md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.summary.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.summary_available",
+        "data_type": "boolean"
+      },
+      {
+        "contains": [
+          "sha256"
+        ],
+        "data_path": "action_result.summary.task_id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.verdict_code",
+        "data_type": "numeric"
+      },
+      {
+        "data_path": "action_result.message",
+        "data_type": "string"
+      },
+      {
+        "data_path": "summary.total_objects",
+        "data_type": "numeric"
+      },
+      {
+        "data_path": "summary.total_objects_successful",
+        "data_type": "numeric"
+      }
+    ],
+    "get_report": [
+      {
+        "data_path": "action_result.status",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "sha256",
+          "wildfire task id"
+        ],
+        "data_path": "action_result.parameter.id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.file_signer",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.filetype",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.malware",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.file_info.md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.file_info.sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.file_info.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.file_info.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.#text",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@File_Location",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@SDK",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@SDK_Status",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@key",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "pid"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@pid",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "process name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@process_image",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@reg_key",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.@sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.@subkey",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@Format",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@Issuer",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@MD5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@Owner",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@SHA1",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Cert_File.@SHA256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Embedded_URLs.*.@Known_Malicious_URL",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Embedded_URLs.*.@URL",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Internal_File.*.@Format",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Internal_File.*.@SHA256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_API_Calls.*.@API_Calls",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_API_Calls.*.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Action_Monitored.*.@Action",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Action_Monitored.*.@Details",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Behavior.@Behavior",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Behavior.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Behavior.@Target",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Files.*.@File_Type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Files.*.@Reason",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Pattern.*.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Pattern.*.@Feature",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Strings.*.@Description",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.apk_api.Suspicious_Strings.*.@String",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.doc_embedded_files",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.embedded_files",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.embedded_urls",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.entry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.*.@behavior_id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.mutex",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.process",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.evidence.registry",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.extracted_urls.entry.*.@url",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.extracted_urls.entry.*.@verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file.file_deleted.*.@deleted_file",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file.file_written.*.@written_file",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Certificate",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Package_Name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Signer",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.APK_Version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.App_Icon",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.App_Name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.File_Type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Max_SDK_Requirement",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Min_SDK_Requirement",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Min_SDK_Requirement",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Repackaged",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Repackaged",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Target_SDK",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.file_info.Target_SDK",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.malware",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.md5",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.compilation_timestamp",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@raw_size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@virtual_addr",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.metadata.sections.section.*.@virtual_size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@query",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@response",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.dns.*.@type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@country",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "ip"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ip",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ja3",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@ja3s",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.tcp.*.@port",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@country",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@ip",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.udp.*.@port",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@host",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@method",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@uri",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.network.url.*.@user_agent",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.platform",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@command",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "process name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.@name",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "md5",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@md5",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "file path"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@name",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha1",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha1",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.file.create.*.@type",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.java_api",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.process_activity",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.*.@name",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.*.@text",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "process name"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+        "data_type": "string"
+      },
+      {
+        "contains": [
+          "sha256",
+          "hash"
+        ],
+        "data_path": "action_result.data.*.task_info.report.*.sha256",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.size",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.software",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Defined_Receivers",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Defined_Sensors",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Defined_Services",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Embedded_Libraries",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Requested_Permissions",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.static_analysis.Sensitive_API_Calls_Performed",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@details",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@id",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.summary.entry.*.@score",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.task",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.task_info.report.*.timeline.entry.*.@seq",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.data.*.version",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.malware",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.summary_available",
+        "data_type": "boolean"
+      },
+      {
+        "data_path": "action_result.summary.verdict",
+        "data_type": "string"
+      },
+      {
+        "data_path": "action_result.summary.verdict_code",
+        "data_type": "numeric"
+      },
+      {
+        "data_path": "action_result.message",
+        "data_type": "string"
+      },
+      {
+        "data_path": "summary.total_objects",
+        "data_type": "numeric"
+      },
+      {
+        "data_path": "summary.total_objects_successful",
+        "data_type": "numeric"
+      }
+    ]
+  },
+  "policy": "Preserve stable legacy output paths; exclude sample-specific numeric observable_objects keys and primary_malware_instances identifiers from the published contract. Full WildFire response data remains available at runtime.",
+  "source_commit": "658f77df58c049b4e9e1f331f56a8dff243a3ec4"
+}
