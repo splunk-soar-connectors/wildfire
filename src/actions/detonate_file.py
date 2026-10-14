@@ -357,7 +357,7 @@ class ProcessListOutput(ActionOutput):
 
 
 class ProcessTreeEntryOutput(ActionOutput):
-    process: ProcessTreeNodeOutput
+    process: list[ProcessTreeNodeOutput] | None
 
 
 class StaticAnalysisOutput(ActionOutput):
@@ -419,31 +419,31 @@ class ReportOutput(ActionOutput):
     process_image: str = OutputField(cef_types=["process name"], alias="@process_image")
     reg_key: str = OutputField(alias="@reg_key")
     subkey: str = OutputField(alias="@subkey")
-    apk_api: ApkApiOutput
+    apk_api: ApkApiOutput | None
     doc_embedded_files: str
     elf_api: str
-    elf_info: ElfInfoOutput
+    elf_info: ElfInfoOutput | None
     embedded_files: str
     embedded_urls: str
-    evidence: EvidenceOutput
-    extracted_urls: ExtractedUrlsOutput
-    file: ReportFileActivityOutput
-    file_info: ApkFileInfoOutput
+    evidence: EvidenceOutput | None
+    extracted_urls: ExtractedUrlsOutput | None
+    file: ReportFileActivityOutput | None
+    file_info: ApkFileInfoOutput | None
     malware: str
     md5: str = OutputField(cef_types=["md5", "hash"])
-    metadata: MetadataOutput
-    network: NetworkOutput
+    metadata: MetadataOutput | None
+    network: NetworkOutput | None
     platform: str
-    process_list: ProcessListOutput
-    process_tree: list[ProcessTreeEntryOutput]
+    process_list: ProcessListOutput | None
+    process_tree: list[ProcessTreeEntryOutput] | None
     sha256: str = OutputField(cef_types=["sha256", "hash"])
     size: str
     software: str
-    static_analysis: StaticAnalysisOutput
-    summary: SummaryOutput
-    syscall: SyscallOutput
+    static_analysis: StaticAnalysisOutput | None
+    summary: SummaryOutput | None
+    syscall: SyscallOutput | None
     task: str
-    timeline: TimelineOutput
+    timeline: TimelineOutput | None
     version: str
 
 

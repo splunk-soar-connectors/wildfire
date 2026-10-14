@@ -1230,15 +1230,15 @@ class n99Output(ActionOutput):
 
 
 class FileReportOutput(ActionOutput):
-    evidence: EvidenceOutput
+    evidence: EvidenceOutput | None
     malware: str = OutputField(example_values=["no"])
     md5: str = OutputField(
         cef_types=["md5"], example_values=["04f4f1c83f1e69b1f055202964536f13"]
     )
-    network: NetworkOutput
+    network: NetworkOutput | None
     platform: str = OutputField(example_values=["204"])
-    process_list: ProcessListOutput
-    process_tree: list[ProcessTreeEntryOutput]
+    process_list: ProcessListOutput | None
+    process_tree: list[ProcessTreeEntryOutput] | None
     sha256: str = OutputField(
         cef_types=["sha256"],
         example_values=[
@@ -1247,8 +1247,8 @@ class FileReportOutput(ActionOutput):
     )
     size: str = OutputField(example_values=["796268"])
     software: str = OutputField(example_values=["PE Static Analyzer"])
-    summary: SummaryOutput
-    timeline: TimelineOutput
+    summary: SummaryOutput | None
+    timeline: TimelineOutput | None
     version: str = OutputField(example_values=["3.0"])
 
 

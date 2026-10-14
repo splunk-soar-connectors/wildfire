@@ -228,8 +228,8 @@ action_result.data.\*.task_info.report.\*.process_list.process.\*.java_api | str
 action_result.data.\*.task_info.report.\*.process_list.process.\*.mutex.createmutex.\*.@name | string | | |
 action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity | string | | |
 action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@data | string | | |
-action_result.data.\*.task_info.report.\*.process_tree.\*.process.@name | string | `process name` | |
-action_result.data.\*.task_info.report.\*.process_tree.\*.process.@text | string | | |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@name | string | `process name` | |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@text | string | | |
 action_result.data.\*.task_info.report.\*.sha256 | string | `sha256` `hash` | |
 action_result.data.\*.task_info.report.\*.size | string | | |
 action_result.data.\*.task_info.report.\*.software | string | | |
@@ -541,8 +541,8 @@ action_result.data.\*.task_info.report.\*.process_list.process.\*.java_api | str
 action_result.data.\*.task_info.report.\*.process_list.process.\*.mutex.createmutex.\*.@name | string | | |
 action_result.data.\*.task_info.report.\*.process_list.process.\*.process_activity | string | | |
 action_result.data.\*.task_info.report.\*.process_list.process.\*.registry.set.\*.@data | string | | |
-action_result.data.\*.task_info.report.\*.process_tree.\*.process.@name | string | `process name` | |
-action_result.data.\*.task_info.report.\*.process_tree.\*.process.@text | string | | |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@name | string | `process name` | |
+action_result.data.\*.task_info.report.\*.process_tree.\*.process.\*.@text | string | | |
 action_result.data.\*.task_info.report.\*.size | string | | |
 action_result.data.\*.task_info.report.\*.software | string | | |
 action_result.data.\*.task_info.report.\*.static_analysis.Defined_Receivers | string | | |

@@ -14,7 +14,7 @@
 from importlib import import_module
 import json
 from pathlib import Path
-from typing import Any, get_type_hints
+from typing import Any, get_args, get_type_hints
 
 import pytest
 from soar_sdk.action_results import PermissiveActionOutput
@@ -59,13 +59,13 @@ def test_native_common_file_information_matches_legacy_contract(
         )
 
     if action_name != "detonate_url":
-        assert (
-            output.model_fields["file_info"].annotation is module.CommonFileInfoOutput
-        )
-        assert (
-            module.ReportOutput.model_fields["file_info"].annotation
-            is module.ApkFileInfoOutput
-        )
+        common_annotation = output.model_fields["file_info"].annotation
+        common_types = get_args(common_annotation) or (common_annotation,)
+        assert module.CommonFileInfoOutput in common_types
+
+        apk_annotation = module.ReportOutput.model_fields["file_info"].annotation
+        apk_types = get_args(apk_annotation) or (apk_annotation,)
+        assert module.ApkFileInfoOutput in apk_types
         assert f"{prefix}APK_Package_Name" not in fields
         assert (
             "action_result.data.*.task_info.report.*.file_info.APK_Package_Name"
@@ -264,4 +264,51 @@ def test_named_detonation_outputs_preserve_full_raw_payload(
 def test_permissive_outputs_preserve_unrepresentable_legacy_shapes(
     output_class, data: dict[str, Any]
 ) -> None:
+    assert output_class(**data).model_dump(by_alias=True) == data
+
+
+@pytest.mark.parametrize(
+    "output_class",
+    [DetonateFileOutput, DetonateUrlOutput, GetReportOutput],
+)
+def test_dynamic_report_outputs_preserve_explicit_null_sections(output_class) -> None:
+    data = {
+        "task_info": {
+            "report": [
+                {
+                    "evidence": None,
+                    "file": None,
+                    "metadata": None,
+                    "network": None,
+                    "process_list": None,
+                    "process_tree": None,
+                    "summary": None,
+                    "timeline": None,
+                }
+            ]
+        }
+    }
+
+    assert output_class(**data).model_dump(by_alias=True) == data
+
+
+@pytest.mark.parametrize("output_class", [DetonateFileOutput, GetReportOutput])
+def test_xml_report_outputs_preserve_plural_process_tree_nodes(output_class) -> None:
+    data = {
+        "task_info": {
+            "report": [
+                {
+                    "process_tree": [
+                        {
+                            "process": [
+                                {"@name": "parent", "@text": "/tmp/parent"},
+                                {"@name": "child", "@text": "/tmp/child"},
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
     assert output_class(**data).model_dump(by_alias=True) == data

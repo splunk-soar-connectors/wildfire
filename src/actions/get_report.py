@@ -318,7 +318,7 @@ class ProcessListOutput(ActionOutput):
 
 
 class ProcessTreeEntryOutput(ActionOutput):
-    process: ProcessTreeNodeOutput
+    process: list[ProcessTreeNodeOutput] | None
 
 
 class SummaryEntryOutput(ActionOutput):
@@ -366,27 +366,27 @@ class ReportOutput(ActionOutput):
     )
     sha256: str = OutputField(cef_types=["sha256", "hash"])
     subkey: str = OutputField(alias="@subkey")
-    apk_api: ApkApiOutput
+    apk_api: ApkApiOutput | None
     doc_embedded_files: str
     embedded_files: str
     embedded_urls: str
     entry: str = OutputField(example_values=["com.panw.panwapktest.MainActivity"])
-    evidence: EvidenceOutput
-    extracted_urls: ExtractedUrlsOutput
-    file: ReportFileActivityOutput
-    file_info: ApkFileInfoOutput
+    evidence: EvidenceOutput | None
+    extracted_urls: ExtractedUrlsOutput | None
+    file: ReportFileActivityOutput | None
+    file_info: ApkFileInfoOutput | None
     malware: str
-    metadata: MetadataOutput
-    network: NetworkOutput
+    metadata: MetadataOutput | None
+    network: NetworkOutput | None
     platform: str
-    process_list: ProcessListOutput
-    process_tree: list[ProcessTreeEntryOutput]
+    process_list: ProcessListOutput | None
+    process_tree: list[ProcessTreeEntryOutput] | None
     size: str
     software: str
-    static_analysis: StaticAnalysisOutput
-    summary: SummaryOutput
+    static_analysis: StaticAnalysisOutput | None
+    summary: SummaryOutput | None
     task: str
-    timeline: TimelineOutput
+    timeline: TimelineOutput | None
 
 
 class TaskInfoOutput(ActionOutput):

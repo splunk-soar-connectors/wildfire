@@ -58,8 +58,8 @@ SDK_NATIVE_UNREPRESENTABLE_PATHS = {
         "action_result.data.*.task_info.report.*.evidence.file.entry.@md5",
         "action_result.data.*.task_info.report.*.extracted_urls.entry.@url",
         "action_result.data.*.task_info.report.*.extracted_urls.entry.@verdict",
-        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@name",
-        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@text",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
     },
     "detonate_url": {
         "action_result.data.*.task_info.report.*.process_list.process.*.process_activity",
@@ -68,8 +68,8 @@ SDK_NATIVE_UNREPRESENTABLE_PATHS = {
         "action_result.data.*.task_info.report.*.evidence",
         "action_result.data.*.task_info.report.*.evidence.file",
         "action_result.data.*.task_info.report.*.evidence.file.entry.@behavior_id",
-        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@name",
-        "action_result.data.*.task_info.report.*.process_tree.*.process.*.@text",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.@name",
+        "action_result.data.*.task_info.report.*.process_tree.*.process.@text",
     },
 }
 
@@ -103,8 +103,8 @@ action_result.data.*.task_info.report.*.process_list.process.*.java_api
 action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity
 action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
-action_result.data.*.task_info.report.*.process_tree.*.process.@name
-action_result.data.*.task_info.report.*.process_tree.*.process.@text
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@name
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@text
 action_result.data.*.task_info.report.*.summary.entry.*.@behavior
 action_result.data.*.task_info.report.*.summary.entry.*.@details
 action_result.data.*.task_info.report.*.summary.entry.*.@id
@@ -188,8 +188,8 @@ action_result.data.*.task_info.report.*.process_list.process.*.java_api
 action_result.data.*.task_info.report.*.process_list.process.*.mutex.createmutex.*.@name
 action_result.data.*.task_info.report.*.process_list.process.*.process_activity
 action_result.data.*.task_info.report.*.process_list.process.*.registry.set.*.@data
-action_result.data.*.task_info.report.*.process_tree.*.process.@name
-action_result.data.*.task_info.report.*.process_tree.*.process.@text
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@name
+action_result.data.*.task_info.report.*.process_tree.*.process.*.@text
 action_result.data.*.task_info.report.*.summary.entry.*.@details
 action_result.data.*.task_info.report.*.summary.entry.*.@id
 action_result.data.*.task_info.report.*.summary.entry.*.@score
