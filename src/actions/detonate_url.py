@@ -559,7 +559,7 @@ class EvidenceFileOutput(ActionOutput):
 
 
 class EvidenceOutput(ActionOutput):
-    file: EvidenceFileOutput
+    file: EvidenceFileOutput | None
     mutex: str
     process: str
     registry: str

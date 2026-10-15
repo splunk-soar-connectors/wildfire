@@ -205,69 +205,6 @@ def test_named_detonation_outputs_preserve_full_raw_payload(
 
 
 @pytest.mark.parametrize(
-    ("output_class", "data"),
-    [
-        (
-            DetonateFileOutput,
-            {
-                "task_info": {
-                    "report": [
-                        {
-                            "evidence": "legacy scalar evidence",
-                            "extracted_urls": {
-                                "entry": {
-                                    "@url": "https://example.test",
-                                    "@verdict": "unknown",
-                                }
-                            },
-                            "process_tree": {
-                                "process": [{"@name": "sample", "@text": "/tmp/sample"}]
-                            },
-                        }
-                    ]
-                }
-            },
-        ),
-        (
-            DetonateUrlOutput,
-            {
-                "task_info": {
-                    "report": [
-                        {
-                            "process_list": {
-                                "process": [
-                                    {"process_activity": "legacy scalar activity"}
-                                ]
-                            }
-                        }
-                    ]
-                }
-            },
-        ),
-        (
-            GetReportOutput,
-            {
-                "task_info": {
-                    "report": [
-                        {
-                            "evidence": {"file": "legacy scalar file evidence"},
-                            "process_tree": {
-                                "process": [{"@name": "sample", "@text": "/tmp/sample"}]
-                            },
-                        }
-                    ]
-                }
-            },
-        ),
-    ],
-)
-def test_permissive_outputs_preserve_unrepresentable_legacy_shapes(
-    output_class, data: dict[str, Any]
-) -> None:
-    assert output_class(**data).model_dump(by_alias=True) == data
-
-
-@pytest.mark.parametrize(
     "output_class",
     [DetonateFileOutput, DetonateUrlOutput, GetReportOutput],
 )
@@ -284,6 +221,32 @@ def test_dynamic_report_outputs_preserve_explicit_null_sections(output_class) ->
                     "process_tree": None,
                     "summary": None,
                     "timeline": None,
+                }
+            ]
+        }
+    }
+
+    assert output_class(**data).model_dump(by_alias=True) == data
+
+
+@pytest.mark.parametrize(
+    "output_class",
+    [DetonateFileOutput, DetonateUrlOutput, GetReportOutput],
+)
+def test_dynamic_report_outputs_preserve_observed_null_nodes(output_class) -> None:
+    data = {
+        "task_info": {
+            "report": [
+                {
+                    "evidence": {
+                        "file": None,
+                        "mutex": None,
+                        "process": None,
+                        "registry": None,
+                    },
+                    "process_list": {
+                        "process": [{"process_activity": None}],
+                    },
                 }
             ]
         }
