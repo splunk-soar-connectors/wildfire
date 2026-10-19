@@ -16,7 +16,12 @@ import time
 
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
+from soar_sdk.action_results import (
+    ActionOutput,
+    ActionResult,
+    OutputField,
+    PermissiveActionOutput,
+)
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 from soar_sdk.models.view import ViewContext
@@ -501,6 +506,22 @@ def _poll_report(client: httpx.Client, asset: Asset, task_id: str) -> dict[str, 
     raise ActionFailure("Reached max polling attempts.")
 
 
+def _submission_failure_result(
+    params: DetonateFileParams,
+    upload_data: dict[str, object],
+    error: ActionFailure | OSError | httpx.HTTPError,
+) -> ActionResult:
+    failure = (
+        error
+        if isinstance(error, ActionFailure)
+        else ActionFailure(f"REST Api to server failed: {error}")
+    )
+    failure.set_action_name("detonate file")
+    result = ActionResult(False, str(failure), params.model_dump())
+    result.add_data(upload_data)
+    return result
+
+
 def detonate_file(
     params: DetonateFileParams, soar: SOARClient, asset: Asset
 ) -> DetonateFileOutput:
@@ -558,7 +579,12 @@ def detonate_file(
                 task_id = upload_info.get("sha256") or upload_info.get("md5")
                 if not isinstance(task_id, str):
                     raise ActionFailure("Task id not part of response, can't continue")
-                report_data = _poll_report(client, asset, task_id)
+                try:
+                    report_data = _poll_report(client, asset, task_id)
+                except (ActionFailure, OSError, httpx.HTTPError) as exc:
+                    # Keep the model annotation for the SDK schema; failed results
+                    # must carry the submission data without claiming success.
+                    return _submission_failure_result(params, upload_data, exc)  # type: ignore[return-value]
             else:
                 try:
                     report_response.raise_for_status()

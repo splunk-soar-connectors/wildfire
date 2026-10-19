@@ -13,14 +13,17 @@
 # limitations under the License.
 from typing import get_type_hints
 
+import httpx
 import pytest
 from pydantic import ValidationError
 from soar_sdk.action_results import ActionOutput, ActionResult, PermissiveActionOutput
 from soar_sdk.app import App
+from soar_sdk.exceptions import ActionFailure
 
 from src.actions.detonate_file import (
     DetonateFileOutput,
     DetonateFileParams,
+    _submission_failure_result,
     detonate_file,
 )
 from src.actions.get_pcap import GetPcapOutput, GetPcapParams, GetPcapSummary, get_pcap
@@ -37,6 +40,60 @@ from src.actions.save_report import (
     save_report,
 )
 from src.app import create_wildfire_connector_app
+
+
+@pytest.mark.parametrize(
+    ("error", "message"),
+    [
+        (
+            ActionFailure("Reached max polling attempts."),
+            "Reached max polling attempts.",
+        ),
+        (
+            ActionFailure(
+                "REST Api Call returned error, status_code: 500, detail: Internal error"
+            ),
+            "REST Api Call returned error, status_code: 500, detail: Internal error",
+        ),
+        (
+            ActionFailure("Unable to parse reply from device: invalid XML"),
+            "Unable to parse reply from device: invalid XML",
+        ),
+        (
+            httpx.ReadTimeout("report request timed out"),
+            "REST Api to server failed: report request timed out",
+        ),
+        (
+            OSError("report connection closed"),
+            "REST Api to server failed: report connection closed",
+        ),
+    ],
+)
+def test_file_detonation_polling_failure_preserves_submission_data(
+    error, message
+) -> None:
+    app = create_wildfire_connector_app()
+    params = DetonateFileParams(vault_id="vault-id", file_name="sample.pdf")
+    upload_data = {
+        "upload-file-info": {
+            "sha256": "sample-sha256",
+            "md5": "sample-md5",
+            "filename": "sample.pdf",
+            "size": "123",
+        }
+    }
+
+    failure = _submission_failure_result(params, upload_data, error)
+    assert App._adapt_action_result(failure, app.actions_manager, params) is False
+    result = app.actions_manager.get_results()[-1]
+
+    assert result.get_status() is False
+    assert result.get_message() == f"Action failure in detonate file: {message}"
+    assert result.get_param() == params.model_dump()
+    assert result.get_data() == [upload_data]
+    assert result.get_data()[0]["upload-file-info"]["sha256"] == "sample-sha256"
+    assert result.get_data()[0]["upload-file-info"]["md5"] == "sample-md5"
+    assert result.get_summary() == {}
 
 
 @pytest.mark.parametrize(
