@@ -35,11 +35,13 @@ from .get_report import (
 )
 from .get_sample import GetFileSummary, get_sample
 from .get_pcap import GetPcapSummary, get_pcap
+from .make_request import make_request
 from .save_report import SaveReportSummary, save_report
 
 
 def register_actions(app: App) -> App:
     """Register all WildFire actions on the provided app."""
+    app.make_request()(make_request)
     app.register_action(
         action=run_detonate_file,
         name="detonate file",

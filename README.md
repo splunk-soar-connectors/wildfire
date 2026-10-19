@@ -73,6 +73,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 ### Supported Actions
 
 [test connectivity](#action-test-connectivity) - Upload the bundled test PDF to verify WildFire connectivity. <br>
+[make request](#action-make-request) - Make an authenticated request to a WildFire public API endpoint. <br>
 [detonate file](#action-detonate-file) - Run the file in the WildFire sandbox and retrieve the analysis results <br>
 [detonate url](#action-detonate-url) - Submit a single website link for WildFire analysis <br>
 [url reputation](#action-url-reputation) - Submit a single website link for WildFire verdict <br>
@@ -100,6 +101,45 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failure |
 action_result.message | string | | |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
+## action: 'make request'
+
+Make an authenticated request to a WildFire public API endpoint.
+
+Type: **generic** <br>
+Read only: **False**
+
+'make request' action for the app. Used to handle arbitrary HTTP requests with the app's asset
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**http_method** | required | The HTTP method to use for the request. | string | |
+**endpoint** | required | WildFire public API endpoint appended to the asset base URL, such as 'get/report'. Do not include the base URL or '/publicapi'. | string | |
+**headers** | optional | The headers to send with the request (JSON object). An example is {'Content-Type': 'application/json'} | string | |
+**query_parameters** | optional | Parameters to append to the URL (JSON object or query string). An example is ?key=value&key2=value2 | string | |
+**body** | optional | Request form fields as a JSON object. The configured WildFire API key is added automatically. File uploads are not supported. | string | |
+**timeout** | optional | The timeout for the request in seconds. | numeric | |
+**verify_ssl** | optional | Whether to verify the SSL certificate. Default is True. | boolean | |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.http_method | string | | |
+action_result.parameter.endpoint | string | | |
+action_result.parameter.headers | string | | |
+action_result.parameter.query_parameters | string | | |
+action_result.parameter.body | string | | |
+action_result.parameter.timeout | numeric | | |
+action_result.parameter.verify_ssl | boolean | | |
+action_result.data.\*.status_code | numeric | | 200 404 500 |
+action_result.data.\*.response_body | string | | {"key": "value"} |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

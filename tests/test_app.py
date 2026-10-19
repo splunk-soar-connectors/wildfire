@@ -25,6 +25,7 @@ from src.app import _apply_soar_proxy_environment, create_wildfire_connector_app
 
 EXPECTED_ACTIONS = [
     "test_connectivity",
+    "make_request",
     "detonate_file",
     "detonate_url",
     "get_url_reputation",
@@ -254,7 +255,13 @@ def test_all_actions_preserve_legacy_read_only_metadata() -> None:
     app = create_wildfire_connector_app()
 
     for action in app.actions_manager.get_actions_meta_list():
-        assert action.read_only is True, action.identifier
+        if action.identifier != "make_request":
+            assert action.read_only is True, action.identifier
+
+    make_request = app.actions_manager.get_action("make_request").meta
+    assert make_request.action == "make request"
+    assert make_request.type == "generic"
+    assert make_request.read_only is False
 
 
 def test_detonation_actions_publish_summary_contracts() -> None:
