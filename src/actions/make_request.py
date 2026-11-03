@@ -13,7 +13,7 @@
 # limitations under the License.
 import json
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 import httpx
 from soar_sdk.action_results import MakeRequestOutput
@@ -21,7 +21,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import MakeRequestParams, Param
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT
+from ..utils import WILDFIRE_HTTP_TIMEOUT, get_error_detail
 
 
 class WildFireMakeRequestParams(MakeRequestParams):
@@ -62,6 +62,19 @@ def _relative_endpoint(endpoint: str) -> str:
         )
     if not path:
         raise ActionFailure("The endpoint parameter is required")
+
+    decoded_path = path
+    while True:
+        if "\\" in decoded_path or any(
+            segment in {".", ".."} for segment in decoded_path.split("/")
+        ):
+            raise ActionFailure(
+                "The endpoint must not contain dot path segments or backslashes"
+            )
+        unquoted_path = unquote(decoded_path)
+        if unquoted_path == decoded_path:
+            break
+        decoded_path = unquoted_path
 
     return path + (f"?{parsed.query}" if parsed.query else "")
 
@@ -125,7 +138,7 @@ def make_request(params: WildFireMakeRequestParams, asset: Asset) -> MakeRequest
             )
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        detail = exc.response.text.strip() or "N/A"
+        detail = get_error_detail(exc.response)
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {exc.response.status_code}, detail: {detail}"

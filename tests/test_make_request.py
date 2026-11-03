@@ -53,6 +53,54 @@ def test_make_request_accepts_relative_endpoint_and_query() -> None:
     assert _relative_endpoint("/get/report?format=xml") == "get/report?format=xml"
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "../rest/version",
+        "get/../../rest/version",
+        "./get/report",
+        "get/./report",
+        "get/..",
+        "%2e%2e/rest/version",
+        "%2E%2E/rest/version",
+        ".%2e/rest/version",
+        "%2e./rest/version",
+        "%252e%252e/rest/version",
+        "%25252e%25252e/rest/version",
+        "get%2f..%2f..%2frest/version",
+        "get%252f..%252f..%252frest/version",
+        "get\\report",
+        "%5c..%5crest/version",
+        "get%255creport",
+    ],
+)
+def test_make_request_rejects_traversal_and_backslashes(endpoint: str) -> None:
+    with pytest.raises(ActionFailure, match="dot path segments or backslashes"):
+        _relative_endpoint(endpoint)
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "get/report?format=xml&format=json",
+        "get/report?value=../outside&encoded=%2e%2e%2f",
+        "get/report?value=%255c",
+        "get/report%20name?value=with%20spaces",
+        "get/report.json",
+        "get/report..json",
+    ],
+)
+def test_make_request_valid_endpoints_keep_encoding_query_and_publicapi_scope(
+    endpoint: str,
+) -> None:
+    validated = _relative_endpoint(endpoint)
+    with httpx.Client(base_url="https://example.invalid/publicapi/") as client:
+        request = client.build_request("POST", validated)
+
+    assert validated == endpoint
+    assert str(request.url) == f"https://example.invalid/publicapi/{endpoint}"
+
+
 @pytest.mark.parametrize("value", ["[]", '"value"', "1", "null"])
 def test_make_request_requires_json_objects(value: str) -> None:
     with pytest.raises(ActionFailure, match="must be a JSON object"):
