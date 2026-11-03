@@ -18,7 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
+from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault, get_error_detail
 
 GET_SAMPLE_ERRORS = {
     401: "API key invalid",
@@ -33,10 +33,7 @@ GET_SAMPLE_ERRORS = {
 
 
 def _error_detail(response: httpx.Response) -> str:
-    detail = response.text.strip()
-    if detail:
-        return detail
-    return GET_SAMPLE_ERRORS.get(response.status_code, "N/A")
+    return get_error_detail(response, GET_SAMPLE_ERRORS)
 
 
 class GetFileParams(Params):
@@ -90,6 +87,7 @@ def get_sample(params: GetFileParams, soar: SOARClient, asset: Asset) -> GetFile
             data={"apikey": asset.api_key, "hash": params.hash},
             verify=verify,
             timeout=WILDFIRE_HTTP_TIMEOUT,
+            follow_redirects=True,
         )
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc

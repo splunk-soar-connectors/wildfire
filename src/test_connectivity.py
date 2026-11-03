@@ -18,7 +18,12 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
 
 from .asset import Asset
-from .utils import FILE_UPLOAD_ERRORS, WILDFIRE_HTTP_TIMEOUT, parse_wildfire_xml
+from .utils import (
+    FILE_UPLOAD_ERRORS,
+    WILDFIRE_HTTP_TIMEOUT,
+    get_error_detail,
+    parse_wildfire_xml,
+)
 
 __test__ = False
 
@@ -28,10 +33,7 @@ TEST_PDF_PATH = Path(__file__).parents[1] / "templates" / TEST_PDF_NAME
 
 
 def _error_detail(response: httpx.Response) -> str:
-    detail = response.text.strip()
-    if detail:
-        return detail
-    return FILE_UPLOAD_ERRORS.get(response.status_code, "N/A")
+    return get_error_detail(response, FILE_UPLOAD_ERRORS)
 
 
 def run_test_connectivity(asset: Asset) -> None:
@@ -46,7 +48,10 @@ def run_test_connectivity(asset: Asset) -> None:
         with (
             TEST_PDF_PATH.open("rb") as payload,
             httpx.Client(
-                base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+                base_url=base_url,
+                verify=verify,
+                timeout=WILDFIRE_HTTP_TIMEOUT,
+                follow_redirects=True,
             ) as client,
         ):
             response = client.post(

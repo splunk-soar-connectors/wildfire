@@ -24,6 +24,7 @@ from src.actions.detonate_file import DetonateFileOutput
 from src.actions.detonate_url import DetonateUrlOutput
 from src.actions.get_report import GetReportOutput
 from src.app import create_wildfire_connector_app
+from src.utils import normalize_wildfire_report_response
 
 
 @pytest.mark.parametrize(
@@ -227,6 +228,46 @@ def test_dynamic_report_outputs_preserve_explicit_null_sections(output_class) ->
     }
 
     assert output_class(**data).model_dump(by_alias=True) == data
+
+
+@pytest.mark.parametrize(
+    "output_class", [DetonateFileOutput, DetonateUrlOutput, GetReportOutput]
+)
+@pytest.mark.parametrize("sections_present", [False, True])
+def test_normalized_report_outputs_restore_legacy_empty_sections(
+    output_class, sections_present: bool
+) -> None:
+    section_names = ("network", "timeline", "summary", "registry", "file")
+    process_section_names = ("service", "registry", "file", "mutex")
+    process = {key: None for key in process_section_names} if sections_present else {}
+    process["vendor_extension"] = {"unknown": None}
+    report = {key: None for key in section_names} if sections_present else {}
+    report.update(
+        process_list={"process": [process]},
+        evidence=None,
+        vendor_extension={"unknown": None},
+    )
+    data = normalize_wildfire_report_response({"task_info": {"report": report}})
+    serialized = output_class(**data).model_dump(by_alias=True)
+    normalized = serialized["task_info"]["report"][0]
+
+    for key in (*section_names, "process"):
+        assert normalized[key] == {}
+    for key in process_section_names:
+        assert normalized["process_list"]["process"][0][key] == {}
+    assert normalized["evidence"] is None
+    assert normalized["vendor_extension"] == {"unknown": None}
+    assert normalized["process_list"]["process"][0]["vendor_extension"] == {
+        "unknown": None
+    }
+
+
+@pytest.mark.parametrize("sections_present", [False, True])
+def test_normalizer_restores_empty_process_list(sections_present: bool) -> None:
+    report = {"process_list": None} if sections_present else {}
+    normalized = normalize_wildfire_report_response({"task_info": {"report": [report]}})
+
+    assert normalized["task_info"]["report"][0]["process_list"] == {}
 
 
 @pytest.mark.parametrize(

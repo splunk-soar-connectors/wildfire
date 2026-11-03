@@ -27,13 +27,15 @@ from ..utils import (
     GET_REPORT_ERRORS,
     VERDICT_MESSAGES,
     WILDFIRE_HTTP_TIMEOUT,
+    get_error_detail,
+    has_file_report,
     normalize_wildfire_report_response,
     parse_wildfire_xml,
 )
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
-POLL_INTERVAL_SECONDS = 5
+POLL_INTERVAL_SECONDS = 10
 
 
 class GetReportParams(Params):
@@ -423,7 +425,10 @@ def get_report(
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
     try:
         with httpx.Client(
-            base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+            base_url=base_url,
+            verify=verify,
+            timeout=WILDFIRE_HTTP_TIMEOUT,
+            follow_redirects=True,
         ) as client:
             logger.progress("Getting verdict for: %s", params.id)
             verdict_response = client.post(
@@ -434,9 +439,7 @@ def get_report(
             try:
                 verdict_response.raise_for_status()
             except httpx.HTTPStatusError as exc:
-                detail = verdict_response.text.strip() or GET_REPORT_ERRORS.get(
-                    verdict_response.status_code, "N/A"
-                )
+                detail = get_error_detail(verdict_response, GET_REPORT_ERRORS)
                 raise ActionFailure(
                     "REST Api Call returned error, "
                     f"status_code: {verdict_response.status_code}, detail: {detail}"
@@ -482,17 +485,17 @@ def get_report(
                 try:
                     report_response.raise_for_status()
                 except httpx.HTTPStatusError as exc:
-                    detail = report_response.text.strip() or GET_REPORT_ERRORS.get(
-                        report_response.status_code, "N/A"
-                    )
+                    detail = get_error_detail(report_response, GET_REPORT_ERRORS)
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {report_response.status_code}, detail: {detail}"
                     ) from exc
-                report_data = normalize_wildfire_report_response(
-                    parse_wildfire_xml(report_response)
-                )
-                return GetReportOutput(**report_data)
+                report_data = parse_wildfire_xml(report_response)
+                if has_file_report(report_data):
+                    return GetReportOutput(
+                        **normalize_wildfire_report_response(report_data)
+                    )
+                time.sleep(POLL_INTERVAL_SECONDS)
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 

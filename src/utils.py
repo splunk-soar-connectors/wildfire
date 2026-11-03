@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from ipaddress import IPv6Address
 from typing import Any
-from urllib.parse import urlsplit
+from xml.parsers.expat import ExpatError
 
 import httpx
 import xmltodict
+from bs4 import BeautifulSoup
 from soar_sdk.abstract import SOARClient
 from soar_sdk.exceptions import ActionFailure
 
@@ -58,29 +58,28 @@ GET_REPORT_ERRORS = {
 }
 
 
-def is_valid_http_url(value: str) -> bool:
-    """Validate a user-supplied HTTP(S) URL without changing its value."""
-    if any(character.isspace() or ord(character) < 32 for character in value):
-        return False
-    try:
-        parsed = urlsplit(value)
-    except ValueError:
-        return False
-    if (
-        parsed.scheme not in {"http", "https"}
-        or parsed.hostname is None
-        or parsed.username is not None
-        or parsed.password is not None
-    ):
-        return False
-    try:
-        _ = parsed.port
-    except ValueError:
+def get_error_detail(
+    response: httpx.Response, error_descriptions: dict[int, str] | None = None
+) -> str:
+    """Extract legacy vendor messages, retaining action-specific status fallbacks."""
+    detail = response.text.strip()
+    content_type = response.headers.get("Content-Type", "").lower()
+    if "xml" in content_type:
         try:
-            IPv6Address(parsed.netloc)
-        except ValueError:
-            return False
-    return True
+            error = xmltodict.parse(response.text).get("error")
+            message = error.get("error-message") if isinstance(error, dict) else None
+            detail = message.strip() if isinstance(message, str) else ""
+        except ExpatError:
+            detail = ""
+    elif "html" in content_type:
+        soup = BeautifulSoup(response.text, "html.parser")
+        for element in soup(["script", "style", "footer", "nav"]):
+            element.decompose()
+        detail = next(
+            (line.strip() for line in soup.get_text().splitlines() if line.strip()),
+            "Cannot parse error details",
+        )
+    return detail or (error_descriptions or {}).get(response.status_code, "N/A")
 
 
 def parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
@@ -96,6 +95,12 @@ def parse_wildfire_xml(response: httpx.Response) -> dict[str, object]:
     return wildfire
 
 
+def has_file_report(response: dict[str, Any]) -> bool:
+    """Match legacy readiness: task_info must contain a nonempty report."""
+    task_info = response.get("task_info")
+    return isinstance(task_info, dict) and bool(task_info.get("report"))
+
+
 def _normalize_children_into_lists(value: object) -> dict[str, list[Any]]:
     if not isinstance(value, dict):
         return {}
@@ -106,13 +111,14 @@ def _normalize_children_into_lists(value: object) -> dict[str, list[Any]]:
 
 
 def normalize_wildfire_report(report: dict[str, Any]) -> None:
-    """Normalize existing XML collections declared as lists by output contracts."""
+    """Restore legacy empty sections and normalize XML collection children."""
     report["process"] = _normalize_children_into_lists(
         report.get("process_created", {})
     )
     for key in ("network", "timeline", "summary", "process_list", "registry", "file"):
-        if isinstance(report.get(key), dict):
-            report[key] = _normalize_children_into_lists(report[key])
+        value = report.get(key)
+        if value is None or isinstance(value, dict):
+            report[key] = _normalize_children_into_lists(value)
 
     process_tree = report.get("process_tree")
     if process_tree is not None and not isinstance(process_tree, list):
@@ -125,8 +131,9 @@ def normalize_wildfire_report(report: dict[str, Any]) -> None:
         if not isinstance(process, dict):
             continue
         for key in ("service", "registry", "file", "mutex"):
-            if isinstance(process.get(key), dict):
-                process[key] = _normalize_children_into_lists(process[key])
+            value = process.get(key)
+            if value is None or isinstance(value, dict):
+                process[key] = _normalize_children_into_lists(value)
 
     summary = report.get("summary", {})
     if not isinstance(summary, dict):

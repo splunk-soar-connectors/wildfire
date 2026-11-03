@@ -97,6 +97,36 @@ def test_file_detonation_polling_failure_preserves_submission_data(
 
 
 @pytest.mark.parametrize(
+    "upload_data",
+    [
+        {"status": "submitted"},
+        {"upload-file-info": None},
+        {"upload-file-info": "unexpected"},
+        {"upload-file-info": [{"sha256": "sample-sha256"}]},
+        {"upload-file-info": {"filename": "sample.pdf"}},
+        {"upload-file-info": {"sha256": 123, "filename": "sample.pdf"}},
+    ],
+)
+def test_failed_result_preserves_malformed_submission_metadata(upload_data) -> None:
+    app = create_wildfire_connector_app()
+    params = DetonateFileParams(vault_id="vault-id")
+    failure = _submission_failure_result(
+        params,
+        upload_data,
+        ActionFailure("Task id not part of response, can't continue"),
+    )
+
+    assert App._adapt_action_result(failure, app.actions_manager, params) is False
+    result = app.actions_manager.get_results()[-1]
+    assert result.get_status() is False
+    assert result.get_data() == [upload_data]
+    assert result.get_message() == (
+        "Action failure in detonate file: Task id not part of response, can't continue"
+    )
+    assert result.get_param() == params.model_dump()
+
+
+@pytest.mark.parametrize(
     ("identifier", "handler", "output_class", "params", "summary"),
     [
         (

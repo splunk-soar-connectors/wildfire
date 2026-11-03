@@ -18,8 +18,8 @@ from typing import Any
 import pytest
 from soar_sdk.app import App
 
-from src.actions.detonate_url import _detonation_result_data
-from src.utils import is_valid_http_url
+from src.actions.detonate_url import DetonateUrlParams, _detonation_result_data
+from src.actions.get_url_reputation import UrlReputationParams
 
 SAMPLE_MD5 = "0123456789abcdef0123456789abcdef"  # pragma: allowlist secret
 SAMPLE_SHA256 = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  # pragma: allowlist secret
@@ -48,29 +48,21 @@ def test_pending_file_url_detonation_preserves_submission_hashes() -> None:
     [
         "http://example.com",
         "https://example.com/path?query=value#fragment",
+        "ftp://example.com/sample.exe",
+        "https://user:password@example.com/sample.exe",  # pragma: allowlist secret
         "https://192.0.2.1:8443/path",
         "https://[aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa]",
         "https://aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa",
     ],
 )
-def test_http_url_validation_accepts_wildfire_urls(url: str) -> None:
-    assert is_valid_http_url(url)
+@pytest.mark.parametrize("params_class", [DetonateUrlParams, UrlReputationParams])
+def test_url_params_preserve_input_and_delegate_validation_to_soar(
+    params_class, url: str
+) -> None:
+    params = params_class(url=url)
 
-
-@pytest.mark.parametrize(
-    "url",
-    [
-        "http://",
-        "ftp://example.com",
-        "https://user:password@example.com",  # pragma: allowlist secret
-        "https://example.com/path with spaces",
-        "https://example.com/\ncontrol",
-        "https://example.com:invalid-port",
-        "https://aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:gggg",
-    ],
-)
-def test_http_url_validation_rejects_malformed_urls(url: str) -> None:
-    assert not is_valid_http_url(url)
+    assert params.url == url
+    assert params_class._to_json_schema()["url"]["contains"] == ["url"]
 
 
 @pytest.mark.live

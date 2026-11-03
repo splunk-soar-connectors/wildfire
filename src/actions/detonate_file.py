@@ -32,13 +32,15 @@ from ..utils import (
     FILE_UPLOAD_ERRORS,
     GET_REPORT_ERRORS,
     WILDFIRE_HTTP_TIMEOUT,
+    get_error_detail,
+    has_file_report,
     normalize_wildfire_report_response,
     parse_wildfire_xml,
 )
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
-POLL_INTERVAL_SECONDS = 5
+POLL_INTERVAL_SECONDS = 10
 
 
 class DetonateFileParams(Params):
@@ -494,15 +496,16 @@ def _poll_report(client: httpx.Client, asset: Asset, task_id: str) -> dict[str, 
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
-            detail = response.text.strip() or GET_REPORT_ERRORS.get(
-                response.status_code, "N/A"
-            )
+            detail = get_error_detail(response, GET_REPORT_ERRORS)
             raise ActionFailure(
                 "REST Api Call returned error, "
                 f"status_code: {response.status_code}, "
                 f"detail: {detail}"
             ) from exc
-        return parse_wildfire_xml(response)
+        report_data = parse_wildfire_xml(response)
+        if has_file_report(report_data):
+            return report_data
+        time.sleep(POLL_INTERVAL_SECONDS)
     raise ActionFailure("Reached max polling attempts.")
 
 
@@ -531,7 +534,7 @@ def detonate_file(
     if not attachments:
         raise ActionFailure("Vault file could not be found with supplied Vault ID")
     attachment = attachments[0]
-    file_name = params.file_name or attachment.name
+    file_name = params.file_name or params.vault_id
     sha256 = attachment.metadata.get("sha256") or attachment.hash
     if not sha256:
         raise ActionFailure("Unable to get meta info of vault file")
@@ -539,7 +542,10 @@ def detonate_file(
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
     try:
         with httpx.Client(
-            base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+            base_url=base_url,
+            verify=verify,
+            timeout=WILDFIRE_HTTP_TIMEOUT,
+            follow_redirects=True,
         ) as client:
             logger.progress("Checking for prior detonations")
             report_response = client.post(
@@ -554,6 +560,20 @@ def detonate_file(
             if report_response.status_code == httpx.codes.OK:
                 report_data = parse_wildfire_xml(report_response)
             elif report_response.status_code == httpx.codes.NOT_FOUND:
+                report_data = {}
+            else:
+                try:
+                    report_response.raise_for_status()
+                except httpx.HTTPStatusError as exc:
+                    detail = get_error_detail(report_response, GET_REPORT_ERRORS)
+                    raise ActionFailure(
+                        "REST Api Call returned error, "
+                        f"status_code: {report_response.status_code}, "
+                        f"detail: {detail}"
+                    ) from exc
+                raise ActionFailure("Unable to retrieve prior detonation report")
+
+            if not has_file_report(report_data):
                 logger.progress("Uploading the file")
                 with attachment.open("rb") as payload:
                     upload_response = client.post(
@@ -564,40 +584,29 @@ def detonate_file(
                 try:
                     upload_response.raise_for_status()
                 except httpx.HTTPStatusError as exc:
-                    detail = upload_response.text.strip() or FILE_UPLOAD_ERRORS.get(
-                        upload_response.status_code, "N/A"
-                    )
+                    detail = get_error_detail(upload_response, FILE_UPLOAD_ERRORS)
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {upload_response.status_code}, "
                         f"detail: {detail}"
                     ) from exc
                 upload_data = parse_wildfire_xml(upload_response)
-                upload_info = upload_data.get("upload-file-info")
-                if not isinstance(upload_info, dict):
-                    raise ActionFailure("Task id not part of response, can't continue")
-                task_id = upload_info.get("sha256") or upload_info.get("md5")
-                if not isinstance(task_id, str):
-                    raise ActionFailure("Task id not part of response, can't continue")
                 try:
+                    upload_info = upload_data.get("upload-file-info")
+                    if not isinstance(upload_info, dict):
+                        raise ActionFailure(
+                            "Task id not part of response, can't continue"
+                        )
+                    task_id = upload_info.get("sha256") or upload_info.get("md5")
+                    if not isinstance(task_id, str):
+                        raise ActionFailure(
+                            "Task id not part of response, can't continue"
+                        )
                     report_data = _poll_report(client, asset, task_id)
                 except (ActionFailure, OSError, httpx.HTTPError) as exc:
                     # Keep the model annotation for the SDK schema; failed results
                     # must carry the submission data without claiming success.
                     return _submission_failure_result(params, upload_data, exc)  # type: ignore[return-value]
-            else:
-                try:
-                    report_response.raise_for_status()
-                except httpx.HTTPStatusError as exc:
-                    detail = report_response.text.strip() or GET_REPORT_ERRORS.get(
-                        report_response.status_code, "N/A"
-                    )
-                    raise ActionFailure(
-                        "REST Api Call returned error, "
-                        f"status_code: {report_response.status_code}, "
-                        f"detail: {detail}"
-                    ) from exc
-                raise ActionFailure("Unable to retrieve prior detonation report")
     except (OSError, httpx.HTTPError) as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc
 

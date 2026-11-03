@@ -29,14 +29,15 @@ from ..utils import (
     GET_REPORT_ERRORS,
     VERDICT_MESSAGES,
     WILDFIRE_HTTP_TIMEOUT,
-    is_valid_http_url,
+    get_error_detail,
+    has_file_report,
     normalize_wildfire_report_response,
     parse_wildfire_xml,
 )
 from ..views.report import WildFireReportViewOutput, build_report_context
 
 logger = getLogger()
-POLL_INTERVAL_SECONDS = 5
+POLL_INTERVAL_SECONDS = 10
 
 
 class DetonateUrlParams(Params):
@@ -1459,9 +1460,7 @@ def _get_verdict(
     try:
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        detail = response.text.strip() or FILE_UPLOAD_ERRORS.get(
-            response.status_code, "N/A"
-        )
+        detail = get_error_detail(response, FILE_UPLOAD_ERRORS)
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, "
@@ -1495,16 +1494,18 @@ def _poll_report(
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
-            detail = response.text.strip() or GET_REPORT_ERRORS.get(
-                response.status_code, "N/A"
-            )
+            detail = get_error_detail(response, GET_REPORT_ERRORS)
             raise ActionFailure(
                 "REST Api Call returned error, "
                 f"status_code: {response.status_code}, "
                 f"detail: {detail}"
             ) from exc
         if task_id:
-            return normalize_wildfire_report_response(parse_wildfire_xml(response))
+            report = parse_wildfire_xml(response)
+            if has_file_report(report):
+                return normalize_wildfire_report_response(report)
+            time.sleep(POLL_INTERVAL_SECONDS)
+            continue
         try:
             report = response.json()
             report_body = report.get("result", {}).get("report")
@@ -1527,13 +1528,14 @@ def _detonation_result_data(
 def detonate_url(
     params: DetonateUrlParams, soar: SOARClient, asset: Asset
 ) -> DetonateUrlOutput:
-    if not is_valid_http_url(params.url):
-        raise ActionFailure("Please provide a valid URL")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
     try:
         with httpx.Client(
-            base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+            base_url=base_url,
+            verify=verify,
+            timeout=WILDFIRE_HTTP_TIMEOUT,
+            follow_redirects=True,
         ) as client:
             task_id = None
             response_data: dict[str, object] = {}
@@ -1546,9 +1548,7 @@ def detonate_url(
                 try:
                     response.raise_for_status()
                 except httpx.HTTPStatusError as exc:
-                    detail = response.text.strip() or FILE_UPLOAD_ERRORS.get(
-                        response.status_code, "N/A"
-                    )
+                    detail = get_error_detail(response, FILE_UPLOAD_ERRORS)
                     raise ActionFailure(
                         "REST Api Call returned error, "
                         f"status_code: {response.status_code}, "

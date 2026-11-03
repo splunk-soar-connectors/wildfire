@@ -18,7 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
+from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault, get_error_detail
 
 GET_PCAP_ERRORS = {
     401: "API key invalid",
@@ -33,10 +33,7 @@ GET_PCAP_ERRORS = {
 
 
 def _error_detail(response: httpx.Response) -> str:
-    detail = response.text.strip()
-    if detail:
-        return detail
-    return GET_PCAP_ERRORS.get(response.status_code, "N/A")
+    return get_error_detail(response, GET_PCAP_ERRORS)
 
 
 PLATFORM_IDS = {
@@ -168,6 +165,7 @@ def _download_pcap(asset: Asset, sample_hash: str, platform_id: int | None) -> b
                 data=data,
                 verify=verify,
                 timeout=WILDFIRE_HTTP_TIMEOUT,
+                follow_redirects=True,
             )
         except httpx.HTTPError as exc:
             last_error = ActionFailure(f"REST Api to server failed: {exc}")

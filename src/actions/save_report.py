@@ -18,7 +18,7 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..asset import Asset
-from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault
+from ..utils import WILDFIRE_HTTP_TIMEOUT, add_bytes_to_vault, get_error_detail
 
 SAVE_REPORT_ERRORS = {
     401: "API key invalid",
@@ -32,10 +32,7 @@ SAVE_REPORT_ERRORS = {
 
 
 def _error_detail(response: httpx.Response) -> str:
-    detail = response.text.strip()
-    if detail:
-        return detail
-    return SAVE_REPORT_ERRORS.get(response.status_code, "N/A")
+    return get_error_detail(response, SAVE_REPORT_ERRORS)
 
 
 class SaveReportParams(Params):
@@ -68,6 +65,7 @@ def save_report(
             data={"apikey": asset.api_key, "hash": params.id, "format": "pdf"},
             verify=verify,
             timeout=WILDFIRE_HTTP_TIMEOUT,
+            follow_redirects=True,
         )
     except httpx.HTTPError as exc:
         raise ActionFailure(f"REST Api to server failed: {exc}") from exc

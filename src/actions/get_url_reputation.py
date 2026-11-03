@@ -23,7 +23,7 @@ from ..utils import (
     FILE_UPLOAD_ERRORS,
     VERDICT_MESSAGES,
     WILDFIRE_HTTP_TIMEOUT,
-    is_valid_http_url,
+    get_error_detail,
     parse_wildfire_xml,
 )
 
@@ -95,14 +95,15 @@ def get_url_reputation(
     params: UrlReputationParams, soar: SOARClient, asset: Asset
 ) -> UrlReputationTableOutput:
     """Retrieve the WildFire verdict for a URL."""
-    if not is_valid_http_url(params.url):
-        raise ActionFailure("Please provide a valid URL")
-    logger.progress("Getting verdict for: %s", params.url)
+    logger.progress("Getting verdict for URL")
     verify = asset.verify_server_cert if asset.verify_server_cert is not None else True
     base_url = f"{asset.base_url.rstrip('/')}/publicapi/"
     try:
         with httpx.Client(
-            base_url=base_url, verify=verify, timeout=WILDFIRE_HTTP_TIMEOUT
+            base_url=base_url,
+            verify=verify,
+            timeout=WILDFIRE_HTTP_TIMEOUT,
+            follow_redirects=True,
         ) as client:
             response = client.post(
                 "get/verdict",
@@ -115,9 +116,7 @@ def get_url_reputation(
     try:
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        detail = response.text.strip() or FILE_UPLOAD_ERRORS.get(
-            response.status_code, "N/A"
-        )
+        detail = get_error_detail(response, FILE_UPLOAD_ERRORS)
         raise ActionFailure(
             "REST Api Call returned error, "
             f"status_code: {response.status_code}, detail: {detail}"
