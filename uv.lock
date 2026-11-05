@@ -50,15 +50,15 @@ wheels = [
 
 [[package]]
 name = "authlib"
-version = "1.8.0"
+version = "1.9.4"
 source = { registry = "https://pypi.python.org/simple" }
 dependencies = [
     { name = "cryptography" },
     { name = "joserfc" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f1/51/bc1729d3cfdc214b4935f4e886e4dd443c3065fd8e1e66423fe84b490f81/authlib-1.8.0.tar.gz", hash = "sha256:f3ecd5f1da737262fb53bf1a4d95c4ea1ad9dd509316587a255c99ab1838a4f0", size = 177759, upload-time = "2026-08-30T12:12:34.833Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/1c/4ed575b9e44da3f5ea2c325f50bb3b2016312efffc2b6a62eaf46845bb52/authlib-1.9.4.tar.gz", hash = "sha256:f55a25f561f1f157ceca64da9df776f469f23715ac89ee338aa2f83dc9774e13", size = 183479, upload-time = "2026-11-04T09:00:05.532Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/c6/6f124bcfbbfb20fba22c939b4e43a06dccfc0e1ca20e5634ca573cb1e271/authlib-1.8.0-py2.py3-none-any.whl", hash = "sha256:88aebbd9af6757e14e912d5dc007ae1dc1f3e27e3b2152ce7c552ee2c3b3c121", size = 260804, upload-time = "2026-08-30T12:12:33.162Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/f4/a13df57945062943b4240007b921fe318623da709a7db68b7f944e857333/authlib-1.9.4-py2.py3-none-any.whl", hash = "sha256:1b092ea87ba11cf3bd06d38ec993d82bc6255995fcd85ee436cbbba1d050b2fc", size = 266875, upload-time = "2026-11-04T09:00:03.573Z" },
 ]
 
 [[package]]
@@ -809,11 +809,11 @@ wheels = [
 
 [[package]]
 name = "pyjwt"
-version = "2.14.0"
+version = "2.15.1"
 source = { registry = "https://pypi.python.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/af/c3/8a3b59c25070cc61dc517fbdfa5dc0904670c96f605cc69759dc09166b99/pyjwt-2.14.0.tar.gz", hash = "sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86", size = 113177, upload-time = "2026-09-11T13:11:54.638Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/ea/5194e52748b0da83d71e082d75496eaec6e58f419f5e184786ded517e6a9/pyjwt-2.15.1.tar.gz", hash = "sha256:4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8", size = 121252, upload-time = "2026-09-28T18:40:42.598Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/97/672cb32ce0dfea44b740cb7b4f97038463b9cf7c0ead1aacf595572851d6/pyjwt-2.14.0-py3-none-any.whl", hash = "sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc", size = 32896, upload-time = "2026-09-11T13:11:53.409Z" },
+    { url = "https://files.pythonhosted.org/packages/50/ca/44de4e75f8aadc457f0634be3b542815078ded46dca30efb960edeecad6e/pyjwt-2.15.1-py3-none-any.whl", hash = "sha256:42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193", size = 33860, upload-time = "2026-09-28T18:40:41.429Z" },
 ]
 
 [package.optional-dependencies]
@@ -1014,14 +1014,16 @@ wheels = [
 
 [[package]]
 name = "splunk-soar-sdk"
-version = "6.1.2"
+version = "7.1.2"
 source = { registry = "https://pypi.python.org/simple" }
 dependencies = [
+    { name = "anyio" },
     { name = "authlib" },
     { name = "beautifulsoup4" },
     { name = "bleach" },
     { name = "build" },
     { name = "click" },
+    { name = "cryptography" },
     { name = "distro" },
     { name = "extract-msg" },
     { name = "hatchling" },
@@ -1029,6 +1031,7 @@ dependencies = [
     { name = "httpx-retries" },
     { name = "humanize" },
     { name = "jinja2" },
+    { name = "joserfc" },
     { name = "packaging" },
     { name = "pip-licenses" },
     { name = "pydantic" },
@@ -1036,13 +1039,14 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
     { name = "setuptools" },
+    { name = "soupsieve" },
     { name = "toml" },
     { name = "tqdm" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/a8/e73e8ab6cd74b88b5941a68c401f4dacc15cc27a02a8a63c17520cc3f32c/splunk_soar_sdk-6.1.2.tar.gz", hash = "sha256:c42cc04f402222bff6c16a3405d5fb2757ca2243714e597c88a1bb7f8897aad8", size = 984848, upload-time = "2026-09-30T22:39:12.027Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/eb/08b6583713fb4593751f1b06e4507964df42db9c9787d04e1d037f4db0ae/splunk_soar_sdk-7.1.2.tar.gz", hash = "sha256:38293b95a8a69ae42eb20ae3d54ca2389e4ebb17af6bd489fec2702e4bdfda01", size = 1046236, upload-time = "2026-11-04T19:38:00.174Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/0d/ffa8940eca5567c7abef76f861e5f72ddbb5c0778e7f19a05e320f5305a4/splunk_soar_sdk-6.1.2-py3-none-any.whl", hash = "sha256:316acdd3d0d159e25aec92cc111ff41ab38793193ad6963f87b15f7ac128b879", size = 226648, upload-time = "2026-09-30T22:39:10.805Z" },
+    { url = "https://files.pythonhosted.org/packages/34/4a/e23de10127483fe148f1e0858949a4611717714ba10659e8e95f27d50f82/splunk_soar_sdk-7.1.2-py3-none-any.whl", hash = "sha256:4252cbf8c8b2625b4c4318828f8d437feb0c5b8df3116a44a4057b6860300861", size = 233043, upload-time = "2026-11-04T19:37:58.528Z" },
 ]
 
 [[package]]
@@ -1206,7 +1210,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.15.0" },
-    { name = "splunk-soar-sdk", specifier = "==6.1.2" },
+    { name = "splunk-soar-sdk", specifier = "==7.1.2" },
     { name = "xmltodict", specifier = ">=1.0.4" },
 ]
 
